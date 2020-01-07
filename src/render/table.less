@@ -1,0 +1,33 @@
+
+.table-render {
+  .ant-table {
+    font-size: 1rem;
+  }
+  td{
+    padding: 0 5px;
+  }
+  .table-head{
+    background: #f7f7f7;
+    
+    td{
+      border-color: #c9d1d7;
+      padding: 4px 0 !important;
+      border-right: 1px solid #e9e9e9 !important;
+    }
+  }
+
+  .table-content{
+    &.row-selected{
+        background-color: #ebf2fb !important;
+    }
+    .table-item{
+      display: inline-block;
+      width: 100%;
+      min-height: 26px;
+      &.table-error{
+        border:1px solid #ff3300;
+        color: #ff3300;
+      }
+    }
+  }
+}
