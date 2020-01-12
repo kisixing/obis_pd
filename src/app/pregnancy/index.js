@@ -130,7 +130,7 @@ export default class Patient extends Component {
   }
 
   render(){
-    const { entity } = this.props;
+    const { entity={} } = this.props;
     return (
       <Page className='fuzhen font-16 ant-col'>
         <div className="bgWhite pad-mid " style={{'maxWidth': '1400px'}}>
