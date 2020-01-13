@@ -1,103 +1,168 @@
 import React, { Component } from "react";
-import { Select, Button, Popover, Input, Tabs, Tree, Modal, Icon, Spin, Timeline, Collapse, message } from 'antd';
-
-import tableRender from '../../render/table';
-import FuzhenTable from './table';
+import { Row, Col, Button, Table, Collapse, Modal } from "antd";
 import Page from '../../render/page';
-import service from '../../service';
-import * as baseData from './data';
-import * as util from './util';
-import editors from '../shouzhen/editors';
-
-import store from '../store';
-import { getAlertAction } from '../store/actionCreators.js';
-
-import "../index.less";
+import tableRender from "../../render/table";
 import "./index.less";
 
-const Panel = Collapse.Panel;
-
-function modal(type, title) {
-  message[type](title, 3)
-}
-
-export default class Patient extends Component {
-  static Title = '孕妇信息';
-  static entityParse(obj = {}){
-    return {
-      ...obj.gravidaInfo,
-      useridtype: JSON.parse(obj.gravidaInfo.useridtype)
-    }
-  }
-  static entitySave(entity = {}){
-    return {
-      ...entity
-    }
-  }
+export default class Lis extends Component {
   constructor(props) {
     super(props);
-  }
-
-  config() {
-    return {
-      step: 1,
-      rows: [
-        {
-          columns: [
-            { name: 'userage[年龄]', type: 'input', span: 5, valid: 'required|number'},
-            { span: 1 }, 
-            { name: 'userbirth[出生日期]', type: 'date', span: 5,valid: 'required'},
-            { span: 1 },
-            { name: 'usercuzh[建档日期]', type: 'date', span: 5 ,valid: 'required'},
-          ]
+    this.state = {
+      isShowModal: false,
+      leftList: [
+				{
+          "id": '1',
+          "title": "24+4周 2019-09-2",
+          "child": [
+            {"name": "NT(报告)", "status": "正常"},
+          ],
+					"wy": "外院",
         },
         {
-          columns: [
-            { name: 'usernation[国籍]', type: 'input', span: 5 ,valid: 'required'},
-            { span: 1 },
-            { name: 'userroots[籍贯]', type: 'input', span: 5 ,valid: 'required'},
-            { span: 1 },
-            { name: 'userpeople[民族]', type: 'input', span: 4 ,valid: 'required'},
-            { span: 1 },
-            { name: 'useroccupation[职业]', type: 'input', span: 6 ,valid: 'required'},
-          ]
-        }, {
-          columns: [
-            { name: 'usermobile[手机]', type: 'input', span: 5, valid: 'number|required' },
-            { span: 1 },
-            { name: 'phone[固话]', type: 'input', span: 5},
-            { span: 1 },
-            { name: 'useridtype[证件类型]', type: 'select', span: 4, showSearch: false, options: baseData.sfzOptions ,valid: 'required'},
-            { span: 1 },
-            { name: 'useridno[证件号码]', type: 'input', span: 6 ,valid: 'required'}
-          ]
-        }, {
-          columns: [
-            { name: 'userconstant[户口地址]', type: 'input', span: 11,valid: 'required'},
-            { span: 1 },
-            { name: 'useraddress[现住地址]', type: 'input', span: 11,valid: 'required'},
-            { span: 1 },
-          ]
+          "id": '2',
+          "title": "24+4周 2019-09-2",
+          "child": [
+            {"name": "NT(报告)", "status": "正常"},
+            {"name": "NT(报告)", "status": "正常"},
+            {"name": "NT(报告)", "status": "待审阅"},
+            {"name": "NT(报告)", "status": "待审阅"},
+            {"name": "NT(报告)", "status": "待审阅"},
+          ],
+					"wy": "",
+        },
+        {
+          "id": '3',
+          "title": "24+4周 2019-09-2",
+          "child": [
+            {"name": "NT(报告)", "status": "待审阅"},
+            {"name": "NT(报告)", "status": "待审阅"},
+            {"name": "NT(报告)", "status": "待审阅"},
+            {"name": "NT(报告)", "status": "正常"},
+            {"name": "NT(报告)", "status": "正常"},
+          ],
+					"wy": "外院",
+        },
+        {
+          "id": '4',
+          "title": "24+4周 2019-09-2",
+          "child": [
+            {"name": "NT(报告)", "status": "正常"},
+            {"name": "NT(报告)", "status": "正常"},
+            {"name": "NT(报告)", "status": "正常"},
+            {"name": "NT(报告)", "status": "正常"},
+            {"name": "NT(报告)", "status": "正常"},
+          ],
+					"wy": "外院",
+				},
+      ],
+      
+    tableKey: [
+        {
+          title: '检验项目',
+          key: 'item',
+        },
+        {
+          title: '结果',
+          key: 'result',
+        },
+        {
+          title: '单位',
+          key: 'dw',
+        },
+        {
+          title: '参考值',
+          key: 'val',
+        },
+        {
+          title: '状态',
+          key: 'status',
         }
+      ],
+
+      tableData: [
+        {"item": "霉菌", "result": "未见", "dw": "22", "val": '1', "status": ""},
+        {"item": "清洁度", "result": "未见", "dw": "22", "val": '1', "status": ""},
+        {"item": "霉菌", "result": "未见", "dw": "22", "val": '1', "status": ""},
       ]
-    };
+    }
   }
 
-  handleChange(e, { name, value, target }){
-    const { onChange } = this.props;
-    onChange(e, { name, value, target })
-    // 关联变动请按如下方式写，这些onChange页可以写在form配置的行里
-    // if(name === 'test'){
-    //   onChange(e, { name: 'test01', value: [value,value] })
-    // }
-  }
-
-  render(){
-    const { entity } = this.props;
+  renderLeft() {
+    const {leftList} = this.state;
     return (
-      <div className="">
-        {formRender(entity, this.config(), this.handleChange.bind(this))}
+      <div className="jianyan-left ant-col-5">
+        <Collapse defaultActiveKey={["1", "2"]}>
+          {
+            leftList&&leftList.map(item => (
+              <Collapse.Panel header={item.title} key={item.id}>
+                {
+                  item.child.map(subItem => (
+                    <div className="left-item">                   
+                      <p>{subItem.name}</p>
+                      <Button className={subItem.status=="正常" ? "left-btn normal" : "left-btn"} size="small">{subItem.status}</Button>
+                    </div>
+                  ))
+                }
+              <span className="left-lable">{item.wy}</span>
+              </Collapse.Panel>
+            ))
+          }
+        </Collapse>
       </div>
+    )
+  }
+
+  renderRight() {
+    const {tableKey, tableData, isShowModal} = this.state;
+    const initTable = data => tableRender(tableKey, data, { pagination: false, buttons: null, editable: true});
+
+    const renderTable = () => {
+      return (
+        <div className="right-wrapper">
+          <div className="right-title">
+            <p><span className="right-words">NT报告 </span>检验报告单</p>
+            {
+              !isShowModal ?
+              <Button className="right-btn" type="primary" size="small" onClick={() => this.setState({isShowModal: true})}>审阅</Button>
+              : null
+            }
+          </div>
+          <ul className="right-msg">
+            <li className="msg-item">检验单号 8346833</li>
+            <li className="msg-item">送检</li>
+            <li className="msg-item">姓名</li>
+            <li className="msg-item">性别</li>
+            <li className="msg-item">年龄</li>
+            <li className="msg-item">标本部位</li>
+          </ul>
+          <div>{initTable(tableData)}</div>
+        </div>
+      )
+    }
+
+    const renderModal = () => {
+      const handleClick = (item) => { this.setState({isShowModal: false})}
+      return (
+        <Modal width="60%" visible={isShowModal} onOk={() => handleClick(true)} onCancel={() => handleClick(false)}>
+          {renderTable()}
+        </Modal>
+      )
+    }
+    
+    return (
+      <div className="jianyan-right ant-col-18">
+        {renderTable()}
+        {renderModal()}
+      </div>
+    )
+  }
+
+  render() {
+    return (
+      <Page className='jianyan font-16 ant-col'>
+        {this.renderLeft()}
+        {this.renderRight()}
+      </Page>
     )
   }
 }
