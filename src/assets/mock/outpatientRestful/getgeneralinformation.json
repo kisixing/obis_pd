@@ -1,0 +1,43 @@
+{
+	"code": "200",
+	"message": "OK",
+	"object": {
+	  "ivisitId": "2292",
+	  "userid": "6",
+	  "gravidaInfo": {
+		"usercuzh": "2019-09-03",
+		"chanjno": "333",
+		"userbirth": "1990-03-07",
+		"userage": "31",
+		"usernation": "中国",
+		"userroots": "广东清远",
+		"userpeople": "汉",
+		"useroccupation": "职员",
+		"usermobile": "13456789090",
+		"phone": "020-88989899",
+		"useridtype": "{\"label\":\"护照\",\"value\":\"护照\"}",
+		"useridno": "362734188888888888",
+		"userconstant": "广东省清远市清新区莲花大道275号304房",
+		"useraddress": "广东省广州市天河区中山大道西20号2909房",
+		"add_FIELD_zhunsz": null
+	  },
+	  "husbandInfo": {
+		"userhname": "真真",
+		"userhage": "27",
+		"userhnation": "中国",
+		"userhpeople": "汉族",
+		"userhoccupation": "职员",
+		"userhmobile": "18825119361",
+		"userhidno": "370681198910254800",
+		"userhconstant": "广东广州",
+		"userhyanL": "",
+		"userhjib": "高血压2",
+		"userhmcno": "0022028099",
+		"add_FIELD_husband_userroots": "广东广州",
+		"add_FIELD_husband_useridtype": "{\"label\":\"回乡证\",\"value\":\"回乡证\"}",
+		"add_FIELD_husband_smoking": "2",
+		"add_FIELD_husband_drink_type": "{\"label\":\"红酒\",\"value\":\"红酒\"}",
+		"add_FIELD_husband_drink": "3"
+	  }
+	}
+}

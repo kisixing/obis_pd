@@ -1,0 +1,117 @@
+{
+	"code": "200",
+	"message": "OK",
+	"object": {
+		"id": "1234",
+		"createdate": "2020-01-13",
+		"chief_complaint": "无",
+		"medical_history": "高血压",
+		"diagnosis": "正常妊娠监督",
+		"treatment": "定期复查",
+		"doctor": "李国兰",
+		"other_exam": "无其他",
+		"pregnancy_history": {
+			"LMD": "2019-06-02",
+			"EDD": "2020-03-28",
+			"gravidity": "1",
+			"parity": "1",
+			"Abortion": "1",
+			"exfetation": "1"
+		},
+		"downs_screen": {
+			"early": {
+				"trisomy21": "",
+				"trisomy18": "",
+				"trisomy13": "",
+				"HCG": "",
+				"PAPP": "",
+				"other_anomalies": ""
+			},
+			"middle": {
+				"trisomy21": "",
+				"trisomy18": "",
+				"trisomy13": "",
+				"HCG": "",
+				"NTD": "",
+				"AFP": "",
+				"E3": "",
+				"other_anomalies": ""
+			},
+			"NIPT": {
+				"trisomy21": "",
+				"trisomy18": "",
+				"trisomy13": "",
+				"Z_value": "",
+				"other_anomalies": ""
+			}
+		},
+		"thalassemia": {
+			"wife": {
+				"Hb": "",
+				"MCV": "",
+				"MCH": "",
+				"HbA2": "",
+				"blood_group": "",
+				"genotype": "",
+				"other_anomalies": ""
+			},
+			"husband": {
+				"Hb": "",
+				"MCV": "",
+				"MCH": "",
+				"HbA2": "",
+				"blood_group": "",
+				"genotype": "",
+				"other_anomalies": ""
+			}
+		},
+		"ultrasound": {
+			"menopause": "20",
+			"fetus": [{
+				"CRL": "",
+				"gestational_week": "",
+				"NT": "",
+				"other_anomalies": "",
+				"middle": [{
+					"gestational_week": "",
+					"BPD": "",
+					"HC": "",
+					"AC": "",
+					"FL": "",
+					"AFV": "",
+					"UBF": "",
+					"other_anomalies": ""
+				}]
+			}]
+		},
+		"past_medical_history": {
+			"hypertension": "",
+			"diabetes_mellitus": "",
+			"heart_disease": "",
+			"injury": "",
+			"other_disease": "",
+			"allergy": "",
+			"blood_transfusion": "",
+			"operation_history": [{
+				"name": "",
+				"date_of_operation": "",
+				"hospital": "",
+				"pathology": ""
+			}]
+		},
+		"family_history": {
+			"diabetes_mellitus": "",
+			"hypertension": "",
+			"heritable_disease": "",
+			"congenital_malformation": ""
+		},
+		"physical_check-up": {
+			"BP": "",
+			"fundal_height": "",
+			"waist_hip": "",
+			"pre_weight": "",
+			"current_weight": "",
+			"weight_gain": ""
+		}
+	}
+}

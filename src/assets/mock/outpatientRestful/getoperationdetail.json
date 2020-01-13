@@ -1,0 +1,46 @@
+{
+	"code": "200",
+	"message": "OK",
+	"object": {
+		"id": "1234",
+		"createdate": "2020-01-13",
+		"doctors_advice": "定期复查",
+		"doctor": "李国兰",
+		"preoperative_record": {
+			"BP": "",
+			"temperature": "",
+			"operation_date": ""
+		},
+		"operative_procedure": {
+			"fetus": [{
+				"operation_no": "0002",
+				"operation_items": {},
+				"operator": "1",
+				"assistant": "1",
+				"start_time": "1",
+				"end_time": "1",
+				"duration": "1",
+				"uterus": "",
+				"placenta": "",
+				"specimen_location": "",
+				"method": "",
+				"instrument": "",
+				"specimen_amount": "",
+				"character": "",
+				"process evaluation": "",
+				"special_case": "",
+				"pre_fhr": "",
+				"after_fhr": "",
+				"diagnosis": "",
+				"re_puncture": ""
+			}]
+		},
+		"inspection_item": {
+			"fetus": [{
+				"amniotic_fluid": {},
+				"umbilical_blood": {},
+				"villus": {}
+			}]
+		}
+	}
+}
