@@ -26,6 +26,13 @@ export default {
     highrisk: function(){
         return myAxios.get('/outpatientRestful/findHighriskTree')
     },
+    
+    /**
+     * 手术记录
+     */
+    getoperationdetail: function(){
+        return myAxios.get('/outpatientRestful/getoperationdetail')
+    },
     /**
      * 高危弹出提醒判断
      */

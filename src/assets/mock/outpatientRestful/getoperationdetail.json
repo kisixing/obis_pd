@@ -8,8 +8,8 @@
 		"doctor": "李国兰",
 		"preoperative_record": {
 			"BP": "",
-			"temperature": "",
-			"operation_date": ""
+			"temperature": "37.5",
+			"operation_date": "2019-12-12"
 		},
 		"operative_procedure": {
 			"fetus": [{

@@ -21,7 +21,7 @@ function modal(type, title) {
   message[type](title, 3)
 }
 
-export default class Patient extends Component {
+export default class Outcome extends Component {
   static Title = '孕妇信息';
   static entityParse(obj = {}){
     return {
@@ -96,7 +96,7 @@ export default class Patient extends Component {
     const { entity } = this.props;
     return (
       <div className="">
-        {formRender(entity, this.config(), this.handleChange.bind(this))}
+        <h2>分娩结局</h2>
       </div>
     )
   }

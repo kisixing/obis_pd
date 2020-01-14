@@ -25,6 +25,7 @@ function modal(type, title) {
   message[type](title, 3)
 }
 
+<<<<<<< HEAD
 
 // mock
 // 主诊|现病史|诊断|处理措施 - 拼音前两字首字母
@@ -57,6 +58,9 @@ const templateContentList = {
 
 
 export default class Patient extends Component {
+=======
+export default class MedicalRecord extends Component {
+>>>>>>> refs/remotes/origin/master
 
   constructor(props) {
     super(props);

@@ -48,9 +48,9 @@ export default class App extends Component {
       ...res.object, loading: false,
     }));
 
-    service.highrisk().then(res => this.setState({
-      highriskList: res.object
-    }))
+    // service.highrisk().then(res => this.setState({
+    //   highriskList: res.object
+    // }))
   }
 
   handleStoreChange = () => {
