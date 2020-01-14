@@ -6,6 +6,7 @@ import * as inputs from './input';
 import * as selects from './select';
 import * as dates from './date';
 import * as buttons from './button';
+import * as cascader from './cascader';
 import * as mixs from './mix';
 
 /**
@@ -22,7 +23,7 @@ export const events = eventFns;
 /**
  * 所有的编辑器
  */
-export const editors = {...inputs,...selects,...dates,...buttons,...mixs};
+export const editors = {...inputs,...selects,...dates,...buttons,...mixs,...cascader};
 
 export default {
   types,
