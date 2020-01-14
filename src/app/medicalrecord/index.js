@@ -10,6 +10,8 @@ import formRender from '../../render/form';
 import * as util from './util';
 import editors from '../shouzhen/editors';
 
+import EditableTable from './editableTable.js';
+
 import store from '../store';
 import { getAlertAction } from '../store/actionCreators.js';
 
@@ -25,42 +27,33 @@ function modal(type, title) {
   message[type](title, 3)
 }
 
-<<<<<<< HEAD
+
 
 // mock
 // 主诊|现病史|诊断|处理措施 - 拼音前两字首字母
 const templateContentList = {
   zz: [
-    {title: '主诊1', content: '伤风伤风伤风伤风伤风伤风伤风'},
-    {title: '主诊2', content: '感冒感冒感冒感冒感冒感冒感冒'},
-    {title: '主诊3', content: '发烧发烧发烧发烧发烧发烧发烧'},
+    {key: 1,title: '主诊1', content: '伤风伤风伤风伤风伤风伤风伤风'},
+    {key: 2,title: '主诊2', content: '感冒感冒感冒感冒感冒感冒感冒'},
+    {key: 3,title: '主诊3', content: '发烧发烧发烧发烧发烧发烧发烧'},
   ],
   xb: [
-    {title: '现病史1', content: ''},
-    {title: '现病史2', content: ''},
-    {title: '现病史3', content: ''},
+    {key: 101,title: '现病史1', content: ''},
+    {key: 102,title: '现病史2', content: ''},
+    {key: 103,title: '现病史3', content: ''},
   ],
   zd: [
-    {title: '诊断1', content: ''},
-    {title: '诊断2', content: ''},
-    {title: '诊断3', content: ''},
+    {key: 201,title: '诊断1', content: ''},
+    {key: 202,title: '诊断2', content: ''},
+    {key: 203,title: '诊断3', content: ''},
   ],
   cl: [
-    {title: '处理措施1', content: ''},
-    {title: '处理措施2', content: ''},
-    {title: '处理措施3', content: ''},
+    {key: 301,title: '处理措施1', content: ''},
+    {key: 302,title: '处理措施2', content: ''},
+    {key: 303,title: '处理措施3', content: ''},
   ]
 }
-
-
-
-
-
-
-export default class Patient extends Component {
-=======
 export default class MedicalRecord extends Component {
->>>>>>> refs/remotes/origin/master
 
   constructor(props) {
     super(props);
@@ -95,11 +88,7 @@ export default class MedicalRecord extends Component {
         type: '', 
         templateList: []
       },
-      isNewTemplate:false,
-      currentTemplate:{
-        key: '', title: '', content: '' 
-      },
-
+      
       treatTemp: [],
       templateShow: false,
       collapseActiveKey: ['1', '2', '3'],
@@ -605,63 +594,6 @@ export default class MedicalRecord extends Component {
     })
   }
 
-  // 渲染表格中的元素
-  tableCellRender = (text, index, key) => {
-    const { isNewTemplate } = this.state;
-    const { templateList } = this.state.templateObj;
-    if(isNewTemplate){
-      let { currentTemplate } = this.state;
-      
-      // 此次必为最后一项 先使用state中的current保存，届时再抽出封装
-      return (index === templateList.length - 1 ) ? (
-      <input onChange={(e) => {
-        currentTemplate[key] = e.target.value;
-        this.setState({currentTemplate})
-      }}/>
-      ) :(<span>{text}</span>)
-    }
-    return <span>{text}</span>;    
-  }
-
-  // 新增/保存模板
-  newOrSaveTemplate = () => {
-    const { isNewTemplate, templateObj } = this.state;
-    let len = templateObj.templateList.length;
-    if(!isNewTemplate) {
-      // 进入新增
-      templateObj.templateList.splice(len,0,{})
-      this.setState({isNewTemplate: !isNewTemplate,templateObj});
-    }else{
-      // 保存
-      const { currentTemplate } = this.state;
-
-      // 多了个key ？？
-      console.log(currentTemplate);
-      
-      if(currentTemplate.title && currentTemplate.content) {
-        templateObj.templateList[len - 1] = currentTemplate;
-        this.setState({isNewTemplate:!isNewTemplate,templateObj});
-      }else{
-        message.warning('请先输入内容再新增');
-      }
-    }
-  }
-
-  // 取消新增或者删除模板
-  cancelOrDeleteTemplate = () => {
-    const { isNewTemplate } = this.state;
-    if(!isNewTemplate) {
-      // delete
-    }else{
-      // cancel
-      const { templateObj } = this.state;
-      const len = templateObj.templateList.length;
-      templateObj.templateList.splice(len-1,1);
-      // 这里暂时写死
-      this.setState({templateObj,currentTemplate:{title:'',content:''}});
-    }
-  }
-
   handleChange(e, { name, value, target }){
     const { onChange } = this.props;
     onChange(e, { name, value, target })
@@ -746,7 +678,7 @@ export default class MedicalRecord extends Component {
   render(){
     const { entity={} } = this.props;
     const { isShowTemplateModal, templateList } = this.state.templateObj;
-    const { isNewTemplate } = this.state;
+    const { isNewTemplate, currentRowSelection } = this.state;
 
     const tableColumns = [
       {title: '编号', dataIndex: 'key', key: 'index',  render: (_,__,index) => (<span>{index+1}</span>) },
@@ -754,6 +686,11 @@ export default class MedicalRecord extends Component {
       {title: '内容', dataIndex: 'content', key: 'content',  render: (text,_,index) => this.tableCellRender(text, index,'content')},
     ]
 
+    const rowSelection = {
+      selectedRowKeys:[currentRowSelection],
+      getCheckboxProps: record => ({name: record.title})
+    }
+    console.log(rowSelection);
     return (
       <Page className='fuzhen font-16 ant-col'>
         {/* 左端树形选择 */}
@@ -847,25 +784,11 @@ export default class MedicalRecord extends Component {
           footer={false}
           width="800px"
         >
-          <div style={{display: 'flex', padding: '20px'}}>
-            {/* left */}
-            <div style={{width: '600px'}}>
-              <Table 
-                dataSource={templateList} 
-                columns={tableColumns}
-                pagination={false}
-                size="middle"
-              />
-            </div>
-            {/* right */}
-            <div style={{width: '120px', padding: '0 0 0 15px', margin: 0}}>
-              <Button disabled={isNewTemplate}>向上移动</Button>
-              <Button disabled={isNewTemplate}>向下移动</Button>
-              <br/>
-              <br/>
-              <Button onClick={this.newOrSaveTemplate}>{isNewTemplate ? (<span>保存模板</span>) : (<span>新增模板</span>) }</Button>
-              <Button onClick={this.cancelOrDeleteTemplate}>{isNewTemplate ? (<span>取消新增</span>) : (<span>删除模板</span>) }</Button>
-            </div>
+          <div>
+            <EditableTable
+              columns={tableColumns}
+              dataSource={templateList}
+            />
           </div>
         </Modal>
       </Page>
