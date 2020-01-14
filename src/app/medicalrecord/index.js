@@ -23,7 +23,7 @@ function modal(type, title) {
   message[type](title, 3)
 }
 
-export default class Patient extends Component {
+export default class MedicalRecord extends Component {
 
   constructor(props) {
     super(props);

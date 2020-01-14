@@ -30,7 +30,7 @@ export default {
     /**
      * 手术记录
      */
-    operationdetail: function(){
+    getoperationdetail: function(){
         return myAxios.get('/outpatientRestful/getoperationdetail')
     },
     /**

@@ -133,10 +133,12 @@ export default class Patient extends Component {
     const { entity={} } = this.props;
     return (
       <Page className='fuzhen font-16 ant-col'>
-        <div className="bgWhite pad-mid " style={{'maxWidth': '1400px'}}>
+        <div className="bgWhite pad-mid ">
         <div className="">
           {formRender(entity, this.config(), this.handleChange.bind(this))}
         </div>
+        
+        <Button className="pull-right blue-btn bottom-btn save-btn" type="ghost" onClick={() => this.handleSave(document.querySelector('.fuzhen-form'))}>保存</Button>
       </div>
       </Page>
     )

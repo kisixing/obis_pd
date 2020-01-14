@@ -314,6 +314,11 @@ export default class Operation extends Component {
     }
   }
 
+  componentDidMount() {
+    Promise.all([
+    service.getoperationdetail().then(res => this.setState({ entity: res.object }))])
+
+  }
    onChange(activeKey) {
     this.setState({ activeKey });
   }
@@ -348,14 +353,14 @@ export default class Operation extends Component {
           columns: [
             { name: 'operation_date[手术日期]', type: 'date', span: 5, valid: 'required'},
             {span: 1},
-            { name: 'temperature[体@@@温 ]', type: 'date', span: 5, valid: 'required'},
+            { name: 'temperature(℃)[体@@@温 ]', type: 'input', span: 5, valid: 'required'},
             {span: 1},
             { name: 'ckpressure(mmHg)[血@@@压 ]', type: ['input(/)','input'], span: 5, valid: (value)=>{
               let message = '';
               if(value){
                 message = [0,1].map(i=>valid(`number|required|rang(0,${[139,109][i]})`,value[i])).filter(i=>i).join();
               }else{
-                message = valid('required',value)
+                
               }
               return message;
             }},
@@ -574,7 +579,8 @@ export default class Operation extends Component {
   }
 
   render(){
-    const { entity={} } = this.props;
+    //const { entity={} } = this.props;
+    const { entity} = this.state;
     console.log(this.state.treeData,entity);
     return (
       <Page className='fuzhen font-16 ant-col'>
@@ -616,7 +622,7 @@ export default class Operation extends Component {
         <div className="fuzhen-right ant-col-19 main-pad-small width_7">
         <Collapse defaultActiveKey={['1','2','3','4','5','6','7']} >
           <Panel header="术前记录" key="1">
-            {formRender(entity, this.configpreoperative_record(), this.handleChange.bind(this))}
+            {formRender(entity?entity.preoperative_record:entity, this.configpreoperative_record(), this.handleChange.bind(this))}
           </Panel>
           <Panel header="手术操作" key="2" extra="">
             <Tabs
