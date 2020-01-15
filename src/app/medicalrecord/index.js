@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import {Button, Tabs, Tree, Modal, Timeline, Collapse, message , Table, Form, Popconfirm } from 'antd';
+import React, { Component, createElement } from "react";
+import {Button, Tabs, Tree, Modal, Timeline, Collapse, message} from 'antd';
 
 import tableRender from '../../render/table';
 import FuzhenTable from './table';
@@ -118,7 +118,7 @@ export default class MedicalRecord extends Component {
           children: [{title: "遗传门诊病历",key: "2-1"},{title: "胎儿疾病",key: "2-2"}]
         }
       ],
-      selectedKeys: [], 
+      selectedKeys: ['1-1'], 
       panes:[
         { title: '胎儿一', content: '选项卡一内容', key: '1' },
         { title: '胎儿二', content: '选项卡二内容', key: '2' },
@@ -141,6 +141,10 @@ export default class MedicalRecord extends Component {
     }
   }
 
+  componentDidMount() {
+    // service.fuzhen.getDiagnosisInputTemplate().then(res => console.log(res));
+    service.highrisk().then(res => console.log(res));
+  }
 
 
   onChange(activeKey) {
@@ -259,16 +263,17 @@ export default class MedicalRecord extends Component {
       },
       {
         columns: [
-          { name: 'yjcuch[Hb]', type: 'select', span: 7, showSearch: true, options: baseData.ccOptions, valid: 'required'},
-          { name: 'yjzhouq[MCV]',  type: 'select', span: 7, showSearch: true, options: baseData.ccOptions, valid: 'required'},
-          { name: 'yjchix[MCH]',  type: 'select', span: 7, showSearch: true, options: baseData.ccOptions, valid: 'required'},
+          { name: 'yjcuch(g/L)[Hb]', type: 'input', span: 7, showSearch: true, valid: 'required'},
+          { name: 'yjzhouq(fL)[MCV]',  type: 'input', span: 7, showSearch: true, valid: 'required'},
+          { name: 'yjchix[MCH]',  type: 'input', span: 7, showSearch: true, valid: 'required'},
         ]
       },
       {
         columns: [
-          { name: 'yjcuch[HbA2]', type: 'select', span: 7, showSearch: true, options: baseData.ccOptions, valid: 'required'},
-          { name: 'yjzhouq[血型]',  type: 'select', span: 7, showSearch: true, options: baseData.ccOptions, valid: 'required'},
-          { name: 'yjchix[地贫基因型]',  type: 'select', span: 7, showSearch: true, options: baseData.ccOptions, valid: 'required'},
+          { name: 'yjcuch[HbA2]', type: 'input', span: 6, showSearch: true, valid: 'required'},
+          { name: 'yjzhouq[血型]',  type: 'select', span: 6, showSearch: true, options: baseData.xuexingOptions, valid: 'required'},
+          {name:'ckrh[]', type: 'select',span:2, options: baseData.xuexing2Options},
+          { name: 'yjchix[地贫基因型]',  type: 'input', span: 6, showSearch: true,  valid: 'required'},
         ]
       },
       {
@@ -282,16 +287,17 @@ export default class MedicalRecord extends Component {
       },
       {
         columns: [
-          { name: 'yjcuch[Hb]', type: 'select', span: 7, showSearch: true, options: baseData.ccOptions, valid: 'required'},
-          { name: 'yjzhouq[MCV]',  type: 'select', span: 7, showSearch: true, options: baseData.ccOptions, valid: 'required'},
-          { name: 'yjchix[MCH]',  type: 'select', span: 7, showSearch: true, options: baseData.ccOptions, valid: 'required'},
+          { name: 'yjcuch(g/L)[Hb]', type: 'input', span: 7, showSearch: true,  valid: 'required'},
+          { name: 'yjzhouq(fL)[MCV]',  type: 'input', span: 7, showSearch: true,  valid: 'required'},
+          { name: 'yjchix[MCH]',  type: 'input', span: 7, showSearch: true, valid: 'required'},
         ]
       },
       {
         columns: [
-          { name: 'yjcuch[HbA2]', type: 'select', span: 7, showSearch: true, options: baseData.ccOptions, valid: 'required'},
-          { name: 'yjzhouq[血型]',  type: 'select', span: 7, showSearch: true, options: baseData.ccOptions, valid: 'required'},
-          { name: 'yjchix[地贫基因型]',  type: 'select', span: 7, showSearch: true, options: baseData.ccOptions, valid: 'required'},
+          { name: 'yjcuch[HbA2]', type: 'input', span: 7, showSearch: true, valid: 'required'},
+          { name: 'yjzhouq[血型]',  type: 'select', span: 7, showSearch: true, options: baseData.xuexingOptions, valid: 'required'},
+          {name:'ckrh[]', type: 'select',span:2, options: baseData.xuexing2Options},
+          { name: 'yjchix[地贫基因型]',  type: 'input', span: 7, showSearch: true,  valid: 'required'},
         ]
       },
       {
@@ -595,8 +601,18 @@ export default class MedicalRecord extends Component {
   }
 
   handleChange(e, { name, value, target }){
-    const { onChange } = this.props;
-    onChange(e, { name, value, target })
+    // const { onChange } = this.props;
+    // onChange(e, { name, value, target })
+
+    // console.log(e.target);
+    // let fe = this.refs.fe;
+    // let dom = fe.refs.formItemEditor;
+    // let newNode = document.createElement('div');
+    
+    // dom.parentNode.appendChild(this.newDropDown());
+
+    // dom.appendChilid(<div>new</div>)
+    
     // 关联变动请按如下方式写，这些onChange页可以写在form配置的行里
     // if(name === 'test'){
     //   onChange(e, { name: 'test01', value: [value,value] })
@@ -617,7 +633,7 @@ export default class MedicalRecord extends Component {
     }
   }
 
-  renderTreeNodes = data =>
+  renderTreeNodes = data => 
     data.map(item => {
       if (item.children) {
         return (
@@ -626,9 +642,10 @@ export default class MedicalRecord extends Component {
           </TreeNode>
         );
       }
-      return <TreeNode key={item.key} {...item} dataRef={item} />;
-    });
+    return <TreeNode  key={item.key} {...item} dataRef={item} />;
+  });
 
+    // 这个方法没有被调用
   renderKTreeNode = data => {
     return data.map(item => {
       if (item.child) {
@@ -639,18 +656,17 @@ export default class MedicalRecord extends Component {
         );
       }
 
-      return <TreeNode title={item.menu_name} key={item.menu_code} dataRef={item}/>;
+      return <TreeNode title={item.menu_name} key={item.menu_code}  dataRef={item}/>;
     });
   };
 
   // 选中节点触发-------如何在这里获取到选中节点的app_id？？？
-  onSelect = (selectedKeys) => {
-    // console.log(selectedKeys);
+  onSelect = (selectedKeys,{event, node, selected}) => {
+    // 使用 eventKey 去拿会这个信息
+    const { eventKey } = node.props;
     if (selectedKeys.length > 0) {
       // 防止编辑时重复点击造成选中节点为空
-      this.setState({
-        selectedKeys,
-      });
+      this.setState({selectedKeys});
     }
   };
 
@@ -677,30 +693,46 @@ export default class MedicalRecord extends Component {
 
   render(){
     const { entity={} } = this.props;
+    const { selectedKeys } = this.state;
     const { isShowTemplateModal, templateList } = this.state.templateObj;
-    const { isNewTemplate, currentRowSelection } = this.state;
 
     const tableColumns = [
       {title: '编号', dataIndex: 'key', key: 'index',  render: (_,__,index) => (<span>{index+1}</span>) },
-      {title: '标题', dataIndex: 'title', key: 'title',  render: (text,_,index) => this.tableCellRender(text, index,'title')},
-      {title: '内容', dataIndex: 'content', key: 'content',  render: (text,_,index) => this.tableCellRender(text, index,'content')},
+      {title: '标题', dataIndex: 'title', key: 'title'},
+      {title: '内容', dataIndex: 'content', key: 'content'},
     ]
 
-    const rowSelection = {
-      selectedRowKeys:[currentRowSelection],
-      getCheckboxProps: record => ({name: record.title})
+
+    /**
+     * 点击填充input
+     */
+    const setIptVal = (item, param) => {
+      this.setState({
+        isMouseIn: false,
+        diagnosi: item
+      })
+      if(param) {
+        if (this.timer) clearTimeout(this.timer);
+        this.timer = setTimeout(() => {
+          service.fuzhen.getDiagnosisInputTemplate(item).then(res => this.setState({diagnosislist: res.object}));
+        }, 400)
+      }
     }
-    console.log(rowSelection);
+    
     return (
       <Page className='fuzhen font-16 ant-col'>
         {/* 左端树形选择 */}
-        <div className="fuzhen-left ant-col-5">
+        <div className="fuzhen-left ant-col-5" style={{margin: "20px 0"}}>
+          <div className="single">
           <Tree
-          onSelect={this.onSelect}
-          defaultExpandAll = {true}
+            onSelect={this.onSelect}
+            defaultExpandAll={true}
+            defaultSelectedKeys={selectedKeys}
+            selectedKeys={selectedKeys}         
           >    
           { this.renderTreeNodes(this.state.treeData)}
           </Tree>
+          </div>
         </div>
 
         {/* <div className="fuzhen-left ant-col-5">
@@ -746,6 +778,7 @@ export default class MedicalRecord extends Component {
             {formRender(entity, this.config2(), this.handleChange.bind(this))}
           </Panel>
           <Panel header="地贫/血型检查" key="3">
+            {/* {formRender(entity, this.config3(),(e) => setIptVal(e.target.value, true))} */}
             {formRender(entity, this.config3(), this.handleChange.bind(this))}
           </Panel>
           <Panel header="超声检查" key="4">

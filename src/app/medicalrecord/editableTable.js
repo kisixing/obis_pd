@@ -1,8 +1,13 @@
 import React,{ Component} from 'react';
 import { Table, Input, Button } from 'antd';
 
+
 /*============================ ==============================*/
 
+/**
+ * 1 对外接口还没有做 
+ * 2 空新增问题还没有做
+ */
 
 // 按键名拿index
 function searchIndex(arr,key,value) {
@@ -36,19 +41,35 @@ export default class EditableTable extends Component {
     }  
   }
 
+  // 重置state中值
+  resetMyState = () => {
+    // 这里有没有简单点
+    const { dataSource } = this.props;
+    let newCurrentTemplate = {}, newDataSource = [];
+    Object.assign(newCurrentTemplate,dataSource);
+    Object.assign(newDataSource,dataSource);
+    for(let key in newCurrentTemplate) {
+      newCurrentTemplate[key] = "";
+    } 
+    this.setState({
+      dataSource:newDataSource,
+      currentRowSelection:dataSource[0].key,
+      currentTemplate: newCurrentTemplate
+    })
+  }
+
   componentDidMount() {
     // 将dataSource放入state，以便以后的操作
-    const { dataSource } = this.props;
-    this.setState({dataSource,currentRowSelection:dataSource[0].key})
+    this.resetMyState();
   }
 
   componentDidUpdate(prevProps) { 
+    // TODO 这里的判断要改
     if(prevProps.dataSource.length === 0){
-      const { dataSource } = this.props;
-      this.setState({dataSource,currentRowSelection:dataSource[0].key})
+      console.log('1');
+      this.resetMyState();
     }
   }
-
 
   // 渲染表格中的元素 应用于新增输入
   tableCellRender = (text, index, key) => {
@@ -73,22 +94,26 @@ export default class EditableTable extends Component {
     let len = dataSource.length;
     if(!isNewTemplate) {
       // 进入新增
-      dataSource.splice(len,0,{key: dataSource[len-1].key + 1,title: '', content: ''});
+      // TODO key的生成之后要改,暂时应对展示需要
+      const { currentTemplate } = this.state;
+      // TODO
+      // currentTemplate['key'] = parseInt(Math.random()*100 + Math.random() * 10);
+      dataSource.splice(len,0,currentTemplate);
       this.setState({isNewTemplate: !isNewTemplate,dataSource});
     }else{
       // 保存
-      // 这里会有个bug 当table为空 新建的key如何创造
+      // 这里会有个bug 当table为空 新建的key如何创造 - 先应对展示需要
       const { currentTemplate } = this.state;
       if(currentTemplate.title && currentTemplate.content) {
         // 这里可能会跟服务器后重新
-        currentTemplate['key'] = dataSource[len - 1]['key'] + 1;
         dataSource[len - 1] = currentTemplate;
-        this.setState({isNewTemplate:!isNewTemplate,dataSource});
-        // if(dataSource.length === 1) {
-        //   this.setState({currentRowSelection: })
-        // }
+        this.setState({
+          isNewTemplate:!isNewTemplate,
+          dataSource, 
+          currentRowSelection: currentTemplate['key']
+        });
       }else{
-        message.warning('请先输入内容再新增');
+        console.log('请先输入内容再新增');
       }
     }
   }
@@ -102,14 +127,24 @@ export default class EditableTable extends Component {
       const KEY = 'key';
       let tarIndex = searchIndex(dataSource,KEY,currentRowSelection);
       dataSource.splice(tarIndex,1);
-      this.setState({dataSource, currentRowSelection:  dataSource.length ? dataSource[0][KEY] : ''});
+      console.log(dataSource.length);
+      this.setState({dataSource, currentRowSelection:  dataSource.length  ? dataSource[0][KEY] : ''});
     }else{
       // cancel
       const { dataSource } = this.state;
       const len = dataSource.length;
       dataSource.splice(len-1,1);
-      // 这里暂时写死
-      this.setState({isNewTemplate:!isNewTemplate,dataSource,currentTemplate:{title:'',content:''}});
+      // 这里暂时写死 - currentTemplate应该按dataSource中重写
+      let newCurrentTemplate = {};
+      Object.assign(newCurrentTemplate,dataSource[0]);
+      for(let key in newCurrentTemplate){
+        newCurrentTemplate[key] = 0;
+      }
+      this.setState({
+        isNewTemplate:!isNewTemplate,
+        dataSource,
+        currentTemplate: newCurrentTemplate
+      });
     }
   }
 
@@ -143,8 +178,8 @@ export default class EditableTable extends Component {
 
 
   render() {
-    const { columns, dataSource } = this.props;
-
+    const { columns } = this.props;
+    const { dataSource } = this.state;
     columns.map(v => {
       // 编号不做新增输入
       if(v.key !== 'index'){
