@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Select, Button, Popover, Input, Tabs, Tree, Modal, Icon, Spin,Timeline, Collapse,message } from 'antd';
+import { Select, Button, Popover, Input, Tabs, Tree, Modal, Row,Col, Spin,Timeline, Collapse,message } from 'antd';
 
 import tableRender from '../../render/table';
 import FuzhenTable from './table';
@@ -409,36 +409,32 @@ export default class Operation extends Component {
         },
         {
           columns:[
-            { name: 'exception[手术编号]', type: 'input', span: 4 },
+            { name: 'exception[手术编号]', type: 'input', span: 5 },
+            { name: 'operator[术者]', type: 'select', showSearch: true, options: baseData.operaterOptions, valid: 'required',span: 5 },
+            { name: 'assistant[助手]', type: 'select', showSearch: true, options: baseData.assistantOptions, valid: 'required',span: 5},,
           ]
         },
         {
           columns:[
-            { name: 'operator[术者]', type: 'select', showSearch: true, options: baseData.operaterOptions, valid: 'required',span: 4 },
-            { name: 'assistant[助手]', type: 'select', showSearch: true, options: baseData.assistantOptions, valid: 'required',span: 4},
-            { name: 'start_time[开始时间]', type: 'date', valid: 'required',span: 4},
-            { name: 'end_time[结束时间]', type: 'date', valid: 'required',span: 4},
+            { name: 'start_time[开始时间]', type: 'date', width: 160 ,showTime:true,format:"yyyy-MM-dd HH:mm", valid: 'required',span: 5},
+            { name: 'end_time[结束时间]', type: 'date', width: 160,showTime:true,format:"yyyy-MM-dd HH:mm", valid: 'required',span: 5},
+            { name: 'duration(min)[持续时间]', type: 'input', valid: 'required',span: 5 }
           ]
         },
         {
           columns:[
-            { name: 'duration(min)[持续时间]', type: 'input', valid: 'required',span: 4 }
+            { name: 'uterus[子宫]', type: 'select', showSearch: true, options: baseData.uterusOptions, valid: 'required',span: 5},
+            { name: 'method[方法]', type: 'select', options: baseData.methodOptions, valid: 'required',span: 5},
+            { name: 'placenta[胎盘]', type: 'select', options: baseData.placentaOptions, valid: 'required',span: 5},
+            { name: 'instrument[器械]', type: 'select', options: baseData.instrumentOptions, valid: 'required',span: 5}
           ]
         },
         {
           columns:[
-            { name: 'uterus[子宫]', type: 'select', showSearch: true, options: baseData.uterusOptions, valid: 'required',span: 4},
-            { name: 'method[方法]', type: 'select', options: baseData.methodOptions, valid: 'required',span: 4},
-            { name: 'placenta[胎盘]', type: 'select', options: baseData.placentaOptions, valid: 'required',span: 4},
-            { name: 'instrument[器械]', type: 'select', options: baseData.instrumentOptions, valid: 'required',span: 4}
-          ]
-        },
-        {
-          columns:[
-            { name: 'specimen_location[取样位置]', type: 'select', showSearch: true, options: baseData.assistantOptions, valid: 'required',span: 4},           
-            { name: 'count[进入宫腔次数]', type: 'select', showSearch: true, options: baseData.assistantOptions, valid: 'required',span: 4},
-            { name: 'specimen_amount(ml)[标本]', type: 'input', showSearch: true, valid: 'required',span: 4},
-            { name: 'character[性状]', type: 'select', showSearch: true, options: baseData.assistantOptions, valid: 'required',span: 4},
+            { name: 'specimen_location[取样位置]', type: 'input',valid: 'required',span: 5},           
+            { name: 'count[进入宫腔次数]',  type: 'input',valid: 'required',span: 5},
+            { name: 'specimen_amount(ml)[标本]', type: 'input', showSearch: true, valid: 'required',span: 5},
+            { name: 'character[性状]', type: 'select', showSearch: true, options: baseData.characterOptions, valid: 'required',span: 5},
           ]
         },
         {
@@ -453,8 +449,8 @@ export default class Operation extends Component {
         },
         {
           columns:[
-            { name: 'pre_fhr(bpm)[术前胎心率]', type: 'input', showSearch: true, options: baseData.assistantOptions, valid: 'required',span: 4},
-            { name: 'after_fhr(bpm)[术后胎心率]', type: 'input', showSearch: true, options: baseData.assistantOptions, valid: 'required',span: 4}
+            { name: 'pre_fhr(bpm)[术前胎心率]', type: 'input', valid: 'required',span: 5},
+            { name: 'after_fhr(bpm)[术后胎心率]', type: 'input', valid: 'required',span: 5}
           ]
         },
         {
@@ -464,7 +460,7 @@ export default class Operation extends Component {
         },
         {
           columns:[
-            { name: 're_puncture[是否再次穿刺]', type: 'checkinput', showSearch: true, options: baseData.yesOptions, valid: 'required',span: 4}
+            { name: 're_puncture[是否再次穿刺]', type: 'checkinput', radio: true, options: baseData.yesOptions, valid: 'required',span: 5}
           ]
         },
       ]
@@ -518,6 +514,47 @@ export default class Operation extends Component {
         this.setState({openYy: true});
       })
     }
+  }
+
+  /**
+   * 模板
+   */
+  renderTreatment() {
+    const { treatTemp, openTemplate } = this.state;
+    const closeDialog = (e, items = []) => {
+      this.setState({ openTemplate: false }, ()=>openTemplate&&openTemplate());
+      items.forEach(i => i.checked = false);
+      this.addTreatment(e, items.map(i => i.content).join('\n'));
+    }
+
+    const initTree = (pid, level = 0) => treatTemp.filter(i => i.pid === pid).map(node => (
+      <Tree.TreeNode key={node.id} title={node.content}>
+        {level < 10 ? initTree(node.id, level + 1) : null}
+      </Tree.TreeNode>
+    ));
+
+    const handleCheck = (keys, { checked }) => {
+      treatTemp.forEach(tt => {
+        if (keys.indexOf(`${tt.id}`) !== -1) {
+          tt.checked = checked;
+        }
+      })
+    };
+
+    const treeNodes = initTree(0);
+
+    return (
+      <Modal title="处理模板" closable visible={openTemplate} width={800} onCancel={e => closeDialog(e)} onOk={e => closeDialog(e, treatTemp.filter(i => i.checked))}>
+        <Row>
+          <Col span={12}>
+            <Tree checkable defaultExpandAll onCheck={handleCheck} style={{ maxHeight: '90%' }}>{treeNodes.slice(0,treeNodes.length/2)}</Tree>
+          </Col>
+          <Col span={12}>
+            <Tree checkable defaultExpandAll onCheck={handleCheck} style={{ maxHeight: '90%' }}>{treeNodes.slice(treeNodes.length/2)}</Tree>
+          </Col>
+        </Row>
+      </Modal>
+    )
   }
 
   renderTreeNodes = data =>
@@ -644,10 +681,14 @@ export default class Operation extends Component {
               {this.state.panes.map(pane => <TabPane tab={pane.title} key={pane.key}>{formRender(entity, this.configinspection_item(), this.handleChange.bind(this))}</TabPane>)}
             </Tabs>
           </Panel>
-          <div className="single">{formRender(entity, this.configdoctors_advice(), this.handleChange.bind(this))}</div>
+          <Panel header="" key="4">
+            
+        <div className="single">{formRender(entity, this.configdoctors_advice(), this.handleChange.bind(this))}</div>
+          </Panel>
         </Collapse>
         <Button className="pull-right blue-btn bottom-btn save-btn" type="ghost" onClick={() => this.handleSave(document.querySelector('.fuzhen-form'))}>保存</Button>
         <Button className="pull-right blue-btn bottom-btn" type="ghost" onClick={() => this.handleSave(document.querySelector('.fuzhen-form'), "open")}>保存并开立医嘱</Button>
+        {this.renderTreatment()}
         </div>
       </Page>
     )

@@ -259,14 +259,14 @@ export default class MedicalRecord extends Component {
       },
       {
         columns: [
-          { name: 'yjcuch[Hb]', type: 'select', span: 7, showSearch: true, options: baseData.ccOptions, valid: 'required'},
-          { name: 'yjzhouq[MCV]',  type: 'select', span: 7, showSearch: true, options: baseData.ccOptions, valid: 'required'},
-          { name: 'yjchix[MCH]',  type: 'select', span: 7, showSearch: true, options: baseData.ccOptions, valid: 'required'},
+          { name: 'yjcuch[Hb]', type: 'input', span: 7},
+          { name: 'yjzhouq[MCV]',  type: 'input', span: 7},
+          { name: 'yjchix[MCH]',  type: 'input', span: 7},
         ]
       },
       {
         columns: [
-          { name: 'yjcuch[HbA2]', type: 'select', span: 7, showSearch: true, options: baseData.ccOptions, valid: 'required'},
+          { name: 'yjcuch[HbA2]', type: 'input', span: 7},
           { name: 'yjzhouq[血型]',  type: 'select', span: 7, showSearch: true, options: baseData.ccOptions, valid: 'required'},
           { name: 'yjchix[地贫基因型]',  type: 'select', span: 7, showSearch: true, options: baseData.ccOptions, valid: 'required'},
         ]
