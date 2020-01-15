@@ -7,7 +7,7 @@
 		"doctors_advice": "定期复查",
 		"doctor": "李国兰",
 		"preoperative_record": {
-			"BP": "",
+			"BP": [108,78],
 			"temperature": "37.5",
 			"operation_date": "2019-12-12"
 		},
@@ -33,7 +33,29 @@
 				"after_fhr": "",
 				"diagnosis": "",
 				"re_puncture": ""
-			}]
+			},{
+				"operation_no": "0003",
+				"operation_items": {},
+				"operator": "1",
+				"assistant": "1",
+				"start_time": "1",
+				"end_time": "1",
+				"duration": "1",
+				"uterus": "",
+				"placenta": "",
+				"specimen_location": "",
+				"method": "",
+				"instrument": "",
+				"specimen_amount": "",
+				"character": "",
+				"process evaluation": "",
+				"special_case": "",
+				"pre_fhr": "",
+				"after_fhr": "",
+				"diagnosis": "",
+				"re_puncture": ""
+			}
+		]
 		},
 		"inspection_item": {
 			"fetus": [{
