@@ -1,8 +1,7 @@
 import React, { Component } from "react";
-import { Select, Button, Popover, Input, Tabs, Tree, Modal, Icon, Spin,Timeline, Collapse,message } from 'antd';
+import { Select, Button, Popover, Input, Tabs, Tree, Modal, Row,Col, Spin,Timeline, Collapse,message } from 'antd';
 
-import tableRender from '../../render/table';
-import FuzhenTable from './table';
+import {valid} from '../../render/common';
 import Page from '../../render/page';
 import service from '../../service';
 import * as baseData from './data';
@@ -292,10 +291,13 @@ export default class Operation extends Component {
       ],
       selectedKeys: [], 
       panes:[
-        { title: '胎儿一', content: '选项卡一内容', key: '1' },
-        { title: '胎儿二', content: '选项卡二内容', key: '2' },
-      ],     
+        { title: '胎儿1', content: '选项卡一内容', key: '0' },
+      ],
+      ipanes:[
+        { title: '胎儿1', content: '选项卡一内容', key: '0' },
+      ],
       activeKey: '1',
+      iactiveKey :'1'
     };
 
     this.componentWillUnmount = editors();
@@ -316,22 +318,40 @@ export default class Operation extends Component {
 
   componentDidMount() {
     Promise.all([
-    service.getoperationdetail().then(res => this.setState({ entity: res.object }))])
-
+    service.getoperationdetail().then(res => {
+      let currentpanes = res.object.operative_procedure.fetus;
+      let currentipanes = res.object.inspection_item.fetus;
+      currentpanes.forEach((pane, i) => {
+        pane.key = "fetus-"+i;
+      });
+      currentipanes.forEach((pane, i) => {
+        pane.key = "ifetus-"+i;
+      });
+      this.setState({ entity: res.object,panes:currentpanes,ipanes:currentipanes});
+      console.log(this.state);
+    })])
   }
-   onChange(activeKey) {
-    this.setState({ activeKey });
+  ontabChange=(activeKey) =>{
+    this.setState({
+      activeKey
+    });    
   }
-  onEdit(targetKey, action) {
-    this[action](targetKey);
+  ontabEdit=(targetKey, action)=> {
+    //this[action](targetKey);
+    if(action==='add'){
+      this.addtab();
+    }else if(action ==='remove'){
+      this.remove(targetKey);
+    }
   }
-  add() {
+  addtab() {
     const panes = this.state.panes;
-    const activeKey = `newTab${this.newTabIndex++}`;
-    panes.push({ title: '新建页签', content: '新页面', key: activeKey });
+    const activeKey = panes.length;
+    panes.push({key: "fetus-"+activeKey});
     this.setState({ panes, activeKey });
   }
   remove(targetKey) {
+    //TODO: 删除提示
     let activeKey = this.state.activeKey;
     let lastIndex;
     this.state.panes.forEach((pane, i) => {
@@ -339,11 +359,51 @@ export default class Operation extends Component {
         lastIndex = i - 1;
       }
     });
-    const panes = this.state.panes.filter(pane => pane.key !== targetKey);
+    let panes = this.state.panes.filter(pane => pane.key !== targetKey);
+    panes.forEach((pane, i) => {
+      pane.key = "fetus-"+i;
+    });
     if (lastIndex >= 0 && activeKey === targetKey) {
       activeKey = panes[lastIndex].key;
     }
     this.setState({ panes, activeKey });
+  }
+  oninspectionChange=(activeKey) =>{
+    this.setState({
+      iactiveKey:activeKey
+    });    
+  }
+  oninspectionEdit=(targetKey, action)=> {
+    //this[action](targetKey);
+    if(action==='add'){
+      this.addinspection();
+    }else if(action ==='remove'){
+      this.removeinspection(targetKey);
+    }
+  }
+  addinspection() {
+    const ipanes = this.state.ipanes;
+    const activeKey = ipanes.length;
+    ipanes.push({key: "ifetus-"+activeKey});
+    this.setState({ ipanes:ipanes, iactiveKey:activeKey });
+  }
+  removeinspection(targetKey) {
+    //TODO: 删除提示
+    let activeKey = this.state.iactiveKey;
+    let lastIndex;
+    this.state.ipanes.forEach((pane, i) => {
+      if (pane.key === targetKey) {
+        lastIndex = i - 1;
+      }
+    });
+    let ipanes = this.state.ipanes.filter(pane => pane.key !== targetKey);
+    ipanes.forEach((pane, i) => {
+      pane.key = "ifetus-"+i;
+    });
+    if (lastIndex >= 0 && activeKey === targetKey) {
+      activeKey = ipanes[lastIndex].key;
+    }
+    this.setState({ ipanes:ipanes, iactiveKey:activeKey });
   }
   configpreoperative_record(){
     return {
@@ -355,7 +415,7 @@ export default class Operation extends Component {
             {span: 1},
             { name: 'temperature(℃)[体@@@温 ]', type: 'input', span: 5, valid: 'required'},
             {span: 1},
-            { name: 'ckpressure(mmHg)[血@@@压 ]', type: ['input(/)','input'], span: 5, valid: (value)=>{
+            { name: 'BP(mmHg)[血@@@压 ]', type: ['input(/)','input'], span: 5, valid: (value)=>{
               let message = '';
               if(value){
                 message = [0,1].map(i=>valid(`number|required|rang(0,${[139,109][i]})`,value[i])).filter(i=>i).join();
@@ -375,9 +435,9 @@ export default class Operation extends Component {
       rows: [
         {
           columns:[
-            { name: 'amniotic_fluid[羊水]', type: 'cascader', options:coptions, span: 16 },
-            { name: 'umbilical_blood[脐血]', type: 'cascader', options:coptions, span: 16 },
-            { name: 'villus[绒毛]', type: 'cascader', options:qoptions, span: 16 }
+            { name: 'amniotic_fluid[羊水]', type: 'treeselect', options:coptions, span: 16 },
+            { name: 'umbilical_blood[脐血]', type: 'treeselect', options:coptions, span: 16 },
+            { name: 'villus[绒毛]', type: 'treeselect', options:qoptions, span: 16 }
           ]
         },     
       ]
@@ -409,36 +469,32 @@ export default class Operation extends Component {
         },
         {
           columns:[
-            { name: 'exception[手术编号]', type: 'input', span: 4 },
+            { name: 'operation_no[手术编号]', type: 'input', span: 5 },
+            { name: 'operator[术者]', type: 'select', showSearch: true, options: baseData.operaterOptions, valid: 'required',span: 5 },
+            { name: 'assistant[助手]', type: 'select', showSearch: true, options: baseData.assistantOptions, valid: 'required',span: 5},,
           ]
         },
         {
           columns:[
-            { name: 'operator[术者]', type: 'select', showSearch: true, options: baseData.operaterOptions, valid: 'required',span: 4 },
-            { name: 'assistant[助手]', type: 'select', showSearch: true, options: baseData.assistantOptions, valid: 'required',span: 4},
-            { name: 'start_time[开始时间]', type: 'date', valid: 'required',span: 4},
-            { name: 'end_time[结束时间]', type: 'date', valid: 'required',span: 4},
+            { name: 'start_time[开始时间]', type: 'date', width: 160 ,showTime:true,format:"yyyy-MM-dd HH:mm", valid: 'required',span: 5},
+            { name: 'end_time[结束时间]', type: 'date', width: 160,showTime:true,format:"yyyy-MM-dd HH:mm", valid: 'required',span: 5},
+            { name: 'duration(min)[持续时间]', type: 'input', valid: 'required',span: 5 }
           ]
         },
         {
           columns:[
-            { name: 'duration(min)[持续时间]', type: 'input', valid: 'required',span: 4 }
+            { name: 'uterus[子宫]', type: 'select', showSearch: true, options: baseData.uterusOptions, valid: 'required',span: 5},
+            { name: 'method[方法]', type: 'select', options: baseData.methodOptions, valid: 'required',span: 5},
+            { name: 'placenta[胎盘]', type: 'select', options: baseData.placentaOptions, valid: 'required',span: 5},
+            { name: 'instrument[器械]', type: 'select', options: baseData.instrumentOptions, valid: 'required',span: 5}
           ]
         },
         {
           columns:[
-            { name: 'uterus[子宫]', type: 'select', showSearch: true, options: baseData.uterusOptions, valid: 'required',span: 4},
-            { name: 'method[方法]', type: 'select', options: baseData.methodOptions, valid: 'required',span: 4},
-            { name: 'placenta[胎盘]', type: 'select', options: baseData.placentaOptions, valid: 'required',span: 4},
-            { name: 'instrument[器械]', type: 'select', options: baseData.instrumentOptions, valid: 'required',span: 4}
-          ]
-        },
-        {
-          columns:[
-            { name: 'specimen_location[取样位置]', type: 'select', showSearch: true, options: baseData.assistantOptions, valid: 'required',span: 4},           
-            { name: 'count[进入宫腔次数]', type: 'select', showSearch: true, options: baseData.assistantOptions, valid: 'required',span: 4},
-            { name: 'specimen_amount(ml)[标本]', type: 'input', showSearch: true, valid: 'required',span: 4},
-            { name: 'character[性状]', type: 'select', showSearch: true, options: baseData.assistantOptions, valid: 'required',span: 4},
+            { name: 'specimen_location[取样位置]', type: 'input',valid: 'required',span: 5},           
+            { name: 'count[进入宫腔次数]',  type: 'input',valid: 'required',span: 5},
+            { name: 'specimen_amount(ml)[标本]', type: 'input', showSearch: true, valid: 'required',span: 5},
+            { name: 'character[性状]', type: 'select', showSearch: true, options: baseData.characterOptions, valid: 'required',span: 5},
           ]
         },
         {
@@ -453,8 +509,8 @@ export default class Operation extends Component {
         },
         {
           columns:[
-            { name: 'pre_fhr(bpm)[术前胎心率]', type: 'input', showSearch: true, options: baseData.assistantOptions, valid: 'required',span: 4},
-            { name: 'after_fhr(bpm)[术后胎心率]', type: 'input', showSearch: true, options: baseData.assistantOptions, valid: 'required',span: 4}
+            { name: 'pre_fhr(bpm)[术前胎心率]', type: 'input', valid: 'required',span: 5},
+            { name: 'after_fhr(bpm)[术后胎心率]', type: 'input', valid: 'required',span: 5}
           ]
         },
         {
@@ -464,7 +520,7 @@ export default class Operation extends Component {
         },
         {
           columns:[
-            { name: 're_puncture[是否再次穿刺]', type: 'checkinput', showSearch: true, options: baseData.yesOptions, valid: 'required',span: 4}
+            { name: 're_puncture[是否再次穿刺]', type: 'checkinput', radio: true, options: baseData.yesOptions, valid: 'required',span: 5}
           ]
         },
       ]
@@ -518,6 +574,47 @@ export default class Operation extends Component {
         this.setState({openYy: true});
       })
     }
+  }
+
+  /**
+   * 模板
+   */
+  renderTreatment() {
+    const { treatTemp, openTemplate } = this.state;
+    const closeDialog = (e, items = []) => {
+      this.setState({ openTemplate: false }, ()=>openTemplate&&openTemplate());
+      items.forEach(i => i.checked = false);
+      this.addTreatment(e, items.map(i => i.content).join('\n'));
+    }
+
+    const initTree = (pid, level = 0) => treatTemp.filter(i => i.pid === pid).map(node => (
+      <Tree.TreeNode key={node.id} title={node.content}>
+        {level < 10 ? initTree(node.id, level + 1) : null}
+      </Tree.TreeNode>
+    ));
+
+    const handleCheck = (keys, { checked }) => {
+      treatTemp.forEach(tt => {
+        if (keys.indexOf(`${tt.id}`) !== -1) {
+          tt.checked = checked;
+        }
+      })
+    };
+
+    const treeNodes = initTree(0);
+
+    return (
+      <Modal title="处理模板" closable visible={openTemplate} width={800} onCancel={e => closeDialog(e)} onOk={e => closeDialog(e, treatTemp.filter(i => i.checked))}>
+        <Row>
+          <Col span={12}>
+            <Tree checkable defaultExpandAll onCheck={handleCheck} style={{ maxHeight: '90%' }}>{treeNodes.slice(0,treeNodes.length/2)}</Tree>
+          </Col>
+          <Col span={12}>
+            <Tree checkable defaultExpandAll onCheck={handleCheck} style={{ maxHeight: '90%' }}>{treeNodes.slice(treeNodes.length/2)}</Tree>
+          </Col>
+        </Row>
+      </Modal>
+    )
   }
 
   renderTreeNodes = data =>
@@ -592,33 +689,6 @@ export default class Operation extends Component {
         { this.renderTreeNodes(this.state.treeData)}
         </Tree>
         </div>
-        {/* <div className="fuzhen-left ant-col-5">
-        <Tree
-          showLine={true}
-          showIcon={false}
-          defaultExpandedKeys={['0-0-0', '0-0-1', '0-0-2']}
-        >
-          <TreeNode icon={<Icon type="carry-out" />} title="parent 1" key="0-0">
-            <TreeNode icon={<Icon type="carry-out" />} title="parent 1-0" key="0-0-0">
-              <TreeNode icon={<Icon type="carry-out" />} title="leaf" key="0-0-0-0" />
-              <TreeNode icon={<Icon type="carry-out" />} title="leaf" key="0-0-0-1" />
-              <TreeNode icon={<Icon type="carry-out" />} title="leaf" key="0-0-0-2" />
-            </TreeNode>
-            <TreeNode icon={<Icon type="carry-out" />} title="parent 1-1" key="0-0-1">
-              <TreeNode icon={<Icon type="carry-out" />} title="leaf" key="0-0-1-0" />
-            </TreeNode>
-            <TreeNode icon={<Icon type="carry-out" />} title="parent 1-2" key="0-0-2">
-              <TreeNode icon={<Icon type="carry-out" />} title="leaf" key="0-0-2-0" />
-              <TreeNode
-                switcherIcon={<Icon type="form" />}
-                icon={<Icon type="carry-out" />}
-                title="leaf"
-                key="0-0-2-1"
-              />
-            </TreeNode>
-          </TreeNode>
-        </Tree>
-        </div> */}
         <div className="fuzhen-right ant-col-19 main-pad-small width_7">
         <Collapse defaultActiveKey={['1','2','3','4','5','6','7']} >
           <Panel header="术前记录" key="1">
@@ -626,28 +696,32 @@ export default class Operation extends Component {
           </Panel>
           <Panel header="手术操作" key="2" extra="">
             <Tabs
-              onChange={this.onChange}
+              onChange={this.ontabChange}
               activeKey={this.state.activeKey}
               type="editable-card"
-              onEdit={this.onEdit}
+              onEdit={this.ontabEdit}
             >
-              {this.state.panes.map(pane => <TabPane tab={pane.title} key={pane.key}>{formRender(entity, this.configoperative_procedure(), this.handleChange.bind(this))}</TabPane>)}
+              {this.state.panes.map((pane, index) => <TabPane tab={'胎儿'+(index+1)} key={pane.key}>{formRender(pane, this.configoperative_procedure(), this.handleChange.bind(this))}</TabPane>)}
             </Tabs>
           </Panel>
           <Panel header="送检项目" key="3">
             <Tabs
-              onChange={this.onChange}
-              activeKey={this.state.activeKey}
+              onChange={this.oninspectionChange}
+              activeKey={this.state.iactiveKey}
               type="editable-card"
-              onEdit={this.onEdit}
+              onEdit={this.oninspectionEdit}
             >
-              {this.state.panes.map(pane => <TabPane tab={pane.title} key={pane.key}>{formRender(entity, this.configinspection_item(), this.handleChange.bind(this))}</TabPane>)}
+              {this.state.ipanes.map((pane, index) => <TabPane tab={'胎儿'+(index+1)}  key={pane.key}>{formRender(pane, this.configinspection_item(), this.handleChange.bind(this))}</TabPane>)}
             </Tabs>
           </Panel>
-          <div className="single">{formRender(entity, this.configdoctors_advice(), this.handleChange.bind(this))}</div>
+          <Panel header="" key="4">
+            
+        <div className="single">{formRender(entity, this.configdoctors_advice(), this.handleChange.bind(this))}</div>
+          </Panel>
         </Collapse>
         <Button className="pull-right blue-btn bottom-btn save-btn" type="ghost" onClick={() => this.handleSave(document.querySelector('.fuzhen-form'))}>保存</Button>
         <Button className="pull-right blue-btn bottom-btn" type="ghost" onClick={() => this.handleSave(document.querySelector('.fuzhen-form'), "open")}>保存并开立医嘱</Button>
+        {this.renderTreatment()}
         </div>
       </Page>
     )

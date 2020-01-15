@@ -263,17 +263,29 @@ export default class MedicalRecord extends Component {
       },
       {
         columns: [
+<<<<<<< HEAD
           { name: 'yjcuch(g/L)[Hb]', type: 'input', span: 7, showSearch: true, valid: 'required'},
           { name: 'yjzhouq(fL)[MCV]',  type: 'input', span: 7, showSearch: true, valid: 'required'},
           { name: 'yjchix[MCH]',  type: 'input', span: 7, showSearch: true, valid: 'required'},
+=======
+          { name: 'yjcuch[Hb]', type: 'input', span: 7},
+          { name: 'yjzhouq[MCV]',  type: 'input', span: 7},
+          { name: 'yjchix[MCH]',  type: 'input', span: 7},
+>>>>>>> refs/remotes/origin/master
         ]
       },
       {
         columns: [
+<<<<<<< HEAD
           { name: 'yjcuch[HbA2]', type: 'input', span: 6, showSearch: true, valid: 'required'},
           { name: 'yjzhouq[血型]',  type: 'select', span: 6, showSearch: true, options: baseData.xuexingOptions, valid: 'required'},
           {name:'ckrh[]', type: 'select',span:2, options: baseData.xuexing2Options},
           { name: 'yjchix[地贫基因型]',  type: 'input', span: 6, showSearch: true,  valid: 'required'},
+=======
+          { name: 'yjcuch[HbA2]', type: 'input', span: 7},
+          { name: 'yjzhouq[血型]',  type: 'select', span: 7, showSearch: true, options: baseData.ccOptions, valid: 'required'},
+          { name: 'yjchix[地贫基因型]',  type: 'select', span: 7, showSearch: true, options: baseData.ccOptions, valid: 'required'},
+>>>>>>> refs/remotes/origin/master
         ]
       },
       {
