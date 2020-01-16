@@ -733,7 +733,7 @@ export const shoushushiColumns = [
 	},
 	{
 		title: '手术日期',
-		key: 'date',
+		key: 'date_of_operation',
 		type: 'date',
 		mode:"ym"
 	},
@@ -744,7 +744,7 @@ export const shoushushiColumns = [
   },
   {
 		title: '术后病理',
-		key: 'postoperativePathology',
+		key: 'pathology',
 		type: 'input'
 	},
 ]
@@ -755,42 +755,42 @@ export const shoushushiColumns = [
 export const BvColumns = [
 	{
 		title: '孕周',
-		key: 'gesweek',
+		key: 'gestational_week',
 		type: 'input'
 	},
 	{
 		title: 'BPD',
-		key: 'date',
+		key: 'BPD',
 		type: 'input',
 	},
 	{
 		title: 'HC',
-		key: 'hospital',
+		key: 'HC',
 		type: 'input'
 	},
 	{
 		title: 'AC',
-		key: 'postoperativePathology',
+		key: 'AC',
 		type: 'input'
 	},
 	{
 		title: 'FL',
-		key: 'fl',
+		key: 'FL',
 		type: 'input'
 	},
 	{
 		title: 'AFV',
-		key: 'afv',
+		key: 'AFV',
 		type: 'input'
 	},
 	{
 		title: '脐血流',
-		key: 'qxl',
+		key: 'UBF',
 		type: 'input'
 	},
 	{
 		title: '其他异常描述',
-		key: 'otherexception',
+		key: 'other_anomalies',
 		type: 'input'
 	},
 ]

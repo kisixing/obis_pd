@@ -1,0 +1,134 @@
+{
+	"code": "200",
+	"message": "OK",
+	"object": {
+		"id": "1234",
+		"createdate": "2020-01-13",
+		"chief_complaint": "无",
+		"medical_history": "高血压",
+		"diagnosis": "正常妊娠监督",
+		"treatment": "定期复查",
+		"doctor": "李国兰",
+		"other_exam": "无其他",
+		"pregnancy_history": {
+			"LMD": "2019-06-02",
+			"EDD": "2020-03-28",
+			"gravidity": "1",
+			"parity": "1",
+			"Abortion": "1",
+			"exfetation": "1"
+		},
+		"downs_screen": {
+			"early": {
+				"trisomy21": "",
+				"trisomy18": "",
+				"trisomy13": "",
+				"HCG": "",
+				"PAPP": "",
+				"other_anomalies": ""
+			},
+			"middle": {
+				"trisomy21": "",
+				"trisomy18": "",
+				"trisomy13": "",
+				"HCG": "",
+				"NTD": "",
+				"AFP": "",
+				"E3": "",
+				"other_anomalies": ""
+			},
+			"NIPT": {
+				"trisomy21": "",
+				"trisomy18": "",
+				"trisomy13": "",
+				"Z_value": "",
+				"other_anomalies": ""
+			}
+		},
+		"thalassemia": {
+			"wife": {
+				"Hb": "",
+				"MCV": "",
+				"MCH": "",
+				"HbA2": "",
+				"blood_group": "",
+				"genotype": "",
+				"other_anomalies": ""
+			},
+			"husband": {
+				"Hb": "",
+				"MCV": "",
+				"MCH": "",
+				"HbA2": "",
+				"blood_group": "",
+				"genotype": "",
+				"other_anomalies": ""
+			}
+		},
+		"ultrasound": {
+			"menopause": "20",
+			"fetus": [{
+				"CRL": "1",
+				"gestational_week": "1",
+				"NT": "1",
+				"other_anomalies": "异常结果描述",
+				"middle": [{
+					"gestational_week": "1",
+					"BPD": "1",
+					"HC": "1",
+					"AC": "1",
+					"FL": "1",
+					"AFV": "1",
+					"UBF": "1",
+					"other_anomalies": "其他异常结果"
+				}]
+			},{
+				"CRL": "2",
+				"gestational_week": "2",
+				"NT": "2",
+				"other_anomalies": "异常结果描述",
+				"middle": [{
+					"gestational_week": "2",
+					"BPD": "2",
+					"HC": "1",
+					"AC": "1",
+					"FL": "1",
+					"AFV": "1",
+					"UBF": "1",
+					"other_anomalies": "其他异常结果"
+				}]
+			}
+		
+		]
+		},
+		"past_medical_history": {
+			"hypertension": [{"label":"无", "value":""},{"label": "unselect", "value":""}],
+			"diabetes_mellitus":[{"label":"无", "value":""},{"label": "unselect", "value":""}],
+			"heart_disease":[{"label":"无", "value":""},{"label": "unselect", "value":""}],
+			"injury": [{"label":"无", "value":""},{"label": "unselect", "value":""}],
+			"other_disease":[{"label":"无", "value":""},{"label": "unselect", "value":""}],
+			"allergy": [{"label":"药物", "value":666}],
+			"blood_transfusion": [{"label":"无", "value":""},{"label": "unselect", "value":""}],
+			"operation_history": [{
+				"name": "xxx手术",
+				"date_of_operation": "2017/01/01",
+				"hospital": "xxx医院",
+				"pathology": "xxx"
+			}]
+		},
+		"family_history": {
+			"diabetes_mellitus":  [{"label":"无", "value":""},{"label": "unselect", "value":""}],
+			"hypertension":  [{"label":"无", "value":""},{"label": "unselect", "value":""}],
+			"heritable_disease":  [{"label":"无", "value":""},{"label": "unselect", "value":""}],
+			"congenital_malformation":  [{"label":"无", "value":""},{"label": "unselect", "value":""}]
+		},
+		"physical_check-up": {
+			"BP": {"0": "125", "1": "75"},
+			"fundal_height": "15",
+			"waist_hip": "11",
+			"pre_weight": "50",
+			"current_weight": "55",
+			"weight_gain": "5"
+		}
+	}
+}

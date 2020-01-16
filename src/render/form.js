@@ -99,7 +99,6 @@ class FormItem extends Component {
   getSplitState(name = '', entity = {}){
     const $name = getValueFn(name, entity)
     const field = $name.replace(/\(.*\)/, '').replace(/\[.*\]/, '');
-
     return {
       name: field,
       label: /\[.*\]/.test($name.replace(/\(.*\)/, '')) && /\[(.*)\]/.exec($name.replace(/\(.*\)/, ''))[1],
@@ -272,6 +271,7 @@ export default function (entity, config, onChange, { children, ...props } = {}) 
   if (!entity) {
     console.warn('entity最好不为空,否则可能导致保存不上');
   }
+  
   return (
     <form {...events(props)}>
       {render(entity, onChange, config)}
@@ -344,6 +344,9 @@ export default function (entity, config, onChange, { children, ...props } = {}) 
       });
     }
     if (option.type) {
+      // if(option.type === 'checkinput') {
+      //   console.log(data);
+      // }
       const hanldChange = (...args) => Promise.resolve(change(...args)).then(()=>option.onChange && option.onChange(...args));
       return <FormItem {...option} entity={data} onChange={hanldChange} />
     }
