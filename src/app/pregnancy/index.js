@@ -28,9 +28,7 @@ export default class Patient extends Component {
     }
   }
   static entitySave(entity = {}){
-    return {
-      ...entity
-    }
+    return {...entity}
   }
   constructor(props) {
     super(props);
@@ -40,7 +38,7 @@ export default class Patient extends Component {
     return {
       step: 1,
       rows: [
-        {
+        { 
           columns: [
             { name: 'userage[年龄]', type: 'input', span: 5, valid: 'required|number'},
             { span: 1 }, 

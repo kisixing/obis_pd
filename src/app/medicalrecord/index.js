@@ -1,5 +1,5 @@
 import React, { Component, createElement } from "react";
-import {Button, Tabs, Tree, Modal, Timeline, Collapse, message} from 'antd';
+import {Button, Tabs, Tree, Modal, Timeline, Collapse, Select} from 'antd';
 
 import tableRender from '../../render/table';
 import FuzhenTable from './table';
@@ -23,35 +23,23 @@ const { TreeNode } = Tree;
 const Panel = Collapse.Panel;
 const TabPane = Tabs.TabPane;
 
-function modal(type, title) {
-  message[type](title, 3)
+// β
+// 修改后的
+const _genotypeAnemia = baseData.genotypeAnemia.map(item => {
+  if(item.value.indexOf('β') >= 0){
+    const { value } = item;
+    item.value = value.replace('β','b');
+  }
+  return item;
+})
+// function modal(type, title) {
+//   message[type](title, 3)
+// }
+
+const TEMPLATE_KEY = {
+  zz: 'dmr1', xb: 'dmr2', qt: 'dmr3', zd: 'dmr4', cl: 'dmr5'
 }
 
-
-// mock
-// 主诊|现病史|诊断|处理措施 - 拼音前两字首字母
-const templateContentList = {
-  zz: [
-    {key: 1,title: '主诊1', content: '伤风伤风伤风伤风伤风伤风伤风'},
-    {key: 2,title: '主诊2', content: '感冒感冒感冒感冒感冒感冒感冒'},
-    {key: 3,title: '主诊3', content: '发烧发烧发烧发烧发烧发烧发烧'},
-  ],
-  xb: [
-    {key: 101,title: '现病史1', content: ''},
-    {key: 102,title: '现病史2', content: ''},
-    {key: 103,title: '现病史3', content: ''},
-  ],
-  zd: [
-    {key: 201,title: '诊断1', content: ''},
-    {key: 202,title: '诊断2', content: ''},
-    {key: 203,title: '诊断3', content: ''},
-  ],
-  cl: [
-    {key: 301,title: '处理措施1', content: ''},
-    {key: 302,title: '处理措施2', content: ''},
-    {key: 303,title: '处理措施3', content: ''},
-  ]
-}
 export default class MedicalRecord extends Component {
 
   constructor(props) {
@@ -153,7 +141,7 @@ export default class MedicalRecord extends Component {
         { title: '胎儿一', content: '选项卡一内容', key: '1' },
         { title: '胎儿二', content: '选项卡二内容', key: '2' },
       ],     
-      activeKey: '0',
+      activeKey: 'fetus0',
 
        /**
        * @param
@@ -213,7 +201,6 @@ export default class MedicalRecord extends Component {
         if(res.code === "200"){
           // 这里的res是整个页面的信息
           const { object } = res;
-          console.log(object);
           // 将值设入state
           this.setState({
             doctor: object['doctor'],
@@ -234,7 +221,10 @@ export default class MedicalRecord extends Component {
       })
   }
 
-  /*============================ UI视图  ====================================*/
+  /*============================ UI视图 ====================================*/
+  
+  // 前四个采用拼音首字母作方法的key参数
+
   // 主诉
   config() {
     return {
@@ -411,6 +401,11 @@ export default class MedicalRecord extends Component {
   }
 
   // 地贫检查
+  /* 
+   * CAUTION 
+   * 为迎合 输入b 展示 β 需求
+   * 将option中的value的b替换为β
+   */ 
   config3(){
     const isShow = data => {
       return !data || !data.filter || !data.filter(i=>['未检查','已查'].indexOf(i.label)!==-1).length;
@@ -433,7 +428,7 @@ export default class MedicalRecord extends Component {
           { name: 'yjcuch[HbA2]', type: 'input', span: 6, showSearch: true, valid: 'required'},
           { name: 'yjzhouq[血型]',  type: 'select', span: 6, showSearch: true, options: baseData.xuexingOptions, valid: 'required'},
           {name:'ckrh[]', type: 'select',span:2, options: baseData.xuexing2Options},
-          { name: 'yjchix[地贫基因型]',  type: 'input', span: 6, showSearch: true, valid: 'required'},
+          { name: 'yjchix[地贫基因型]',  type: 'select', span: 6, showSearch: true, options: _genotypeAnemia ,valid: 'required'},
         ]
       },
       {
@@ -457,7 +452,7 @@ export default class MedicalRecord extends Component {
           { name: 'yjcuch[HbA2]', type: 'input', span: 7, showSearch: true, valid: 'required'},
           { name: 'yjzhouq[血型]',  type: 'select', span: 7, showSearch: true, options: baseData.xuexingOptions, valid: 'required'},
           {name:'ckrh[]', type: 'select',span:2, options: baseData.xuexing2Options},
-          { name: 'yjchix[地贫基因型]',  type: 'input', span: 7, showSearch: true,  valid: 'required'},
+          { name: 'yjchix[地贫基因型]',  type: 'select', span: 7, showSearch: true,  options: _genotypeAnemia ,valid: 'required'},
         ]
       },
       {
@@ -648,14 +643,18 @@ export default class MedicalRecord extends Component {
   // 打开modal框 & 根据type值搜索对应模板
   openModal = (type) => {
     if(type){
-      // get templateList from server by key
-      this.setState({
-        templateObj: {
-          isShowTemplateModal: true,
-          type: type,
-          templateList: templateContentList[type]
-        }
-      })
+      const { id } = this.state;
+      const reqData = {doctor:id, type: TEMPLATE_KEY[type]}
+      service.medicalrecord.getTemplate(reqData)
+        .then(res => {
+          this.setState({
+            templateObj: {
+              isShowTemplateModal: true,
+              type: type,
+              templateList: res.object
+            }
+          })
+        });    
     }
   };
 
@@ -664,6 +663,21 @@ export default class MedicalRecord extends Component {
     this.setState({
       templateObj: {isShowTemplateModal: false, type: '', templateList: []}
     })
+  }
+
+  // data - 新增数据项
+  newTemplate = (data,allData) => {
+    console.log(data,allData);
+  }
+
+  // data - 删除 数据项
+  deleteTemplate = (data) => {
+    console.log(data);
+  }
+
+  adjustOrder = (key,acitonType) => {
+    // 请求服务器，调整后重新获取.......
+    console.log(key,acitonType);
   }
 
   /*============================ 页面事件交互类 ====================================*/
@@ -757,6 +771,9 @@ export default class MedicalRecord extends Component {
     return <TreeNode  key={item.key} {...item} dataRef={item} />;
   });
 
+  /*============================ 数据处理 ====================================*/
+  
+  
 
   render(){
     const { entity={} } = this.props;
@@ -764,13 +781,13 @@ export default class MedicalRecord extends Component {
     const { chief_complaint, medical_history, diagnosi, treatment } = this.state;
     const { pregnancy_history, downs_screen, ultrasound, past_medical_history, family_history, thalassemia, physical_checkUp } = this.state;
     const { isShowTemplateModal, templateList } = this.state.templateObj;
-
+    
     const tableColumns = [
-      {title: '编号', dataIndex: 'key', key: 'index',  render: (_,__,index) => (<span>{index+1}</span>) },
-      {title: '标题', dataIndex: 'title', key: 'title'},
+      {title: '编号', key: 'index', render: (_,__,index) => (<span>{index+1}</span>) },
+      {title: '标题', dataIndex: 'key', key: 'key'},
       {title: '内容', dataIndex: 'content', key: 'content'},
     ]
-
+    // console.log(baseData.genotypeAnemia);
     return (
       <Page className='fuzhen font-16 ant-col'>
         {/* 左端树形选择 */}
@@ -786,62 +803,66 @@ export default class MedicalRecord extends Component {
             {this.renderTreeNodes(treeData)}
           </Tree>
           ): null}
-          
           </div>
         </div>
 
         {/* 右端表单区域 */}
-        <div className="fuzhen-right ant-col-19 main-pad-small width_7">
-        <Collapse defaultActiveKey={['98','99','3','4','5','6','7']} >
+        <div className="fuzhen-right ant-col-19 main-pad-small width_7"> 
+          <Collapse defaultActiveKey={['c1','c2','c3','c4','c5','c6','c7']} >
 
-          <div className="single">{formRender({chief_complaint}, this.config(), this.handleChange.bind(this))}</div>
+            <div className="single">{formRender({chief_complaint}, this.config(), this.handleChange.bind(this))}</div>
           
-          <Panel header="预产期" key="98">
-            {formRender(pregnancy_history, this.configedd(), this.handleChange.bind(this))}
-          </Panel>
-          <div className="single">{formRender({medical_history}, this.configbs(), this.handleChange.bind(this))}</div>
-          
-          {/*  类数组对象的 解析问题 我们先做一个留空处理  */}
-          <Panel header="唐氏筛查" key="99">
-            {formRender(downs_screen, this.config2(), this.handleChange.bind(this))}
-          </Panel>
-          <Panel header="地贫/血型检查" key="3">
-            {formRender(thalassemia, this.config3(), this.handleChange.bind(this))}
-          </Panel>
+            {/* 这里 1、3 key值莫名其妙的报错 */}
+            <Panel header="预产期" key="c1">
+              {formRender(pregnancy_history, this.configedd(), this.handleChange.bind(this))}
+            </Panel>
+            <div className="single">{formRender({medical_history}, this.configbs(), this.handleChange.bind(this))}</div>
+            
+            {/*  类数组对象的 解析问题 我们先做一个留空处理  */}
+            <Panel header="唐氏筛查" key="c2">
+              {formRender(downs_screen, this.config2(), this.handleChange.bind(this))}
+            </Panel>
+            <Panel header="地贫/血型检查" key="c3">
+              {formRender(thalassemia, this.config3(), this.handleChange.bind(this))}
+            </Panel>
 
 
-          <Panel header="超声检查" key="4">
-          {formRender(ultrasound, this.configbase(), this.handleChange.bind(this))}
-          <Tabs
-              onChange={this.onChange.bind(this)}
-              activeKey={activeKey}
-              type="editable-card"
-              onEdit={this.onEdit}
-          >
-              {ultrasound.fetus.length !== 0 ? ( ultrasound.fetus.map((v,index) => 
-                  <TabPane tab={`胎儿${index+1}`} key={v.index}>
-                    {formRender(ultrasound.fetus[index], this.config4(), this.handleChange.bind(this))}
-                  </TabPane>
-                )) : null }
-            </Tabs>
-          </Panel>
+            <Panel header="超声检查" key="c4">
+            {formRender(ultrasound, this.configbase(), this.handleChange.bind(this))}
+            <Tabs
+                onChange={this.onChange.bind(this)}
+                activeKey={activeKey}
+                type="editable-card"
+                onEdit={this.onEdit}
+            >
+                {ultrasound.fetus.length !== 0 ? ( ultrasound.fetus.map((v,index) => 
+                    <TabPane tab={`胎儿${index+1}`} key={`fetus${index}`}>
+                      {formRender(ultrasound.fetus[index], this.config4(), this.handleChange.bind(this))}
+                    </TabPane>
+                  )) : null }
+              </Tabs>
+            </Panel>
 
-          <Panel header="既往史" key="5">
-            {formRender(past_medical_history, this.config5(), this.handleChange.bind(this))}
-          </Panel>
-          <Panel header="家族史" key="6">
-            {formRender(family_history, this.config6(), this.handleChange.bind(this))}
-          </Panel>
-          <Panel header="体格检查" key="7">
-            {formRender(physical_checkUp, this.config7(), this.handleChange.bind(this))}
-          </Panel>
-          <div className="single">{formRender({diagnosi},  this.configDiagnosi(), this.handleChange.bind(this))}</div>
-          <div className="single">{formRender({treatment}, this.configTreatment(), this.handleChange.bind(this))}</div>
-        </Collapse>
-        <Button className="pull-right blue-btn bottom-btn save-btn" type="ghost" onClick={() => this.handleSave(document.querySelector('.fuzhen-form'))}>保存</Button>
-        <Button className="pull-right blue-btn bottom-btn" type="ghost" onClick={() => this.handleSave(document.querySelector('.fuzhen-form'), "open")}>保存并开立医嘱</Button>
+            <Panel header="既往史" key="c5">
+              {formRender(past_medical_history, this.config5(), this.handleChange.bind(this))}
+            </Panel>
+            <Panel header="家族史" key="c6">
+              {formRender(family_history, this.config6(), this.handleChange.bind(this))}
+            </Panel>
+            <Panel header="体格检查" key="c7">
+              {formRender(physical_checkUp, this.config7(), this.handleChange.bind(this))}
+            </Panel>
+            <div className="single">{formRender({diagnosi},  this.configDiagnosi(), this.handleChange.bind(this))}</div>
+            <div className="single">{formRender({treatment}, this.configTreatment(), this.handleChange.bind(this))}</div>
+          </Collapse>
+          <Button className="pull-right blue-btn bottom-btn save-btn" type="ghost" onClick={() => this.handleSave(document.querySelector('.fuzhen-form'))}>保存</Button>
+          <Button className="pull-right blue-btn bottom-btn" type="ghost" onClick={() => this.handleSave(document.querySelector('.fuzhen-form'), "open")}>保存并开立医嘱</Button>
         </div>
         
+        <div className="ant-col-24" style={{textAlign: 'center', margin: '20px 0'}}>
+          <Button onClick={() => window.print()}>打印</Button>
+        </div>
+
         {/* modal */}
         <Modal
           visible={isShowTemplateModal}
@@ -853,6 +874,9 @@ export default class MedicalRecord extends Component {
             <EditableTable
               columns={tableColumns}
               dataSource={templateList}
+              newTemplate={this.newTemplate}
+              deleteTemplate={this.deleteTemplate}
+              adjustOrder={this.adjustOrder}
             />
           </div>
         </Modal>

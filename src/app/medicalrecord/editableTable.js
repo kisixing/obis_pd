@@ -11,7 +11,6 @@ import { Table, Input, Button } from 'antd';
 
 // 按键名拿index
 function searchIndex(arr,key,value) {
-  console.log(arr);
   const len = arr.length;
   let tarIndex = -1;
   for(let i = len - 1; len >= 0 ; i--){
@@ -25,7 +24,7 @@ function searchIndex(arr,key,value) {
 
 
 /**
- * {columns,dataSource,saveData()}  - from props
+ * {columns,dataSource,newTemplate(),deteleTemplate}  - from props
  *  - columns 中不写render 由本组件重写
  */
 export default class EditableTable extends Component {
@@ -35,7 +34,7 @@ export default class EditableTable extends Component {
       // 是否新建模板
       isNewTemplate: false,
       // 当前编辑模板
-      currentTemplate: {key:'', title: '', content: ''},
+      currentTemplate: {key:'', content: ''},
       // 当前选中行
       currentRowSelection: -1
     }  
@@ -43,10 +42,10 @@ export default class EditableTable extends Component {
 
   // 重置state中值
   resetMyState = () => {
-    // 这里有没有简单点
+    // 赋予currentTemplate与dataSource中相同的结构
     const { dataSource } = this.props;
     let newCurrentTemplate = {}, newDataSource = [];
-    Object.assign(newCurrentTemplate,dataSource);
+    Object.assign(newCurrentTemplate,dataSource[0]);
     Object.assign(newDataSource,dataSource);
     for(let key in newCurrentTemplate) {
       newCurrentTemplate[key] = "";
@@ -66,7 +65,6 @@ export default class EditableTable extends Component {
   componentDidUpdate(prevProps) { 
     // TODO 这里的判断要改
     if(prevProps.dataSource.length === 0){
-      console.log('1');
       this.resetMyState();
     }
   }
@@ -76,7 +74,6 @@ export default class EditableTable extends Component {
     const { isNewTemplate, dataSource } = this.state;
     if(isNewTemplate){
       let { currentTemplate } = this.state;
-      
       // 此次必为最后一项 先使用state中的current保存，届时再抽出封装
       return (index === dataSource.length - 1 ) ? (
       <input onChange={(e) => {
@@ -88,30 +85,31 @@ export default class EditableTable extends Component {
     return <span>{text}</span>;    
   }
 
+  // 可以考虑从父组件传入
+  handleRowSelection = (selectedRowKeys, selectedRows) => {
+    if(selectedRows[0].key !== selectedRowKeys) {
+      this.setState({currentRowSelection: selectedRowKeys[0]});
+    }
+  }
+
   // 新增 或 保存模板
   newOrSaveTemplate = () => {
     const { isNewTemplate, dataSource } = this.state;
     let len = dataSource.length;
     if(!isNewTemplate) {
       // 进入新增
-      // TODO key的生成之后要改,暂时应对展示需要
       const { currentTemplate } = this.state;
-      // TODO
-      // currentTemplate['key'] = parseInt(Math.random()*100 + Math.random() * 10);
       dataSource.splice(len,0,currentTemplate);
       this.setState({isNewTemplate: !isNewTemplate,dataSource});
     }else{
+      const { newTemplate } = this.props;
       // 保存
-      // 这里会有个bug 当table为空 新建的key如何创造 - 先应对展示需要
       const { currentTemplate } = this.state;
-      if(currentTemplate.title && currentTemplate.content) {
-        // 这里可能会跟服务器后重新
-        dataSource[len - 1] = currentTemplate;
-        this.setState({
-          isNewTemplate:!isNewTemplate,
-          dataSource, 
-          currentRowSelection: currentTemplate['key']
-        });
+      if(currentTemplate.content) {
+        // 传出父组件
+        newTemplate(currentTemplate,dataSource);
+        // 下面的用于效果展示
+        // dataSource[len - 1] = currentTemplate;this.setState({ isNewTemplate:!isNewTemplate,dataSource, currentRowSelection: currentTemplate['key']});
       }else{
         console.log('请先输入内容再新增');
       }
@@ -126,9 +124,15 @@ export default class EditableTable extends Component {
       const { dataSource, currentRowSelection } = this.state;
       const KEY = 'key';
       let tarIndex = searchIndex(dataSource,KEY,currentRowSelection);
-      dataSource.splice(tarIndex,1);
-      console.log(dataSource.length);
-      this.setState({dataSource, currentRowSelection:  dataSource.length  ? dataSource[0][KEY] : ''});
+      this.props.deleteTemplate(dataSource[tarIndex]);
+      /*
+        展示代码
+        
+        
+        dataSource.splice(tarIndex,1);
+        console.log(dataSource.length);
+        this.setState({dataSource, currentRowSelection:  dataSource.length  ? dataSource[0][KEY] : ''});
+       */
     }else{
       // cancel
       const { dataSource } = this.state;
@@ -148,51 +152,36 @@ export default class EditableTable extends Component {
     }
   }
 
-  // 移动 orient 1-向上 0-向下
+  // 移动 orient 1-向上 2-向下
   move = (orient) => {
     const { currentRowSelection, dataSource } = this.state;
-    console.log(dataSource);
+    const { adjustOrder } = this.props;
     const KEY = 'key';
     let tarIndex = searchIndex(dataSource,KEY,currentRowSelection);
-    // 这里有个0 -- 当心
-    if(tarIndex !== false) {
-      if(orient){
-        // 向上
-        if(tarIndex != 0){
-          this.setState({currentRowSelection: dataSource[tarIndex-1][KEY]});
-        }else {
-          console.warn('达到最上');
-        }
-      }else{
-        // 向下
-        if(tarIndex != dataSource.length-1){
-          this.setState({currentRowSelection: dataSource[tarIndex+1][KEY]});
-        }else{
-          console.warn('达到最下');
-        }
-      }
-    }else {
-      console.error('数字出现了负数')
-    }
+    // 将key 和 方向传出 做
+    adjustOrder(tarIndex, orient);
   }
 
 
   render() {
     const { columns } = this.props;
     const { dataSource } = this.state;
+    
     columns.map(v => {
       // 编号不做新增输入
-      if(v.key !== 'index'){
+      if(v.key !== 'index' && v.key !== 'key'){
         v.render = (text,_,index) => this.tableCellRender(text,index,v.dataIndex)
       }
       return v; 
     })
-
-    const { isNewTemplate, currentRowSelection } = this.state;
     
+    const { isNewTemplate, currentRowSelection } = this.state;
+
     const rowSelection = {
+      type: 'radio',
+      onChange:this.handleRowSelection,
       selectedRowKeys:[currentRowSelection],
-      getCheckboxProps: record => ({name: record.title}),
+      getCheckboxProps: record => ({name: record.key}),
       hideDefaultSelections:true
     };
     return (
@@ -203,7 +192,7 @@ export default class EditableTable extends Component {
           dataSource={dataSource} 
           columns={columns}
           rowSelection={rowSelection}
-          rowKey={record => (record.key) }
+          rowKey={record => (record.key)}
           pagination={false}
           size="middle"
         />
@@ -211,7 +200,7 @@ export default class EditableTable extends Component {
       {/* right */}
       <div style={{width: '120px', padding: '0 0 0 15px', margin: 0}}>
         <Button disabled={isNewTemplate} onClick={() => this.move(1)}>向上移动</Button>
-        <Button disabled={isNewTemplate} onClick={() => this.move(0)}>向下移动</Button>
+        <Button disabled={isNewTemplate} onClick={() => this.move(2)}>向下移动</Button>
         <br/>
         <br/>
         <Button onClick={this.newOrSaveTemplate}>{isNewTemplate ? (<span>保存模板</span>) : (<span>新增模板</span>) }</Button>

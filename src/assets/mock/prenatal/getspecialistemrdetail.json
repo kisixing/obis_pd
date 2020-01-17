@@ -73,14 +73,17 @@
 				"NT": "1",
 				"other_anomalies": "异常结果描述",
 				"middle": [{
-					"gestational_week": "1",
-					"BPD": "1",
-					"HC": "1",
-					"AC": "1",
-					"FL": "1",
-					"AFV": "1",
-					"UBF": "1",
-					"other_anomalies": "其他异常结果"
+					"docUniqueid": "ebc0fd1a20124fdaa4840480cf6bc468",
+					"title": "胎儿宫内状况评估2233",
+					"yunzh": "足月",
+					"bpd": "93",
+					"ac": "322",
+					"fl": "69",
+					"hc": "318",
+					"afv": "49",
+					"ubf": "",
+					"errorDesc": "0宫内妊娠，胎儿存活，胎儿发育相当于足月孕周。脐血流频谱未见明显异常。胎儿颈周围见脐彩色血流环绕，注意脐带绕颈。",
+					"writeOperationType": null
 				}]
 			},{
 				"CRL": "2",
@@ -88,14 +91,17 @@
 				"NT": "2",
 				"other_anomalies": "异常结果描述",
 				"middle": [{
-					"gestational_week": "2",
-					"BPD": "2",
-					"HC": "1",
-					"AC": "1",
-					"FL": "1",
-					"AFV": "1",
-					"UBF": "1",
-					"other_anomalies": "其他异常结果"
+					"docUniqueid": "ebc0fd1a20124fdaa4840480cf6bc468",
+					"title": "胎儿宫内状况评估2233",
+					"yunzh": "足月",
+					"bpd": "93",
+					"ac": "322",
+					"fl": "69",
+					"hc": "318",
+					"afv": "49",
+					"ubf": "",
+					"errorDesc": "2宫内妊娠，胎儿存活，胎儿发育相当于足月孕周。脐血流频谱未见明显异常。胎儿颈周围见脐彩色血流环绕，注意脐带绕颈。",
+					"writeOperationType": null
 				}]
 			}
 		

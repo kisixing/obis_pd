@@ -17,5 +17,14 @@ export default {
     getspecialistemrdetail: function(entity) {
         let uri = 'getspecialistemrdetail';
         return this.userId().then(r => myAxios.get(`${FRONT_URL}${uri}?userid=${r.object.userid}&recordid=${entity.recordid}`));
+    },
+
+    /**
+     * 获取模板
+     * entity :{ doctor: "xxxx", type: "drm1/2/3/4/5"}
+     */
+    getTemplate: function(entity) {
+        let uri = 'mrTemplate';
+        return this.userId().then(r => myAxios.get(`${FRONT_URL}${uri}?userid=${r.object.userid}&doctor=${entity.doctor}&type=${entity.type}`));
     }
 }

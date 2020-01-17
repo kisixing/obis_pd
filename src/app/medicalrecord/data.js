@@ -664,6 +664,12 @@ export const sxfOptions = toOptions('存在,亢起{#FF3300},消失{#FF3300},引�
 export const ygOptions = toOptions('正常,小三阳{#FF3300},大三阳{#FF3300},慢活肝{#FF3300},未查{#FF3300},其他{#FF3300}(input)');
 
 /**
+ * 基因型贫血
+ */
+export const genotypeAnemia = toOptions('β地中海贫血基因CD14-15突变,β地中海贫血基因CD17突变,β地中海贫血基因CD27/28突变,β地中海贫血基因CD41-42突变,β地中海贫血基因CD43突变,β地中海贫血基因CD71-72突变,β地中海贫血基因βE突变,β地中海贫血基因-32突变,β地中海贫血基因CD31突变,β地中海贫血基因30突变,β地中海贫血基因-29突变,β地中海贫血基因-28突变,β地中海贫血基因IVS-I-1突变,β地中海贫血基因IVS-II-654突变,β地中海贫血基因IVS-I-5突变,β地中海贫血基因CAP+1突变,β地中海贫血基因IntM突变,a地中海贫血基因SEA缺失,a地中海贫血基因3.7缺失,a地中海贫血基因4.2缺失,a地中海贫血基因QS突变,a地中海贫血基因WS突变,a地中海贫血基因CS突变')
+
+
+/**
  *阴阳未查
 */
 export const yywOptions = toOptions('阴性,阳性{#FF3300}(input),未查{#FF3300}');
@@ -755,42 +761,42 @@ export const shoushushiColumns = [
 export const BvColumns = [
 	{
 		title: '孕周',
-		key: 'gestational_week',
+		key: 'yunzh',
 		type: 'input'
 	},
 	{
 		title: 'BPD',
-		key: 'BPD',
+		key: 'bpd',
 		type: 'input',
 	},
 	{
 		title: 'HC',
-		key: 'HC',
+		key: 'hc',
 		type: 'input'
 	},
 	{
 		title: 'AC',
-		key: 'AC',
+		key: 'ac',
 		type: 'input'
 	},
 	{
 		title: 'FL',
-		key: 'FL',
+		key: 'fl',
 		type: 'input'
 	},
 	{
 		title: 'AFV',
-		key: 'AFV',
+		key: 'afv',
 		type: 'input'
 	},
 	{
 		title: '脐血流',
-		key: 'UBF',
+		key: 'ubf',
 		type: 'input'
 	},
 	{
 		title: '其他异常描述',
-		key: 'other_anomalies',
+		key: 'errorDesc',
 		type: 'input'
 	},
 ]
