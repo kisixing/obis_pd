@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { Select, Button, Popover, Input, Tabs, Tree, Modal, Row,Col, Spin,Timeline, Collapse,message } from 'antd';
 
+import axios from 'axios';
+
 import {valid} from '../../render/common';
 import Page from '../../render/page';
 import service from '../../service';
@@ -8,6 +10,8 @@ import * as baseData from './data';
 import formRender from '../../render/form';
 import * as util from './util';
 import editors from '../shouzhen/editors';
+
+import EditableTable from '../medicalrecord/editableTable.js';
 
 import store from '../store';
 import { getAlertAction } from '../store/actionCreators.js';
@@ -232,6 +236,10 @@ function modal(type, title) {
   message[type](title, 3)
 }
 
+const TEMPLATE_KEY = {
+  zz: 'dmr1', xb: 'dmr2', qt: 'dmr3', zd: 'dmr4', cl: 'dmr5'
+}
+
 export default class Operation extends Component {
 
   constructor(props) {
@@ -274,21 +282,7 @@ export default class Operation extends Component {
           "counts": "3"
         }
       ],
-      treeData : [
-        {
-          title: '2019-12-26',
-          key: '0-1',
-          children: [
-            { title: '羊膜腔穿刺', key: '0-1-0-0' },
-            { title: '减胎/毁胎术', key: '0-1-0-1' },
-            { title: '其他手术', key: '0-1-0-2' },
-          ],
-        },
-        {
-          title: '2020-01-07',
-          key: '0-2',
-        },
-      ],
+      treeData : [],
       selectedKeys: [], 
       panes:[
         { title: '胎儿1', content: '选项卡一内容', key: '0' },
@@ -297,7 +291,19 @@ export default class Operation extends Component {
         { title: '胎儿1', content: '选项卡一内容', key: '0' },
       ],
       activeKey: '1',
-      iactiveKey :'1'
+      iactiveKey :'1',
+
+       /**
+       * @param
+       * {isShowTemplateModal} - modal框
+       * {type} - template type
+       * {templateList} - templateList from server
+       */
+      templateObj: { 
+        isShowTemplateModal: false,
+        type: '', 
+        templateList: []
+      },
     };
 
     this.componentWillUnmount = editors();
@@ -319,6 +325,7 @@ export default class Operation extends Component {
   componentDidMount() {
     Promise.all([
     service.getoperationdetail().then(res => {
+      console.log(res);
       let currentpanes = res.object.operative_procedure.fetus;
       let currentipanes = res.object.inspection_item.fetus;
       currentpanes.forEach((pane, i) => {
@@ -328,9 +335,26 @@ export default class Operation extends Component {
         pane.key = "ifetus-"+i;
       });
       this.setState({ entity: res.object,panes:currentpanes,ipanes:currentipanes});
-      console.log(this.state);
+      // console.log(this.state);
     })])
   }
+
+  // 展示使用
+  getOperationDetail = (key) => {
+    service.getoperationdetail().then(res => {
+      console.log(res);
+      let currentpanes = res.object.operative_procedure.fetus;
+      let currentipanes = res.object.inspection_item.fetus;
+      currentpanes.forEach((pane, i) => {pane.key = "fetus-"+i;});
+      currentipanes.forEach((pane, i) => {pane.key = "ifetus-"+i;});
+      this.setState({ entity: res.object,panes:currentpanes,ipanes:currentipanes});
+      // console.log(this.state);
+      // 记录手术项目
+      console.log(res);
+    })
+  }
+  
+
   ontabChange=(activeKey) =>{
     this.setState({
       activeKey
@@ -405,6 +429,11 @@ export default class Operation extends Component {
     }
     this.setState({ ipanes:ipanes, iactiveKey:activeKey });
   }
+
+
+  /* ================================== UI视图 ==================================== */
+
+  // 术前记录
   configpreoperative_record(){
     return {
       step: 1,
@@ -429,6 +458,8 @@ export default class Operation extends Component {
       ]
     }
   }
+  
+  // 送检项目
   configinspection_item() {
     return {
       step: 1,
@@ -444,6 +475,7 @@ export default class Operation extends Component {
     };
   }
 
+  // 病史 暂不用
   configbs(){
     return {
       step : 3,
@@ -457,14 +489,14 @@ export default class Operation extends Component {
       ]
     }
   }
-
+  // 手术操作
   configoperative_procedure(){
     return {
       step : 3,
       rows:[
         {
           columns:[
-            { name: 'operation_items[手术项目]',  type: 'checkinput', radio: true, options: baseData.operation_itemsOptions, span: 24},
+            { name: 'operation_items[手术项目]',  type: 'checkinput', options: baseData.operation_itemsOptions, span: 24},
           ]
         },
         {
@@ -476,8 +508,8 @@ export default class Operation extends Component {
         },
         {
           columns:[
-            { name: 'start_time[开始时间]', type: 'date', width: 160 ,showTime:true,format:"yyyy-MM-dd HH:mm", valid: 'required',span: 5},
-            { name: 'end_time[结束时间]', type: 'date', width: 160,showTime:true,format:"yyyy-MM-dd HH:mm", valid: 'required',span: 5},
+            { name: 'start_time[开始时间]', type: 'time',format:"HH:mm", valid: 'required', placeholder: '' ,span: 5},
+            { name: 'end_time[结束时间]', type: 'time', format:"HH:mm", valid: 'required',placeholder: '' ,span: 5},
             { name: 'duration(min)[持续时间]', type: 'input', valid: 'required',span: 5 }
           ]
         },
@@ -504,7 +536,7 @@ export default class Operation extends Component {
         },
         {
           columns:[
-            { name: 'process_evaluation[术中特殊]', type: 'textarea',span: 20}
+            { name: 'special_case[术中特殊]', type: 'textarea',span: 20}
           ]
         },
         {
@@ -515,7 +547,9 @@ export default class Operation extends Component {
         },
         {
           columns:[
-            { name: 'diagnosis[诊断]', type: 'textarea', valid: 'required',span: 20}
+            { name: 'diagnosis[诊断]', type: 'textarea', valid: 'required',span: 20},
+            { name: 'diagnosis[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => this.openModal('zz')}
+
           ]
         },
         {
@@ -526,6 +560,8 @@ export default class Operation extends Component {
       ]
     }
   }
+
+  // 医生嘱咐
   configdoctors_advice(){
     return {
       step: 1,
@@ -533,29 +569,95 @@ export default class Operation extends Component {
         {
           columns:[
             { name: 'doctor_advice[术后医嘱]', type: 'textarea', span: 16 },
+            { name: 'doctor_advice_btn[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => this.openModal('cl')}
           ]
         }
       ]
       }
+  }
+
+
+  // configbase(){
+  //   return {
+  //     step: 1,
+  //     rows: [
+  //       {
+  //         label: '早孕超声:', span: 12, className:'labelclass2'
+  //       },
+  //       {
+  //         columns:[
+  //           { name: 'diagnosis(周)[停经]', type: 'input', span: 4 },
+  //         ]
+  //       },
+  //     ]
+  //     }
+  // }
+
+
+  /* ================================== 模板功能 ==================================== */
+
+   // 打开modal框 & 根据type值搜索对应模板
+   openModal = (type) => {
+    if(type){
+      const { id } = this.state;
+      const reqData = {doctor:id, type: TEMPLATE_KEY[type]}
+      service.medicalrecord.getTemplate(reqData)
+        .then(res => {
+          this.setState({
+            templateObj: {
+              isShowTemplateModal: true,
+              type: type,
+              templateList: res.object
+            }
+          })
+        });    
     }
-    configbase(){
-      return {
-        step: 1,
-        rows: [
-          {
-            label: '早孕超声:', span: 12, className:'labelclass2'
-          },
-          {
-            columns:[
-              { name: 'diagnosis(周)[停经]', type: 'input', span: 4 },
-            ]
-          },
-        ]
-        }
-      }
+  };
+
+  // 关闭modal框
+  closeModal = () => {
+    this.setState({
+      templateObj: {isShowTemplateModal: false, type: '', templateList: []}
+    })
+  }
+
+  // data - 新增数据项
+  newTemplate = (data,allData) => {
+    console.log(data,allData);
+  }
+
+  // data - 删除 数据项
+  deleteTemplate = (data) => {
+    console.log(data);
+  }
+
+   // 选择模板
+   getTemplate = (data) => {
+    console.log(data);
+    // 得到数据 设置值
+    const { type } = this.state.templateObj;
+    console.log(type);
+    // switch(type) {
+    //   case 'zz':
+    //   case 'CL':
+
+    // }
+  }
+
+  adjustOrder = (key,acitonType) => {
+    // 请求服务器，调整后重新获取.......
+    console.log(key,acitonType);
+  }
+
+
+  /* ================================== 事件交互 ==================================== */
+
+  
   handleChange(e, { name, value, target }){
     const { onChange } = this.props;
-    onChange(e, { name, value, target })
+    console.log(value);
+    // console.log(onChange);
+    // onChange(e, { name, value, target })
     // 关联变动请按如下方式写，这些onChange页可以写在form配置的行里
     // if(name === 'test'){
     //   onChange(e, { name: 'test01', value: [value,value] })
@@ -576,6 +678,24 @@ export default class Operation extends Component {
     }
   }
 
+  
+  
+  // 选中节点触发-------如何在这里获取到选中节点的app_id？？？
+  onSelect = (selectedKeys) => {
+    console.log(selectedKeys);
+    if (selectedKeys.length > 0) {
+      // 防止编辑时重复点击造成选中节点为空
+      this.setState({
+        selectedKeys,
+      });
+    }
+  };
+
+
+  /* ================================== 渲染类 ==================================== */
+  
+  
+  
   /**
    * 模板
    */
@@ -626,33 +746,25 @@ export default class Operation extends Component {
           </TreeNode>
         );
       }
+      console.log(item);
       return <TreeNode key={item.key} {...item} dataRef={item} />;
     });
 
-    renderKTreeNode = data => {
-      return data.map(item => {
-        if (item.child) {
-          return (
-            <TreeNode title={item.menu_name} key={item.menu_id} appId={item.app_id} dataRef={item}>
-              {this.renderKTreeNode(item.child)}
-            </TreeNode>
-          );
-        }
+    // renderKTreeNode = data => {
+    //   return data.map(item => {
+    //     if (item.child) {
+    //       return (
+    //         <TreeNode title={item.menu_name} key={item.menu_id} appId={item.app_id} dataRef={item}>
+    //           {this.renderKTreeNode(item.child)}
+    //         </TreeNode>
+    //       );
+    //     }
   
-        return <TreeNode title={item.menu_name} key={item.menu_code} dataRef={item}/>;
-      });
-    };
+    //     return <TreeNode title={item.menu_name} key={item.menu_code} dataRef={item}/>;
+    //   });
+    // };
   
-    // 选中节点触发-------如何在这里获取到选中节点的app_id？？？
-    onSelect = (selectedKeys) => {
-      console.log(selectedKeys);
-      if (selectedKeys.length > 0) {
-        // 防止编辑时重复点击造成选中节点为空
-        this.setState({
-          selectedKeys,
-        });
-      }
-    };
+  
   renderLeft() {
     const { planData, collapseActiveKey } = this.state;
 
@@ -677,17 +789,40 @@ export default class Operation extends Component {
 
   render(){
     //const { entity={} } = this.props;
-    const { entity} = this.state;
-    console.log(this.state.treeData,entity);
+    const { entity, treeData} = this.state;
+
+    const { isShowTemplateModal, templateList } = this.state.templateObj;
+
+    const tableColumns = [
+      {title: '编号', key: 'index', render: (_,__,index) => (<span>{index+1}</span>) },
+      {title: '内容', dataIndex: 'content', key: 'content'},
+    ]
+
+    // console.log(this.state.treeData,entity);
     return (
       <Page className='fuzhen font-16 ant-col'>
         <div className="fuzhen-left ant-col-5">
-        <Tree
-        onSelect={this.onSelect}
-        defaultExpandAll = {true}
-        >    
-        { this.renderTreeNodes(this.state.treeData)}
-        </Tree>
+          {/* {treeData.length !== 0 ? (
+            <Tree
+            onSelect={this.onSelect}
+            defaultExpandAll = {true}
+            >    
+            { this.renderTreeNodes(treeData)}
+            </Tree>
+          ): null} */}
+          {/* 展示需要 先手写了 */}
+          <Tree
+            defaultExpandAll={true}
+            onSelect={(selectedKeys) => this.getOperationDetail(selectedKeys)}
+          >
+            
+            <TreeNode title="2019-12-12">
+              <TreeNode title={<span style={{color: 'red'}}>羊膜腔穿刺（待完善）</span>}  />
+            </TreeNode>
+            <TreeNode title="2019-11-11">
+              <TreeNode title="灭胎/毁胎术" />
+            </TreeNode>
+          </Tree>
         </div>
         <div className="fuzhen-right ant-col-19 main-pad-small width_7">
         <Collapse defaultActiveKey={['1','2','3','4','5','6','7']} >
@@ -714,15 +849,38 @@ export default class Operation extends Component {
               {this.state.ipanes.map((pane, index) => <TabPane tab={'胎儿'+(index+1)}  key={pane.key}>{formRender(pane, this.configinspection_item(), this.handleChange.bind(this))}</TabPane>)}
             </Tabs>
           </Panel>
-          <Panel header="" key="4">
+          <Panel header="术后医嘱" key="4">
             
         <div className="single">{formRender(entity, this.configdoctors_advice(), this.handleChange.bind(this))}</div>
           </Panel>
         </Collapse>
-        <Button className="pull-right blue-btn bottom-btn save-btn" type="ghost" onClick={() => this.handleSave(document.querySelector('.fuzhen-form'))}>保存</Button>
-        <Button className="pull-right blue-btn bottom-btn" type="ghost" onClick={() => this.handleSave(document.querySelector('.fuzhen-form'), "open")}>保存并开立医嘱</Button>
+        <div className="pull-right bottom-btn">
+          <Button className="blue-btn " onClick={() => window.print()}>打印</Button>
+          <Button className=" blue-btn save-btn" type="ghost" onClick={() => this.handleSave(document.querySelector('.fuzhen-form'))}>保存</Button>
+          <Button className=" blue-btn" type="ghost" onClick={() => this.handleSave(document.querySelector('.fuzhen-form'), "open")}>保存并开立医嘱</Button>
+        </div>
+
         {this.renderTreatment()}
         </div>
+
+        {/* modal */}
+        <Modal
+          visible={isShowTemplateModal}
+          onCancel={this.closeModal}
+          footer={false}
+          width="800px"
+        >
+          <div>
+            <EditableTable
+              columns={tableColumns}
+              dataSource={templateList}
+              newTemplate={this.newTemplate}
+              deleteTemplate={this.deleteTemplate}
+              adjustOrder={this.adjustOrder}
+              getTemplate={this.getTemplate}
+            />
+          </div>
+        </Modal>
       </Page>
     )
   }

@@ -987,8 +987,8 @@ export const assistantOptions = [{ label: '李志', value: '李志' },{ label: '
  *叶酸
 */
 export const statusOptions = toOptions('顺利,困难,失败');
-export const instrumentOptions = toOptions('钳子');
+export const instrumentOptions = toOptions('穿刺针,活检钳,双腔穿刺镜');
 export const characterOptions = toOptions('淡黄色,水样,血染,新鲜血性,陈旧血性');
 export const methodOptions = toOptions('经胎盘,经羊膜');
-export const uterusOptions = toOptions('前位,后位,脐血穿刺,遗传咨询');
+export const uterusOptions = toOptions('前位,后位');
 export const placentaOptions = toOptions('前上壁,前下壁,后上壁,后下壁,左前壁,右前壁,左后壁,右后壁,左侧壁,右侧壁,子宫底,峡部');

@@ -29,6 +29,14 @@ export default {
     },
     
     /**
+     * 得到手术列表
+     */
+
+    getoperation: function () {
+        return myAxios.get('/outpatientRestful/getoperation')
+    },
+
+    /**
      * 手术记录
      */
     getoperationdetail: function(){

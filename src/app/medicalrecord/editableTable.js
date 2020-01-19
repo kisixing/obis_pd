@@ -162,6 +162,16 @@ export default class EditableTable extends Component {
     adjustOrder(tarIndex, orient);
   }
 
+  // 选择模板 提交出父组件
+  selectTeamplate = () => {
+    const { currentRowSelection, dataSource } = this.state;
+    const { getTemplate } = this.props;
+    const KEY = 'key';
+    let tarIndex = searchIndex(dataSource,KEY,currentRowSelection);
+    // console.log(dataSource[tarIndex]);
+    getTemplate(dataSource[tarIndex]);
+  }
+
 
   render() {
     const { columns } = this.props;
@@ -205,6 +215,7 @@ export default class EditableTable extends Component {
         <br/>
         <Button onClick={this.newOrSaveTemplate}>{isNewTemplate ? (<span>保存模板</span>) : (<span>新增模板</span>) }</Button>
         <Button onClick={this.cancelOrDeleteTemplate}>{isNewTemplate ? (<span>取消新增</span>) : (<span>删除模板</span>) }</Button>
+        <Button disabled={isNewTemplate} onClick={this.selectTeamplate}>选择模板</Button>
       </div>
     </div>
     )

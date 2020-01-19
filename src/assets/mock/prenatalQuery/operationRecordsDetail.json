@@ -1,0 +1,53 @@
+{
+        "code": "200",
+        "message": "OK",
+        "object": {
+            "id": 20,
+            "userid": null,
+            "createdate": 1578844800000,
+            "doctors_advice": "定期复查",
+            "doctor": "李国兰",
+            "preoperative_record": {
+                "temperature": "定期复查",
+                "operation_date": 1578844800000,
+                "bp": "110/80"
+            },
+            "operative_procedure": {
+                "fetus": [
+                    {
+                        "id": 1218019893685841921,
+                        "operation_no": "0002",
+                        "operation_items": "{\"label\":\"绒毛活检\",\"value\":\"绒毛活检\"}",
+                        "operator": "1",
+                        "assistant": "1",
+                        "start_time": "1",
+                        "end_time": "1",
+                        "duration": "1",
+                        "uterus": "2",
+                        "placenta": "3",
+                        "specimen_location": "4",
+                        "method": "5",
+                        "instrument": "6",
+                        "specimen_amount": "7",
+                        "character": "8",
+                        "process_evaluation": null,
+                        "special_case": "10",
+                        "pre_fhr": "11",
+                        "after_fhr": "12",
+                        "diagnosis": "13",
+                        "re_puncture": "14"
+                    }
+                ]
+            },
+            "inspection_item": {
+                "fetus": [
+                    {
+                        "id": 1218019893685841921,
+                        "amniotic_fluid": "{\"label\":\"心酶组合\",\"value\":\"心酶组合\"}",
+                        "umbilical_blood": "{\"label\":\"血型\",\"value\":\"血型\"}",
+                        "villus": "{\"label\":\"染色体核型\",\"value\":\"染色体核型\"}"
+                    }
+                ]
+            }
+        }
+    }

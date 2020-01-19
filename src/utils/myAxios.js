@@ -10,6 +10,8 @@ const getUrl = function (url){
     }else{
         return 'assets/mock/' + url.split('?').map((v,i)=>v+(!i?'.json':'')).join('?');
     }
+    // console.log(url);
+    // return 'http://120.77.46.176:8080/Obcloud/' + url;
 };
 
 /**

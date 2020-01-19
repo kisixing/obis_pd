@@ -22,7 +22,7 @@ import "./index.less";
 const { TreeNode } = Tree;
 const Panel = Collapse.Panel;
 const TabPane = Tabs.TabPane;
-
+const { Group } = Button;
 // β
 // 修改后的
 const _genotypeAnemia = baseData.genotypeAnemia.map(item => {
@@ -37,7 +37,7 @@ const _genotypeAnemia = baseData.genotypeAnemia.map(item => {
 // }
 
 const TEMPLATE_KEY = {
-  zz: 'dmr1', xb: 'dmr2', qt: 'dmr3', zd: 'dmr4', cl: 'dmr5'
+  zz: 'dmr1', xb: 'dmr2', qt: 'dmr3', zd: 'dmr4', cl: 'dmr5', rs: 'dmr6'
 }
 
 export default class MedicalRecord extends Component {
@@ -62,6 +62,11 @@ export default class MedicalRecord extends Component {
       diagnosislist: {},
       // 处理措施
       treatment: '',
+      //
+      chromosome: '',
+      //
+      other: '',
+
       // 预产期
       pregnancy_history: {},
       // 唐氏筛查
@@ -154,6 +159,7 @@ export default class MedicalRecord extends Component {
         type: '', 
         templateList: []
       },
+      isFetusDisease: true
     };
     this.componentWillUnmount = editors();
   }
@@ -172,6 +178,8 @@ export default class MedicalRecord extends Component {
   }
 
   componentDidMount() {
+
+
     // 请求获取专科病历list
     service.medicalrecord.getspecialistemr()
       .then(res => {
@@ -277,6 +285,36 @@ export default class MedicalRecord extends Component {
           columns:[
             { name: 'treatment[处理措施]', type: 'textarea', span: 16 },
             { name:'treatment[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => this.openModal('cl')}
+          ]
+        },
+      ]
+    }
+  }
+
+  // 染色体核
+  configChromosome(){
+    return {
+      step: 1,
+      rows: [
+        {
+          columns:[
+            { name: 'chromosome[染色体核]', type: 'textarea', span: 16 },
+            { name:'chromosome[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => this.openModal('rs')}
+          ]
+        },
+      ]
+    }
+  }
+
+  // 其他检查
+  configOther() {
+    return {
+      step: 1,
+      rows: [
+        {
+          columns:[
+            { name: 'other[其他检查]', type: 'textarea', span: 16 },
+            { name:'other[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => this.openModal('qt')}
           ]
         },
       ]
@@ -392,6 +430,7 @@ export default class MedicalRecord extends Component {
         },
         {
           filter: entity => !entity && !entity.fkjc || isShow(entity.fkjc), columns: [               
+            {span:2},
             { name: 'Z_value[Z值]', type: 'input', span: 5 },   
             { name: 'other_anomalies[其他异常]', type: 'input', span: 11 }
           ]
@@ -418,17 +457,24 @@ export default class MedicalRecord extends Component {
       },
       {
         columns: [
-          { name: 'yjcuch(g/L)[Hb]', type: 'input', span: 7, showSearch: true, valid: 'required'},
-          { name: 'yjzhouq(fL)[MCV]',  type: 'input', span: 7, showSearch: true, valid: 'required'},
-          { name: 'yjchix[MCH]',  type: 'input', span: 7, showSearch: true, valid: 'required'},
+          { span: 1 },
+          { name: 'yjcuch(g/L)[Hb]', type: 'input', span: 6, showSearch: true, valid: 'required'},
+          { name: 'yjzhouq(fL)[MCV]',  type: 'input', span: 6, showSearch: true, valid: 'required'},
+          { name: 'yjchix[MCH]',  type: 'input', span: 6, showSearch: true, valid: 'required'},
         ]
       },
       {
         columns: [
+          { span: 1 },
           { name: 'yjcuch[HbA2]', type: 'input', span: 6, showSearch: true, valid: 'required'},
           { name: 'yjzhouq[血型]',  type: 'select', span: 6, showSearch: true, options: baseData.xuexingOptions, valid: 'required'},
-          {name:'ckrh[]', type: 'select',span:2, options: baseData.xuexing2Options},
-          { name: 'yjchix[地贫基因型]',  type: 'select', span: 6, showSearch: true, options: _genotypeAnemia ,valid: 'required'},
+          {name:'ckrh[RH(D)血型]', type: 'select',span:6, options: baseData.xuexing2Options, valid: 'required'},
+        ]
+      },
+      {
+        columns: [
+          { span: 1 },
+          { name: 'yjchix[地贫基因型]',  type: 'select', span: 11, showSearch: true, options: _genotypeAnemia ,valid: 'required'}
         ]
       },
       {
@@ -442,17 +488,24 @@ export default class MedicalRecord extends Component {
       },
       {
         columns: [
-          { name: 'yjcuch(g/L)[Hb]', type: 'input', span: 7, showSearch: true,  valid: 'required'},
-          { name: 'yjzhouq(fL)[MCV]',  type: 'input', span: 7, showSearch: true,  valid: 'required'},
-          { name: 'yjchix[MCH]',  type: 'input', span: 7, showSearch: true, valid: 'required'},
+          { span: 1},
+          { name: 'yjcuch(g/L)[Hb]', type: 'input', span: 6, showSearch: true,  valid: 'required'},
+          { name: 'yjzhouq(fL)[MCV]',  type: 'input', span: 6, showSearch: true,  valid: 'required'},
+          { name: 'yjchix[MCH]',  type: 'input', span: 6, showSearch: true, valid: 'required'},
         ]
       },
       {
         columns: [
-          { name: 'yjcuch[HbA2]', type: 'input', span: 7, showSearch: true, valid: 'required'},
-          { name: 'yjzhouq[血型]',  type: 'select', span: 7, showSearch: true, options: baseData.xuexingOptions, valid: 'required'},
-          {name:'ckrh[]', type: 'select',span:2, options: baseData.xuexing2Options},
-          { name: 'yjchix[地贫基因型]',  type: 'select', span: 7, showSearch: true,  options: _genotypeAnemia ,valid: 'required'},
+          { span: 1},
+          { name: 'yjcuch[HbA2]', type: 'input', span: 6, showSearch: true, valid: 'required'},
+          { name: 'yjzhouq[血型]',  type: 'select', span: 6, showSearch: true, options: baseData.xuexingOptions, valid: 'required'},
+          {name:'ckrh[RH(D)血型]', type: 'select',span:6, options: baseData.xuexing2Options},
+        ]
+      },
+      {
+        columns: [
+          { span: 1 },
+          { name: 'yjchix[地贫基因型]',  type: 'select', span: 11, showSearch: true, options: _genotypeAnemia ,valid: 'required'}
         ]
       },
       {
@@ -659,7 +712,7 @@ export default class MedicalRecord extends Component {
   };
 
   // 关闭modal框
-  clostModal = () => {
+  closeModal = () => {
     this.setState({
       templateObj: {isShowTemplateModal: false, type: '', templateList: []}
     })
@@ -673,6 +726,36 @@ export default class MedicalRecord extends Component {
   // data - 删除 数据项
   deleteTemplate = (data) => {
     console.log(data);
+  }
+
+  // 选择模板
+  getTemplate = (data) => {
+    const { type } = this.state.templateObj;
+    const { content } = data;
+    console.log(type);
+    switch(type) {
+      case 'zz':
+        this.setState({chief_complaint: content});
+        break;
+      case 'xb':
+        this.setState({medical_history: content});
+        break;
+      case 'zd':
+        this.setState({diagnosi: content});
+        break;
+      case 'cl':
+         this.setState({treatment: content});
+         break;
+        case 'rs':
+        this.setState({chromosome: content});
+         break;
+        case 'qt':
+        this.setState({other: content});
+         break;
+      default:
+        console.log('type error');
+    }
+    this.closeModal();
   }
 
   adjustOrder = (key,acitonType) => {
@@ -778,13 +861,14 @@ export default class MedicalRecord extends Component {
   render(){
     const { entity={} } = this.props;
     const { selectedKeys, treeData, activeKey } = this.state;
-    const { chief_complaint, medical_history, diagnosi, treatment } = this.state;
+    const { chief_complaint, medical_history, diagnosi, treatment, chromosome, other } = this.state;
     const { pregnancy_history, downs_screen, ultrasound, past_medical_history, family_history, thalassemia, physical_checkUp } = this.state;
     const { isShowTemplateModal, templateList } = this.state.templateObj;
-    
+
+    const { isFetusDisease } = this.state;
+
     const tableColumns = [
       {title: '编号', key: 'index', render: (_,__,index) => (<span>{index+1}</span>) },
-      {title: '标题', dataIndex: 'key', key: 'key'},
       {title: '内容', dataIndex: 'content', key: 'content'},
     ]
     // console.log(baseData.genotypeAnemia);
@@ -793,7 +877,7 @@ export default class MedicalRecord extends Component {
         {/* 左端树形选择 */}
         <div className="fuzhen-left ant-col-5" style={{margin: "20px 0"}}>
           <div className="single">
-          { treeData.length !== 0 ? (
+          {/* { treeData.length !== 0 ? (
             <Tree
               onSelect={this.onSelect}
               defaultExpandAll
@@ -802,12 +886,30 @@ export default class MedicalRecord extends Component {
             >    
             {this.renderTreeNodes(treeData)}
           </Tree>
-          ): null}
+          ): null} */}
+          {/* 展示使用 */}
+          <Tree 
+            defaultExpandAll={true}
+          >
+            <TreeNode title="2019-11-16">
+              <TreeNode title={<span style={{color: 'red'}}>待完善病历</span>}></TreeNode>
+            </TreeNode>
+            <TreeNode title="2019-11-16">
+              <TreeNode title="胎儿疾病病历"></TreeNode>
+              <TreeNode title="遗传门诊病历"></TreeNode>
+            </TreeNode>
+          </Tree>
           </div>
         </div>
 
         {/* 右端表单区域 */}
         <div className="fuzhen-right ant-col-19 main-pad-small width_7"> 
+          <div>
+            <Group>
+              <Button type={isFetusDisease ? 'primary' : ''} onClick={() => this.setState({isFetusDisease:true})}>胎儿疾病</Button>
+              <Button type={isFetusDisease ? '' : 'primary'} onClick={() => this.setState({isFetusDisease:false})}>遗传门诊</Button>
+            </Group>
+          </div>
           <Collapse defaultActiveKey={['c1','c2','c3','c4','c5','c6','c7']} >
 
             <div className="single">{formRender({chief_complaint}, this.config(), this.handleChange.bind(this))}</div>
@@ -819,29 +921,44 @@ export default class MedicalRecord extends Component {
             <div className="single">{formRender({medical_history}, this.configbs(), this.handleChange.bind(this))}</div>
             
             {/*  类数组对象的 解析问题 我们先做一个留空处理  */}
-            <Panel header="唐氏筛查" key="c2">
+            
+            {!isFetusDisease ? null : (
+              <Panel header="唐氏筛查" key="c2">
               {formRender(downs_screen, this.config2(), this.handleChange.bind(this))}
             </Panel>
+            )}
+            
             <Panel header="地贫/血型检查" key="c3">
               {formRender(thalassemia, this.config3(), this.handleChange.bind(this))}
             </Panel>
-
-
-            <Panel header="超声检查" key="c4">
-            {formRender(ultrasound, this.configbase(), this.handleChange.bind(this))}
-            <Tabs
-                onChange={this.onChange.bind(this)}
-                activeKey={activeKey}
-                type="editable-card"
-                onEdit={this.onEdit}
-            >
-                {ultrasound.fetus.length !== 0 ? ( ultrasound.fetus.map((v,index) => 
-                    <TabPane tab={`胎儿${index+1}`} key={`fetus${index}`}>
-                      {formRender(ultrasound.fetus[index], this.config4(), this.handleChange.bind(this))}
-                    </TabPane>
-                  )) : null }
-              </Tabs>
-            </Panel>
+            
+            {!isFetusDisease ? (
+              <div>
+                {formRender(chromosome, this.configChromosome(), this.handleChange.bind(this))}
+                
+              </div>
+            ):null}
+            <div>
+              {formRender(other, this.configOther(), this.handleChange.bind(this))}
+            </div>
+            {!isFetusDisease ? null : (
+              <Panel header="超声检查" key="c4">
+              {formRender(ultrasound, this.configbase(), this.handleChange.bind(this))}
+              <Tabs
+                  onChange={this.onChange.bind(this)}
+                  activeKey={activeKey}
+                  type="editable-card"
+                  onEdit={this.onEdit}
+              >
+                  {ultrasound.fetus.length !== 0 ? ( ultrasound.fetus.map((v,index) => 
+                      <TabPane tab={`胎儿${index+1}`} key={`fetus${index}`}>
+                        {formRender(ultrasound.fetus[index], this.config4(), this.handleChange.bind(this))}
+                      </TabPane>
+                    )) : null }
+                </Tabs>
+              </Panel>
+            )}
+            
 
             <Panel header="既往史" key="c5">
               {formRender(past_medical_history, this.config5(), this.handleChange.bind(this))}
@@ -849,24 +966,28 @@ export default class MedicalRecord extends Component {
             <Panel header="家族史" key="c6">
               {formRender(family_history, this.config6(), this.handleChange.bind(this))}
             </Panel>
-            <Panel header="体格检查" key="c7">
-              {formRender(physical_checkUp, this.config7(), this.handleChange.bind(this))}
-            </Panel>
+
+            {!isFetusDisease ? null : (
+              <Panel header="体格检查" key="c7">
+                {formRender(physical_checkUp, this.config7(), this.handleChange.bind(this))}
+              </Panel>
+            )}
+            
+            
             <div className="single">{formRender({diagnosi},  this.configDiagnosi(), this.handleChange.bind(this))}</div>
             <div className="single">{formRender({treatment}, this.configTreatment(), this.handleChange.bind(this))}</div>
           </Collapse>
-          <Button className="pull-right blue-btn bottom-btn save-btn" type="ghost" onClick={() => this.handleSave(document.querySelector('.fuzhen-form'))}>保存</Button>
-          <Button className="pull-right blue-btn bottom-btn" type="ghost" onClick={() => this.handleSave(document.querySelector('.fuzhen-form'), "open")}>保存并开立医嘱</Button>
-        </div>
-        
-        <div className="ant-col-24" style={{textAlign: 'center', margin: '20px 0'}}>
-          <Button onClick={() => window.print()}>打印</Button>
+          <div className="pull-right bottom-btn">
+						<Button className="blue-btn " onClick={() => window.print()}>打印</Button>
+						<Button className="blue-btn save-btn" type="ghost" onClick={() => this.handleSave(document.querySelector('.fuzhen-form'))}>保存</Button>
+						<Button className="blue-btn " type="ghost" onClick={() => this.handleSave(document.querySelector('.fuzhen-form'), "open")}>保存并开立医嘱</Button>
+          </div>
         </div>
 
         {/* modal */}
         <Modal
           visible={isShowTemplateModal}
-          onCancel={this.clostModal}
+          onCancel={this.closeModal}
           footer={false}
           width="800px"
         >
@@ -877,6 +998,7 @@ export default class MedicalRecord extends Component {
               newTemplate={this.newTemplate}
               deleteTemplate={this.deleteTemplate}
               adjustOrder={this.adjustOrder}
+              getTemplate={this.getTemplate}
             />
           </div>
         </Modal>
