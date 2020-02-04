@@ -99,7 +99,9 @@ export default class Lis extends Component {
                   item.child.map(subItem => (
                     <div className="left-item">                   
                       <p>{subItem.name}</p>
-                      <Button className={subItem.status=="正常" ? "left-btn normal" : "left-btn"} size="small">{subItem.status}</Button>
+                      {/* 2020-02-04 #121 取消审阅按钮与相关功能 */}
+                      <Button className="left-btn normal">正常</Button>
+                      {/*<Button className={subItem.status=="正常" ? "left-btn normal" : "left-btn"} size="small">{subItem.status}</Button>*/}
                     </div>
                   ))
                 }
@@ -121,11 +123,12 @@ export default class Lis extends Component {
         <div className="right-wrapper">
           <div className="right-title">
             <p><span className="right-words">NT报告 </span>检验报告单</p>
-            {
-              !isShowModal ?
-              <Button className="right-btn" type="primary" size="small" onClick={() => this.setState({isShowModal: true})}>审阅</Button>
-              : null
-            }
+            {/* 2020-02-04 #121 取消审阅按钮与相关功能 */}
+            {/*{*/}
+            {/*  !isShowModal ?*/}
+            {/*  <Button className="right-btn" type="primary" size="small" onClick={() => this.setState({isShowModal: true})}>审阅</Button>*/}
+            {/*  : null*/}
+            {/*}*/}
           </div>
           <ul className="right-msg">
             <li className="msg-item">检验单号 8346833</li>

@@ -14,7 +14,7 @@
 		"operative_procedure": {
 			"fetus": [{
 				"operation_no": "0002",
-				"operation_items": [{"label": "绒毛活检","value":"绒毛活检"},{"label": "羊膜腔穿刺","value":"羊膜腔穿刺"}],
+				"operation_items": [{"label": "绒毛活检","value":"绒毛活检"},{"label": "脐带穿刺","value":"脐带穿刺"}],
 				"operator": "1",
 				"assistant": "1",
 				"start_time": "11:44",
@@ -61,13 +61,25 @@
 		},
 		"inspection_item": {
 			"fetus": [{
-				"amniotic_fluid": {},
-				"umbilical_blood": {},
-				"villus": {}
+				"amniotic_fluid": {
+					"value": []
+				},
+				"umbilical_blood": {
+					"value": []
+				},
+				"villus": {
+					"value": []
+				}
 			},{
-				"amniotic_fluid": {},
-				"umbilical_blood": {},
-				"villus": {}
+				"amniotic_fluid": {
+					"value": []
+				},
+				"umbilical_blood": {
+					"value": []
+				},
+				"villus": {
+					"value": []
+				}
 			}]
 		}
 	}

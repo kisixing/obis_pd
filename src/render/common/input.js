@@ -5,7 +5,7 @@ export function input({onChange, onBlur, value, ...props}){
   const handleChange = (e) => {
     if (value !== e.target.value) {
         if (onChange) {
-            onChange(e, e.target.value)
+          onChange(e, e.target.value)
         } else {
             console.log('miss onChange: ' + props.name);
         }

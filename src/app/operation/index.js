@@ -100,10 +100,10 @@ const coptions = [{
     value: 'thalassemia2',
     label: '地中海贫血基因全套',
   },{
-    value: 'thalassemia2',
+    value: 'thalassemia3',
     label: 'α地贫基因检测',
   },{
-    value: 'thalassemia3',
+    value: 'thalassemia4',
     label: 'β地贫基因检测',
   }
 ],
@@ -223,10 +223,10 @@ const qoptions = [{
     value: 'thalassemia2',
     label: '地中海贫血基因全套',
   },{
-    value: 'thalassemia2',
+    value: 'thalassemia3',
     label: 'α地贫基因检测',
   },{
-    value: 'thalassemia3',
+    value: 'thalassemia4',
     label: 'β地贫基因检测',
   }
 ]
@@ -290,8 +290,8 @@ export default class Operation extends Component {
       ipanes:[
         { title: '胎儿1', content: '选项卡一内容', key: '0' },
       ],
-      activeKey: '1',
-      iactiveKey :'1',
+      activeKey: 'fetus-0',
+      iactiveKey :'ifetus-0',
 
        /**
        * @param
@@ -323,18 +323,32 @@ export default class Operation extends Component {
   }
 
   componentDidMount() {
+    const {} = this.state;
     Promise.all([
     service.getoperationdetail().then(res => {
-      console.log(res);
-      let currentpanes = res.object.operative_procedure.fetus;
-      let currentipanes = res.object.inspection_item.fetus;
+      let currentpanes = res['object']['operative_procedure'].fetus;
+      let currentipanes = res['object']['inspection_item'].fetus;
       currentpanes.forEach((pane, i) => {
         pane.key = "fetus-"+i;
+        // 为 送检项目 提供render属性
+        pane['operation_items'].forEach(item => {
+          switch (item.value) {
+            case '绒毛活检':
+              Object.assign(currentipanes[i]['villus'],{render: true});
+              break;
+            case '羊膜腔穿刺':
+              Object.assign(currentipanes[i]['amniotic_fluid'],{render: true});
+              break;
+            case '脐带穿刺':
+              Object.assign(currentipanes[i]['umbilical_blood'],{render: true});
+              break;
+          }
+        })
       });
       currentipanes.forEach((pane, i) => {
         pane.key = "ifetus-"+i;
       });
-      this.setState({ entity: res.object,panes:currentpanes,ipanes:currentipanes});
+      this.setState({ entity: res['object'], panes:currentpanes, ipanes:currentipanes});
       // console.log(this.state);
     })])
   }
@@ -355,7 +369,8 @@ export default class Operation extends Component {
   }
   
 
-  ontabChange=(activeKey) =>{
+  onTabChange=(activeKey) =>{
+    console.log(activeKey);
     this.setState({
       activeKey
     });    
@@ -393,6 +408,7 @@ export default class Operation extends Component {
     this.setState({ panes, activeKey });
   }
   oninspectionChange=(activeKey) =>{
+    console.log(activeKey);
     this.setState({
       iactiveKey:activeKey
     });    
@@ -440,11 +456,11 @@ export default class Operation extends Component {
         rows: [
         {
           columns: [
-            { name: 'operation_date[手术日期]', type: 'date', span: 5, valid: 'required'},
+            { name: 'operation_date[手术日期]', type: 'date', span: 7, valid: 'required'},
             {span: 1},
             { name: 'temperature(℃)[体@@@温 ]', type: 'input', span: 5, valid: 'required'},
             {span: 1},
-            { name: 'BP(mmHg)[血@@@压 ]', type: ['input(/)','input'], span: 5, valid: (value)=>{
+            { name: 'BP(mmHg)[血@@@压 ]', type: ['input(/)','input'], span: 7, valid: (value)=>{
               let message = '';
               if(value){
                 message = [0,1].map(i=>valid(`number|required|rang(0,${[139,109][i]})`,value[i])).filter(i=>i).join();
@@ -474,6 +490,30 @@ export default class Operation extends Component {
       ]
     };
   }
+  // 送检项目分开
+  amniotic_fluid_item() {
+    return {
+      step: 1,
+      rows: [{
+        columns:[
+          { name: 'amniotic_fluid[羊水]', type: 'treeselect', options:coptions, span: 16, isSelectParent: false }
+        ]
+      }]
+    }
+  }
+  umbilical_blood_item() {
+    return {
+      step: 1,
+      rows: [{columns:[{ name: 'umbilical_blood[脐血]', type: 'treeselect', options:coptions, span: 16, isSelectParent: false }]}]
+    }
+  }
+  villus_item() {
+    return {
+      step: 1,
+      rows: [{columns:[{ name: 'villus[绒毛]', type: 'treeselect', options:qoptions, span: 16, isSelectParent: false }]}]
+    }
+  }
+
 
   // 病史 暂不用
   configbs(){
@@ -692,9 +732,37 @@ export default class Operation extends Component {
   };
 
 
+  // 送检项目其他选项
+  handleSJChange = (_, {name, value }) => {
+    console.log(value);
+  }
+
   /* ================================== 渲染类 ==================================== */
   
-  
+  // 关于 送检项目 渲染
+  sjRender = (ipane) => {
+    let DOM = [];
+    for(let key in ipane) {
+
+      if(ipane[key]['render']) {
+        let obj = {};
+        /*
+         * 进入的数据必须有
+         * {
+         *  name: value
+         * }
+         * 不然treeSelect会显示一道横线
+         */
+        obj[key] = ipane[key].value;
+        DOM.push(
+          <div key={`${ipane.key}-${key}`}>
+            {formRender(obj,this[`${key}_item`](),this.handleSJChange)}
+          </div>
+        )
+      }
+    }
+    return (<div>{DOM}</div>);
+  }
   
   /**
    * 模板
@@ -831,12 +899,12 @@ export default class Operation extends Component {
           </Panel>
           <Panel header="手术操作" key="2" extra="">
             <Tabs
-              onChange={this.ontabChange}
+              onChange={this.onTabChange}
               activeKey={this.state.activeKey}
               type="editable-card"
               onEdit={this.ontabEdit}
             >
-              {this.state.panes.map((pane, index) => <TabPane tab={'胎儿'+(index+1)} key={pane.key}>{formRender(pane, this.configoperative_procedure(), this.handleChange.bind(this))}</TabPane>)}
+              {this.state.panes.map((pane, index) => <TabPane tab={'胎儿'+(index+1)} key={pane.key}>{formRender(pane, this.configoperative_procedure(), this.handleSJChange.bind(this))}</TabPane>)}
             </Tabs>
           </Panel>
           <Panel header="送检项目" key="3">
@@ -846,7 +914,24 @@ export default class Operation extends Component {
               type="editable-card"
               onEdit={this.oninspectionEdit}
             >
-              {this.state.ipanes.map((pane, index) => <TabPane tab={'胎儿'+(index+1)}  key={pane.key}>{formRender(pane, this.configinspection_item(), this.handleChange.bind(this))}</TabPane>)}
+              {/*{this.state.ipanes.map((pane, index) =>{*/}
+              {/*  // TODO 这里的数据 entity 绑定有点问题，要更改通过 handleChange去做*/}
+              {/*  // TODO 多了一横... 忘了为什么*/}
+              {/*  console.log(pane);*/}
+              {/*  let renderJXSDOM = [];*/}
+              {/*  for(let key in pane) {*/}
+              {/*    if(pane[key]['render']){*/}
+              {/*      let obj = {};*/}
+              {/*      obj[`${key}`] = pane[key];*/}
+              {/*      delete obj[key]['render'];*/}
+              {/*      renderJXSDOM.push(<div key={`ifatus${index}-${key}`}>{formRender(obj, this[`${key}_item`](), this.handleChange.bind(this))}</div>)*/}
+              {/*    }*/}
+              {/*  }*/}
+              {/*  return (<TabPane tab={'胎儿'+(index+1)}  key={pane.key}>{renderJXSDOM}</TabPane>)*/}
+              {/*})}*/}
+
+              {this.state.ipanes.map((ipane,index) => <TabPane tab={`胎儿${index+1}`} key={ipane.key}>{this.sjRender(ipane)}</TabPane>)}
+
             </Tabs>
           </Panel>
           <Panel header="术后医嘱" key="4">
