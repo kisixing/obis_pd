@@ -28,6 +28,7 @@ class MyTreeSelect extends Component{
     this.state = {
       currentValue: []
     }
+    console.log(props);
   }
 
   componentDidMount() {
@@ -42,23 +43,8 @@ class MyTreeSelect extends Component{
     }
   }
 
-  // handleSelect = (value, node, _) => {
-  //   const { isSelectParent } = this.props['mProps'];
-  //   const { props } = node;
-  //   const { currentValue } = this.state;
-  //   // 不可选择父节点 且 此节点为父节点
-  //   if(isSelectParent || props.children === undefined){
-  //     currentValue.push(value);
-  //     this.setState({currentValue});
-  //   }else{
-  //     console.log('父节点,不可选');
-  //   }
-  // };
 
   handleChange = (_,__,event) => {
-    console.log(_);
-    console.log(__);
-    console.log(event);
     // 清除
     const { currentValue } = this.state;
     const { onChange, onBlur } = this.props['mProps'];

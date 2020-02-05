@@ -1,5 +1,5 @@
 import React, { Component, createElement } from "react";
-import {Button, Tabs, Tree, Modal, Timeline, Collapse, Select} from 'antd';
+import {Button, Tabs, Tree, Modal, Checkbox, Collapse} from 'antd';
 
 import tableRender from '../../render/table';
 import FuzhenTable from './table';
@@ -107,6 +107,9 @@ export default class MedicalRecord extends Component {
         current_weight: "",
         weight_gain: ""
       },
+
+      /* 地贫 超声 唐氏 */
+      isCheckUltrasound: false,
 
       relatedObj: {},
       recentRvisit: null,
@@ -452,70 +455,78 @@ export default class MedicalRecord extends Component {
     return {
       step: 1,
       rows: [
-      {
-        label: '女方:', span: 12, className:'labelclass2'
-      },
-      {
-        columns: [
-          { span: 1 },
-          { name: 'yjcuch(g/L)[Hb]', type: 'input', span: 6, showSearch: true, valid: 'required'},
-          { name: 'yjzhouq(fL)[MCV]',  type: 'input', span: 6, showSearch: true, valid: 'required'},
-          { name: 'yjchix[MCH]',  type: 'input', span: 6, showSearch: true, valid: 'required'},
-        ]
-      },
-      {
-        columns: [
-          { span: 1 },
-          { name: 'yjcuch[HbA2]', type: 'input', span: 6, showSearch: true, valid: 'required'},
-          { name: 'yjzhouq[血型]',  type: 'select', span: 6, showSearch: true, options: baseData.xuexingOptions, valid: 'required'},
-          {name:'ckrh[RH(D)血型]', type: 'select',span:6, options: baseData.xuexing2Options, valid: 'required'},
-        ]
-      },
-      {
-        columns: [
-          { span: 1 },
-          { name: 'yjchix[地贫基因型]',  type: 'select', span: 11, showSearch: true, options: _genotypeAnemia ,valid: 'required'}
-        ]
-      },
-      {
-        columns:[
-          { span: 1 },
-          { name: 'otherExceptEarly[其他异常]', type: 'input', span: 11 }
-        ]
-      },
-      {
-        label: '男方:', span: 12, className:'labelclass2'
-      },
-      {
-        columns: [
-          { span: 1},
-          { name: 'yjcuch(g/L)[Hb]', type: 'input', span: 6, showSearch: true,  valid: 'required'},
-          { name: 'yjzhouq(fL)[MCV]',  type: 'input', span: 6, showSearch: true,  valid: 'required'},
-          { name: 'yjchix[MCH]',  type: 'input', span: 6, showSearch: true, valid: 'required'},
-        ]
-      },
-      {
-        columns: [
-          { span: 1},
-          { name: 'yjcuch[HbA2]', type: 'input', span: 6, showSearch: true, valid: 'required'},
-          { name: 'yjzhouq[血型]',  type: 'select', span: 6, showSearch: true, options: baseData.xuexingOptions, valid: 'required'},
-          {name:'ckrh[RH(D)血型]', type: 'select',span:6, options: baseData.xuexing2Options},
-        ]
-      },
-      {
-        columns: [
-          { span: 1 },
-          { name: 'yjchix[地贫基因型]',  type: 'select', span: 11, showSearch: true, options: _genotypeAnemia ,valid: 'required'}
-        ]
-      },
-      {
-        columns:[
-          { span: 1 },
-          { name: 'otherExceptEarly[其他异常]', type: 'input', span: 11 }
-        ]
-      }
+        {
+          className: 'tangshai-group', columns: [
+            { name: 'fkjc[]', type: 'checkinput', radio: true, options: baseData.wjjOptions, span: 8 }
+          ]
+        },
+        {
+          label: '女方:', span: 12, className:'labelclass2'
+        },
+        {
+          filter: entity => !entity && !entity.fkjc || isShow(entity.fkjc), columns: [
+            { span: 1 },
+            { name: 'yjcuch(g/L)[Hb]', type: 'input', span: 6, showSearch: true, valid: 'required'},
+            { name: 'yjzhouq(fL)[MCV]',  type: 'input', span: 6, showSearch: true, valid: 'required'},
+            { name: 'yjchix[MCH]',  type: 'input', span: 6, showSearch: true, valid: 'required'},
+          ]
+        },
+        {
+          filter: entity => !entity && !entity.fkjc || isShow(entity.fkjc), columns: [
+            { span: 1 },
+            { name: 'yjcuch[HbA2]', type: 'input', span: 6, showSearch: true, valid: 'required'},
+            { name: 'yjzhouq[血型]',  type: 'select', span: 6, showSearch: true, options: baseData.xuexingOptions, valid: 'required'},
+            {name:'ckrh[RH(D)血型]', type: 'select',span:6, options: baseData.xuexing2Options, valid: 'required'},
+          ]
+        },
+        {
+          filter: entity => !entity && !entity.fkjc || isShow(entity.fkjc), columns: [
+            { span: 1 },
+            { name: 'yjchix[地贫基因型]',  type: 'select', span: 11, showSearch: true, options: _genotypeAnemia ,valid: 'required'}
+          ]
+        },
+        {
+          filter: entity => !entity && !entity.fkjc || isShow(entity.fkjc), columns:[
+            { span: 1 },
+            { name: 'otherExceptEarly[其他异常]', type: 'input', span: 11 }
+          ]
+        },
+        {
+          label: '男方:', span: 12, className:'labelclass2'
+        },
+        {
+          filter: entity => !entity && !entity.fkjc || isShow(entity.fkjc), columns: [
+            { span: 1},
+            { name: 'yjcuch(g/L)[Hb]', type: 'input', span: 6, showSearch: true,  valid: 'required'},
+            { name: 'yjzhouq(fL)[MCV]',  type: 'input', span: 6, showSearch: true,  valid: 'required'},
+            { name: 'yjchix[MCH]',  type: 'input', span: 6, showSearch: true, valid: 'required'},
+          ]
+        },
+        {
+          filter: entity => !entity && !entity.fkjc || isShow(entity.fkjc), columns: [
+            { span: 1},
+            { name: 'yjcuch[HbA2]', type: 'input', span: 6, showSearch: true, valid: 'required'},
+            { name: 'yjzhouq[血型]',  type: 'select', span: 6, showSearch: true, options: baseData.xuexingOptions, valid: 'required'},
+            {name:'ckrh[RH(D)血型]', type: 'select',span:6, options: baseData.xuexing2Options},
+          ]
+        },
+        {
+          filter: entity => !entity && !entity.fkjc || isShow(entity.fkjc), columns: [
+            { span: 1 },
+            { name: 'yjchix[地贫基因型]',  type: 'select', span: 11, showSearch: true, options: _genotypeAnemia ,valid: 'required'}
+          ]
+        },
+        {
+          filter: entity => !entity && !entity.fkjc || isShow(entity.fkjc), columns:[
+            { span: 1 },
+            { name: 'otherExceptEarly[其他异常]', type: 'input', span: 11 }
+          ]
+        }
     ]};
   }
+
+
+  // 这里要分开
 
   // 早孕超声
   configbase(){ 
@@ -860,7 +871,7 @@ export default class MedicalRecord extends Component {
 
   render(){
     const { entity={} } = this.props;
-    const { selectedKeys, treeData, activeKey } = this.state;
+    const { selectedKeys, treeData, activeKey, isCheckUltrasound } = this.state;
     const { chief_complaint, medical_history, diagnosi, treatment, chromosome, other } = this.state;
     const { pregnancy_history, downs_screen, ultrasound, past_medical_history, family_history, thalassemia, physical_checkUp } = this.state;
     const { isShowTemplateModal, templateList } = this.state.templateObj;
@@ -914,7 +925,6 @@ export default class MedicalRecord extends Component {
 
             <div className="single">{formRender({chief_complaint}, this.config(), this.handleChange.bind(this))}</div>
           
-            {/* 这里 1、3 key值莫名其妙的报错 */}
             <Panel header="预产期" key="c1">
               {formRender(pregnancy_history, this.configedd(), this.handleChange.bind(this))}
             </Panel>
@@ -928,9 +938,7 @@ export default class MedicalRecord extends Component {
             </Panel>
             )}
             
-            <Panel header="地贫/血型检查" key="c3">
-              {formRender(thalassemia, this.config3(), this.handleChange.bind(this))}
-            </Panel>
+            <Panel header="地贫/血型检查" key="c3">{formRender(thalassemia, this.config3(), this.handleChange.bind(this))}</Panel>
             
             {!isFetusDisease ? (
               <div>
@@ -943,19 +951,24 @@ export default class MedicalRecord extends Component {
             </div>
             {!isFetusDisease ? null : (
               <Panel header="超声检查" key="c4">
-              {formRender(ultrasound, this.configbase(), this.handleChange.bind(this))}
-              <Tabs
-                  onChange={this.onChange.bind(this)}
-                  activeKey={activeKey}
-                  type="editable-card"
-                  onEdit={this.onEdit}
-              >
-                  {ultrasound.fetus.length !== 0 ? ( ultrasound.fetus.map((v,index) => 
+                <div>
+                  <Checkbox checked={isCheckUltrasound} onChange={({target}) => this.setState({isCheckUltrasound: target.checked}) }>未检查</Checkbox>
+                </div>
+                <div style={{display: isCheckUltrasound ? "none" : "block"}}>
+                  {formRender(ultrasound, this.configbase(), this.handleChange.bind(this))}
+                  <Tabs
+                    onChange={this.onChange.bind(this)}
+                    activeKey={activeKey}
+                    type="editable-card"
+                    onEdit={this.onEdit}
+                  >
+                    {ultrasound.fetus.length !== 0 ? ( ultrasound.fetus.map((v,index) =>
                       <TabPane tab={`胎儿${index+1}`} key={`fetus${index}`}>
                         {formRender(ultrasound.fetus[index], this.config4(), this.handleChange.bind(this))}
                       </TabPane>
                     )) : null }
-                </Tabs>
+                  </Tabs>
+                </div>
               </Panel>
             )}
             

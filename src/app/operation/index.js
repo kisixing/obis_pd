@@ -287,9 +287,7 @@ export default class Operation extends Component {
       panes:[
         { title: '胎儿1', content: '选项卡一内容', key: '0' },
       ],
-      ipanes:[
-        { title: '胎儿1', content: '选项卡一内容', key: '0' },
-      ],
+      ipanes:[],
       activeKey: 'fetus-0',
       iactiveKey :'ifetus-0',
 
@@ -304,6 +302,11 @@ export default class Operation extends Component {
         type: '', 
         templateList: []
       },
+
+      // 其他输入模态框
+      otherInputType: '',
+      isShowOtherInputModal:false,
+      otherInputContext: '',
     };
 
     this.componentWillUnmount = editors();
@@ -671,18 +674,18 @@ export default class Operation extends Component {
     console.log(data);
   }
 
-   // 选择模板
-   getTemplate = (data) => {
-    console.log(data);
-    // 得到数据 设置值
-    const { type } = this.state.templateObj;
-    console.log(type);
-    // switch(type) {
-    //   case 'zz':
-    //   case 'CL':
+  // 选择模板
+  getTemplate = (data) => {
+  console.log(data);
+  // 得到数据 设置值
+  const { type } = this.state.templateObj;
+  console.log(type);
+  // switch(type) {
+  //   case 'zz':
+  //   case 'CL':
 
-    // }
-  }
+  // }
+}
 
   adjustOrder = (key,acitonType) => {
     // 请求服务器，调整后重新获取.......
@@ -733,9 +736,33 @@ export default class Operation extends Component {
 
 
   // 送检项目其他选项
-  handleSJChange = (_, {name, value }) => {
-    console.log(value);
+  handleSJChange = (_, {name, value}) => {
+    const { ipanes, iactiveKey } = this.state;
+    // 拿当前的index
+    const ipanesIndex = iactiveKey.slice(-1);
+    const index = value.findIndex((item) => item === 'other2');
+    if(index >= 0){
+      value.splice(index,1);
+      // 打开模态框进行输入
+      this.setState({isShowOtherInputModal: true, otherInputType: name});
+    }else {
+      ipanes[ipanesIndex][name]['value'] = value;
+    }
+    this.setState({ipanes});
   }
+
+  // 送检项目其他输入
+  handleOtherInputOfSJ = () => {
+    const { iactiveKey, otherInputType, ipanes, otherInputContext} = this.state;
+    if(otherInputContext !== "") {
+      const ipanesIndex = iactiveKey.slice(-1);
+      ipanes[ipanesIndex][otherInputType]['value'].push(otherInputContext);
+      this.setState({ipanes, isShowOtherInputModal: false, otherInputContext: ''});
+    } else {
+      alert('请输入后再确认');
+    }
+  }
+
 
   /* ================================== 渲染类 ==================================== */
   
@@ -914,24 +941,7 @@ export default class Operation extends Component {
               type="editable-card"
               onEdit={this.oninspectionEdit}
             >
-              {/*{this.state.ipanes.map((pane, index) =>{*/}
-              {/*  // TODO 这里的数据 entity 绑定有点问题，要更改通过 handleChange去做*/}
-              {/*  // TODO 多了一横... 忘了为什么*/}
-              {/*  console.log(pane);*/}
-              {/*  let renderJXSDOM = [];*/}
-              {/*  for(let key in pane) {*/}
-              {/*    if(pane[key]['render']){*/}
-              {/*      let obj = {};*/}
-              {/*      obj[`${key}`] = pane[key];*/}
-              {/*      delete obj[key]['render'];*/}
-              {/*      renderJXSDOM.push(<div key={`ifatus${index}-${key}`}>{formRender(obj, this[`${key}_item`](), this.handleChange.bind(this))}</div>)*/}
-              {/*    }*/}
-              {/*  }*/}
-              {/*  return (<TabPane tab={'胎儿'+(index+1)}  key={pane.key}>{renderJXSDOM}</TabPane>)*/}
-              {/*})}*/}
-
               {this.state.ipanes.map((ipane,index) => <TabPane tab={`胎儿${index+1}`} key={ipane.key}>{this.sjRender(ipane)}</TabPane>)}
-
             </Tabs>
           </Panel>
           <Panel header="术后医嘱" key="4">
@@ -965,6 +975,15 @@ export default class Operation extends Component {
               getTemplate={this.getTemplate}
             />
           </div>
+        </Modal>
+
+        <Modal
+          visible={this.state.isShowOtherInputModal}
+          onCancel={() => this.setState({isShowOtherInputModal: false, otherInputContext: ''})}
+          onOk={this.handleOtherInputOfSJ}
+          title="请输入"
+        >
+          <Input type='text' placeholder="其输入补充信息" value={this.state.otherInputContext} onChange={({target}) => this.setState({otherInputContext: target.value})} />
         </Modal>
       </Page>
     )
