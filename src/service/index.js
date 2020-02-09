@@ -4,6 +4,7 @@ import myAxios, * as method from '../utils/myAxios';
 import { default as fuzhen } from './fuzhen';
 import { default as shouzhen } from './shouzhen';
 import { default as medicalrecord } from './medicalrecord';
+import { default as operation } from './operation.js';
 
 let userId = null;
 let watchInfoList = [];
@@ -73,5 +74,9 @@ export default {
     /**
      * 专科病历 所需API
      */
-    medicalrecord: Object.assign(medicalrecord, {userId: () => userId, fireWatch: (...args)=>watchInfoList.forEach(fn=>fn(...args)) })
+    medicalrecord: Object.assign(medicalrecord, {userId: () => userId, fireWatch: (...args)=>watchInfoList.forEach(fn=>fn(...args))}),
+    /*
+     * 手术记录所需API
+     */
+    operation: Object.assign(operation, {userId: () => userId, fireWatch: (...args)=>watchInfoList.forEach(fn=>fn(...args)) })
 }
