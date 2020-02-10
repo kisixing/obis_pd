@@ -1,14 +1,6 @@
 import React,{ Component} from 'react';
 
-<<<<<<< HEAD
-var Trigger = require('rc-trigger');
-
-import axios from 'axios';
-
-import {valid} from '../../render/common';
-=======
 import { Tree, Button, Collapse, Tabs, Modal, Input } from 'antd';
->>>>>>> refs/remotes/origin/master
 import Page from '../../render/page';
 
 import formRender from '../../render/form.js';
@@ -29,7 +21,7 @@ import {valid} from "../../render/common";
 /**
  * TODO
  * 2020-02-07
- *  1 ward - 姓名、麻醉方法、麻醉医师、器械护士
+ *  1 是否用药 特殊输入框 暂时不可用实现
  *  2 送检项目 的 treeselect 有小横线 BUG
  *  3 新建的Tab 因为类型问题，会console.error
  *  4 打开otherInput的modal，原来的ant-select遮挡
@@ -37,240 +29,10 @@ import {valid} from "../../render/common";
  */
 
 const { TreeNode } = Tree;
-<<<<<<< HEAD
-const Panel = Collapse.Panel;
-const TabPane = Tabs.TabPane;
 
-const coptions = [{
-  value: 'genic',
-  label: '遗传学检查',
-  disabled: true,
-  children: [{
-    value: 'chromosome_karyotype',
-    label: '染色体核型',
-    },
-    {
-      value: 'chromosomal_microarray',
-      label: '染色体微阵列',
-    },
-    {
-      value: 'FISH',
-      label: 'FISH',
-    }
-  ],
-}, {
-  value: 'infection',
-  label: '感染',
-  disabled: true,
-  children: [{
-    value: 'infection3',
-    label: '感染三项DNA/RNA',
-  },{
-    value: 'infectionlgm',
-    label: '感染三项lgm',
-  },{
-    value: 'infectiongaint',
-    label: '巨细胞DNA',
-  },{
-    value: 'infectionRubella',
-    label: '风疹病毒RNA',
-  },{
-    value: 'infectiontox',
-    label: '弓形虫DNA',
-  },{
-    value: 'infectioncoxsackie',
-    label: '柯萨奇病毒RNA',
-  },{
-    value: 'infectionb19',
-    label: 'B19病毒核酸检测',
-  }
-],
-}, {
-  value: 'hemolytic_anemia',
-  label: '溶血性贫血',
-  disabled: true,
-  children: [{
-    value: 'hemolytic_anemia1',
-    label: '血常规全套',
-  },{
-    value: 'hemolytic_anemia2',
-    label: '血常规五类',
-  },{
-    value: 'hemolytic_anemia3',
-    label: '血型',
-  },{
-    value: 'hemolytic_anemia4',
-    label: '新生儿血清学组合',
-  },{
-    value: 'hemolytic_anemia5',
-    label: '弓形虫DNA',
-  },{
-    value: 'hemolytic_anemia6',
-    label: '直接抗人球蛋白试验',
-  },{
-    value: 'hemolytic_anemia7',
-    label: '肝代谢组合',
-  }
-],
-}, {
-  value: 'thalassemia',
-  label: '地中海贫血检测',
-  disabled: true,
-  children: [{
-    value: 'thalassemia1',
-    label: '地贫筛查组合',
-  },{
-    value: 'thalassemia2',
-    label: '地中海贫血基因全套',
-  },{
-    value: 'thalassemia2',
-    label: 'α地贫基因检测',
-  },{
-    value: 'thalassemia3',
-    label: 'β地贫基因检测',
-  }
-],
-}, {
-  value: 'hydrothorax_ascites',
-  label: '胸腹水检查',
-  disabled: true,
-  children: [{
-    value: 'hydrothorax_ascites1',
-    label: '胸腹水全套',
-  },{
-    value: 'hydrothorax_ascites2',
-    label: '胸腹水生化组合',
-  },{
-    value: 'hydrothorax_ascites3',
-    label: '肝代谢组合',
-  }
-]}, {
-  value: 'HF',
-  label: '心衰检查',
-  disabled: true,
-  children: [{
-    value: 'HF1',
-    label: '心质组合',
-  },{
-    value: 'HF2',
-    label: '心酶组合',
-  },{
-    value: 'HF3',
-    label: 'BNP',
-  }
-]}, {
-  value: 'other',
-  label: '其他检查',
-  children: [{
-    value: 'other1',
-    label: 'AFP',
-  },{
-    value: 'other2',
-    label: '其他',
-  }
-]}];
-
-const qoptions = [{
-  value: 'genic',
-  label: '遗传学检查',
-  children: [{
-    value: 'chromosome_karyotype',
-    label: '染色体核型',
-    },
-    {
-      value: 'chromosomal_microarray',
-      label: '染色体微阵列',
-    },
-    {
-      value: 'FISH',
-      label: 'FISH',
-    }
-  ],
-}, {
-  value: 'infection',
-  label: '感染',
-  children: [{
-    value: 'infection3',
-    label: '感染三项DNA/RNA',
-  },{
-    value: 'infectionlgm',
-    label: '感染三项lgm',
-  },{
-    value: 'infectiongaint',
-    label: '巨细胞DNA',
-  },{
-    value: 'infectionRubella',
-    label: '风疹病毒RNA',
-  },{
-    value: 'infectiontox',
-    label: '弓形虫DNA',
-  },{
-    value: 'infectioncoxsackie',
-    label: '柯萨奇病毒RNA',
-  },{
-    value: 'infectionb19',
-    label: 'B19病毒核酸检测',
-  }
-],
-}, {
-  value: 'hemolytic_anemia',
-  label: '溶血性贫血',
-  children: [{
-    value: 'hemolytic_anemia1',
-    label: '血常规全套',
-  },{
-    value: 'hemolytic_anemia2',
-    label: '血常规五类',
-  },{
-    value: 'hemolytic_anemia3',
-    label: '血型',
-  },{
-    value: 'hemolytic_anemia4',
-    label: '新生儿血清学组合',
-  },{
-    value: 'hemolytic_anemia5',
-    label: '弓形虫DNA',
-  },{
-    value: 'hemolytic_anemia6',
-    label: '直接抗人球蛋白试验',
-  },{
-    value: 'hemolytic_anemia7',
-    label: '肝代谢组合',
-  }
-],
-}, {
-  value: 'thalassemia',
-  label: '地中海贫血检测',
-  children: [{
-    value: 'thalassemia1',
-    label: '地贫筛查组合',
-  },{
-    value: 'thalassemia2',
-    label: '地中海贫血基因全套',
-  },{
-    value: 'thalassemia2',
-    label: 'α地贫基因检测',
-  },{
-    value: 'thalassemia3',
-    label: 'β地贫基因检测',
-  }
-]
-}];
-
-function modal(type, title) {
-  message[type](title, 3)
-}
-
-const TEMPLATE_KEY = {
-  zz: 'dmr1', xb: 'dmr2', qt: 'dmr3', zd: 'dmr4', cl: 'dmr5'
-}
-
-export default class Operation extends Component {
-=======
 const ButtonGroup = Button.Group;
 const { Panel } = Collapse;
 const { TabPane } = Tabs;
->>>>>>> refs/remotes/origin/master
 
 export default class Operation extends Component{
   constructor(props) {
@@ -365,58 +127,7 @@ export default class Operation extends Component{
               }
               return message;
             }},
-<<<<<<< HEAD
-          ]
-        },
-      ]
-    }
-  }
-  
-  // 羊水
-  config_amniotic_fluid(){
-    return {
-      step: 1,
-      rows: [
-        {columns:[{ name: 'amniotic_fluid[羊水]', type: 'treeselect',multiple:true, options:coptions, span: 16 }]}
-      ]
-    }
-  }
 
-  // 脐血
-  config_umbilical_blood(){
-    return {
-      step: 1,
-      rows: [
-        {columns:[{ name: 'amniotic_fluid[羊水]', type: 'treeselect',multiple: true, options:coptions, span: 16 }]}
-      ]
-    }
-  }
-
-  // 绒毛
-  config_villus() {
-    return {
-      step: 1,
-      rows: [
-        {columns:[{ name: 'villus[绒毛]', type: 'treeselect',multiple: true, options:qoptions, span: 16 }]}
-      ]
-    }
-  }
-
-  // 病史 暂不用
-  configbs(){
-    return {
-      step : 3,
-      rows:[
-        {
-          columns:[
-            { name: 'treatment2[现病史]', type: 'textarea', span: 16 },
-            { name:'treatment2[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: this.handleTreatmentClick.bind(this)}
-          ]
-        }
-      ]
-    }
-  }
-=======
         ]
       },
       {
@@ -426,7 +137,6 @@ export default class Operation extends Component{
       }
     ]
   });
->>>>>>> refs/remotes/origin/master
   // 手术操作
   operative_procedure_config = () => ({
     step: 1,
@@ -601,25 +311,13 @@ export default class Operation extends Component{
     if(node.props.children) {
       return ;
     }
-<<<<<<< HEAD
-  }
-  
-  // 选中节点触发-------如何在这里获取到选中节点的app_id？？？
-  onSelect = (selectedKeys) => {
-    console.log(selectedKeys);
-    if (selectedKeys.length > 0) {
-      // 防止编辑时重复点击造成选中节点为空
-      this.setState({
-        selectedKeys,
-      });
-=======
+
     if(selectedKeys.length !== 0) {
       service.operation.getOperationdetail({specialtyRecordTreeId: selectedKeys[0]})
         .then(res => {
           console.log(res);
           if(res.code === 200 || "200") this.convertOperationDetail(res.object)
         });
->>>>>>> refs/remotes/origin/master
     }
   };
   // 胎儿Tab Edit
@@ -686,42 +384,10 @@ export default class Operation extends Component{
 
   }
 
-<<<<<<< HEAD
-  renderTreeNodes = data =>
-    data.map(item => {
-      if (item.children) {
-        return (
-          <TreeNode title={item.title} key={item.key} dataRef={item} disabled={true}>
-            {this.renderTreeNodes(item.children)}
-          </TreeNode>
-        );
-      }
-      return <TreeNode key={item.key} {...item} dataRef={item} />;
-    });
-
-    // renderKTreeNode = data => {
-    //   return data.map(item => {
-    //     if (item.child) {
-    //       return (
-    //         <TreeNode title={item.menu_name} key={item.menu_id} appId={item.app_id} dataRef={item}>
-    //           {this.renderKTreeNode(item.child)}
-    //         </TreeNode>
-    //       );
-    //     }
-  
-    //     return <TreeNode title={item.menu_name} key={item.menu_code} dataRef={item}/>;
-    //   });
-    // };
-  
-  
-  renderLeft() {
-    const { planData, collapseActiveKey } = this.state;
-=======
   render() {
     const { operationList, isFetusPage, currentFetusActiveKey, isShowOtherContextModal } = this.state;
     const { operationItem, preoperative_record, operative_procedure, afterFhr, doctors_advice, ward } = this.state;
     const { otherContext } = this.state;
->>>>>>> refs/remotes/origin/master
     return (
       <Page className="fuzhen font-16">
         <div className="fuzhen-left ant-col-5">
@@ -765,104 +431,6 @@ export default class Operation extends Component{
                 {formRender(ward, this.ward_config(), () => console.log('c'))}
               </div>
             )}
-
-<<<<<<< HEAD
-    const tableColumns = [
-      {title: '编号', key: 'index', render: (_,__,index) => (<span>{index+1}</span>) },
-      {title: '内容', dataIndex: 'content', key: 'content'},
-    ]
-    
-   
-    let stateArr = [[false,false,false],[false,false,false]];
-    if(entity) {
-      const { operative_procedure } = entity;
-      if(operative_procedure) {
-        operative_procedure.fetus.forEach((v, index) => {
-          const len = v.operation_items.length;
-          for(let i = 0; i < len;i++){
-            if( v.operation_items[i].value === "绒毛活检"){
-              stateArr[index][0] = true;
-            }else if( v.operation_items[i].value === "羊膜腔穿刺"){
-              stateArr[index][1] = true;
-            }else if( v.operation_items[i].value === "脐带穿刺"){
-              stateArr[index][2] = true;
-            }
-          }
-        })
-      }
-    }
-    return (
-      <Page className='fuzhen font-16 ant-col'>
-        <div className="fuzhen-left ant-col-5">
-          {/* {treeData.length !== 0 ? (
-            <Tree
-            onSelect={this.onSelect}
-            defaultExpandAll = {true}
-            >    
-            { this.renderTreeNodes(treeData)}
-            </Tree>
-          ): null} */}
-          {/* 展示需要 先手写了 */}
-          <Tree
-            defaultExpandAll={true}
-            onSelect={(selectedKeys) => this.getOperationDetail(selectedKeys)}
-          >
-            
-            <TreeNode title="2019-12-12">
-              <TreeNode title={<span style={{color: 'red'}}>羊膜腔穿刺（待完善）</span>}  />
-            </TreeNode>
-            <TreeNode title="2019-11-11">
-              <TreeNode title="灭胎/毁胎术" />
-            </TreeNode>
-          </Tree>
-        </div>
-        <div className="fuzhen-right ant-col-19 main-pad-small width_7">
-        <Collapse defaultActiveKey={['1','2','3','4','5','6','7']} >
-          <Panel header="术前记录" key="1">
-            {formRender(entity?entity.preoperative_record:entity, this.configpreoperative_record(), this.handleChange.bind(this))}
-          </Panel>
-          <Panel header="手术操作" key="2" extra="">
-            <Tabs
-              onChange={this.ontabChange}
-              activeKey={this.state.activeKey}
-              type="editable-card"
-              onEdit={this.ontabEdit}
-            >
-              {this.state.panes.map((pane, index) => <TabPane tab={'胎儿'+(index+1)} key={pane.key}>{formRender(pane, this.configoperative_procedure(), this.handleChange.bind(this))}</TabPane>)}
-            </Tabs>
-          </Panel>
-          <Panel header="送检项目" key="3">
-            <Tabs
-              onChange={this.oninspectionChange}
-              activeKey={this.state.iactiveKey}
-              type="editable-card"
-              onEdit={this.oninspectionEdit}
-            >
-            {/* 这个位置又渲染的问题 */}
-            {entity !== undefined ? (
-                this.state.ipanes.map((pane,index) => (<TabPane tab={'胎儿'+(index+1)}  key={pane.key}>
-                    {stateArr[index][0] ? formRender(pane, this.config_villus(), this.handleChange.bind(this)) : null}
-                    {stateArr[index][1] ? formRender(pane, this.config_amniotic_fluid(), this.handleChange.bind(this)) : null}
-                    {stateArr[index][2] ? formRender(pane, this.config_umbilical_blood(), this.handleChange.bind(this)) : null}
-                  </TabPane>)
-                  )
-                ): null      
-              }
-            </Tabs>
-          </Panel>
-          <Panel header="术后医嘱" key="4">
-            
-            <div className="single">{formRender(entity, this.configdoctors_advice(), this.handleChange.bind(this))}</div>
-            <Trigger popupAlign={{points: ['tl', 'bl'],offset: [0, 3]}} trigger={['click']} popup={<span>popup</span>}>
-              <a>hover</a>
-            </Trigger>
-          </Panel>
-        </Collapse>
-        <div className="pull-right bottom-btn">
-          <Button className="blue-btn " onClick={() => window.print()}>打印</Button>
-          <Button className=" blue-btn save-btn" type="ghost" onClick={() => this.handleSave(document.querySelector('.fuzhen-form'))}>保存</Button>
-          <Button className=" blue-btn" type="ghost" onClick={() => this.handleSave(document.querySelector('.fuzhen-form'), "open")}>保存并开立医嘱</Button>
-=======
           </div>
           <div className="btn-group pull-right bottom-btn">
             <Button className="blue-btn">打印</Button>
@@ -886,11 +454,9 @@ export default class Operation extends Component{
               onChange={(e) => this.setState({otherContext: e.target.value})}
             />
           </Modal>
->>>>>>> refs/remotes/origin/master
         </div>
         {/*  新建病例modal */}
         <div>
-
         </div>
       </Page>
     );

@@ -656,6 +656,12 @@ export const hnOptions = toOptions('无,有');
 export const nhOptions = toOptions('有(input){#FF3300},无');
 
 export const wssOptions = toOptions([{k: '有{#FF3300}(input)', addspan: 2}]);
+
+/**
+ * 是否用药 （含有用药特殊输入框）
+ */
+export const iumOption = toOptions('有(右)(input),无');
+
 /**
  *乳头
  */

@@ -4,14 +4,13 @@ import {Modal} from 'antd';
 import modal from './modal';
 
 const getUrl = function (url){
-    if(location.search){
-        return 'http://127.0.0.1:8900/Obcloud' + url;
-        //return 'http://120.77.46.176:8899/rapi' + url;
-    }else{
-        return 'assets/mock/' + url.split('?').map((v,i)=>v+(!i?'.json':'')).join('?');
-    }
-    // console.log(url);
-    // return 'http://120.77.46.176:8080/Obcloud/' + url;
+    // if(location.search){
+    //     return 'http://127.0.0.1:8900/Obcloud' + url;
+    //     //return 'http://120.77.46.176:8899/rapi' + url;
+    // }else{
+    //     return 'assets/mock/' + url.split('?').map((v,i)=>v+(!i?'.json':'')).join('?');
+    // }
+    return 'http://120.77.46.176:8080/Obcloud/' + url;
 };
 
 /**

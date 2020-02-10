@@ -1,5 +1,6 @@
-
 import myAxios, * as method from '../utils/myAxios';
+
+import axios from 'axios';
 
 import { default as fuzhen } from './fuzhen';
 import { default as shouzhen } from './shouzhen';
@@ -9,12 +10,19 @@ import { default as operation } from './operation.js';
 let userId = null;
 let watchInfoList = [];
 
+// 此页全写 get 方法
+
 export default {
     ...method,
     watchInfo: function(fn){
         watchInfoList.push(fn);
         return () => watchInfoList = watchInfoList.filter(f=>f!==fn);
     },
+
+    // 查询-产前诊断-基本信息
+    getgeneralinformation: ({userId}) => myAxios.get(`/prenatalQuery/getgeneralinformation?userid=${userId}`),
+
+
     /**
      * 获取个人信息
      */
@@ -28,21 +36,7 @@ export default {
     highrisk: function(){
         return myAxios.get('/outpatientRestful/findHighriskTree')
     },
-    
-    /**
-     * 得到手术列表
-     */
 
-    getoperation: function () {
-        return myAxios.get('/outpatientRestful/getoperation')
-    },
-
-    /**
-     * 手术记录
-     */
-    getoperationdetail: function(){
-        return myAxios.get('/outpatientRestful/getoperationdetail')
-    },
     /**
      * 高危弹出提醒判断
      */
@@ -67,7 +61,7 @@ export default {
     fuzhen: Object.assign(fuzhen, { userId: ()=>userId, fireWatch: (...args)=>watchInfoList.forEach(fn=>fn(...args)) }),
 
     /**
-     * 复诊所需API
+     * 首诊所需API
      */
     shouzhen: Object.assign(shouzhen, { userId: ()=>userId, fireWatch: (...args)=>watchInfoList.forEach(fn=>fn(...args)) }),
 
@@ -75,7 +69,8 @@ export default {
      * 专科病历 所需API
      */
     medicalrecord: Object.assign(medicalrecord, {userId: () => userId, fireWatch: (...args)=>watchInfoList.forEach(fn=>fn(...args))}),
-    /*
+
+    /**
      * 手术记录所需API
      */
     operation: Object.assign(operation, {userId: () => userId, fireWatch: (...args)=>watchInfoList.forEach(fn=>fn(...args)) })

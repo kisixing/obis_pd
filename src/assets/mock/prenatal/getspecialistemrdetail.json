@@ -8,70 +8,74 @@
 		"medical_history": "高血压",
 		"diagnosis": "正常妊娠监督",
 		"treatment": "定期复查",
+		"karyotype": "染色体核型",
 		"doctor": "李国兰",
 		"other_exam": "无其他",
 		"pregnancy_history": {
-			"LMD": "2019-06-02",
-			"EDD": "2020-03-28",
+			"lmd": "2019-06-02",
+			"edd": "2020-03-28",
 			"gravidity": "1",
 			"parity": "1",
-			"Abortion": "1",
+			"abortion": "1",
 			"exfetation": "1"
 		},
 		"downs_screen": {
 			"early": {
-				"trisomy21": "",
-				"trisomy18": "",
-				"trisomy13": "",
-				"HCG": "",
-				"PAPP": "",
-				"other_anomalies": ""
+				"trisomy21": "1",
+				"trisomy18": "1",
+				"trisomy13": "1",
+				"hcg": "1",
+				"papp": "1",
+				"other_anomalies": "1"
 			},
 			"middle": {
-				"trisomy21": "",
-				"trisomy18": "",
-				"trisomy13": "",
-				"HCG": "",
-				"NTD": "",
-				"AFP": "",
-				"E3": "",
-				"other_anomalies": ""
+				"trisomy21": "1",
+				"trisomy18": "1",
+				"trisomy13": "1",
+				"hcg": "1",
+				"ntd": "1",
+				"e3": "1",
+				"afp": "1",
+				"other_anomalies": "1"
 			},
 			"NIPT": {
-				"trisomy21": "",
-				"trisomy18": "",
-				"trisomy13": "",
-				"Z_value": "",
-				"other_anomalies": ""
+				"trisomy21": "1",
+				"trisomy18": "1",
+				"trisomy13": "1",
+				"z21": "1",
+				"z18": "1",
+				"z13": "1",
+				"other_anomalies": "1"
 			}
 		},
 		"thalassemia": {
 			"wife": {
-				"Hb": "",
-				"MCV": "",
-				"MCH": "",
-				"HbA2": "",
-				"blood_group": "",
-				"genotype": "",
-				"other_anomalies": ""
+				"blood_group": "34",
+				"genotype": "β地中海贫血基因CD14-15突变",
+				"other_anomalies": "36",
+				"mcv": "37",
+				"mch": "38",
+				"hb": "39",
+				"hbA2": "40"
 			},
 			"husband": {
-				"Hb": "",
-				"MCV": "",
-				"MCH": "",
-				"HbA2": "",
-				"blood_group": "",
-				"genotype": "",
-				"other_anomalies": ""
+				"blood_group": "34",
+				"genotype": "β地中海贫血基因CD14-15突变",
+				"other_anomalies": "36",
+				"mcv": "37",
+				"mch": "38",
+				"hb": "39",
+				"hbA2": "40"
 			}
 		},
 		"ultrasound": {
 			"menopause": "20",
 			"fetus": [{
-				"CRL": "1",
-				"gestational_week": "1",
-				"NT": "1",
-				"other_anomalies": "异常结果描述",
+				"id": "1",
+				"crl": "1",
+				"crlweek": "1",
+				"nt": "1",
+				"excdesc": "异常结果描述",
 				"middle": [{
 					"docUniqueid": "ebc0fd1a20124fdaa4840480cf6bc468",
 					"title": "胎儿宫内状况评估2233",
@@ -86,10 +90,11 @@
 					"writeOperationType": null
 				}]
 			},{
-				"CRL": "2",
-				"gestational_week": "2",
-				"NT": "2",
-				"other_anomalies": "异常结果描述",
+				"id": "2",
+				"crl": "1",
+				"crlweek": "1",
+				"nt": "1",
+				"excdesc": "异常结果描述",
 				"middle": [{
 					"docUniqueid": "ebc0fd1a20124fdaa4840480cf6bc468",
 					"title": "胎儿宫内状况评估2233",
@@ -100,7 +105,7 @@
 					"hc": "318",
 					"afv": "49",
 					"ubf": "",
-					"errorDesc": "2宫内妊娠，胎儿存活，胎儿发育相当于足月孕周。脐血流频谱未见明显异常。胎儿颈周围见脐彩色血流环绕，注意脐带绕颈。",
+					"errorDesc": "0宫内妊娠，胎儿存活，胎儿发育相当于足月孕周。脐血流频谱未见明显异常。胎儿颈周围见脐彩色血流环绕，注意脐带绕颈。",
 					"writeOperationType": null
 				}]
 			}
@@ -128,13 +133,16 @@
 			"heritable_disease":  [{"label":"无", "value":""},{"label": "unselect", "value":""}],
 			"congenital_malformation":  [{"label":"无", "value":""},{"label": "unselect", "value":""}]
 		},
-		"physical_check-up": {
-			"BP": {"0": "125", "1": "75"},
-			"fundal_height": "15",
-			"waist_hip": "11",
-			"pre_weight": "50",
-			"current_weight": "55",
-			"weight_gain": "5"
+		"physical_check_up": {
+			"bp": {"0": "125", "1": "75"},
+			"systolic_pressure": "8",
+			"diastolic_pressure": "9",
+			"edema": "10",
+			"fundal_height": "11",
+			"waist_hip": "12",
+			"pre_weight": "13",
+			"current_weight": "14",
+			"weight_gain": "15"
 		}
 	}
 }

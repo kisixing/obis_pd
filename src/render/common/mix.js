@@ -71,7 +71,7 @@ class MMix extends Component{
 
   renderEditor([FormItemComponent, ]) {
     const { data, option, onChange } = this.props;
-    const {field,type,unit,width} = this.state; 
+    const {field,type,unit,width} = this.state;
     const props = {type:type||'input',...option,name:unit?`${field}(${unit})`:field};
 
     return <FormItemComponent {...props} width={width} entity={data} onChange={onChange} />;

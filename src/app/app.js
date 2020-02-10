@@ -7,6 +7,7 @@ import service from '../service';
 
 import store from './store';
 import { getAlertAction, closeAlertAction } from './store/actionCreators.js';
+import { setUserData } from "./store/actionCreators";
 
 import Pregnancy from 'bundle-loader?lazy&name=pregnancy!./pregnancy';
 import MedicalRecord from 'bundle-loader?lazy&name=medicalrecord!./medicalrecord';
@@ -50,6 +51,7 @@ export default class App extends Component {
 
     service.getuserDoc().then(
       res => {
+        store.dispatch(setUserData(res.object));
         this.setState({
           ...res.object, loading: false,
         })

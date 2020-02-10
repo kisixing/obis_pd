@@ -1,5 +1,5 @@
 import React,{ Component} from 'react';
-import {Tree, Tabs, Collapse, Modal} from 'antd';
+import {Tree, Tabs, Collapse, Modal, Button} from 'antd';
 
 import formRender from '../../render/form';
 import Page from '../../render/page';
@@ -14,6 +14,7 @@ import EditableTable from "./editableTable";
 const { TreeNode } = Tree;
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
+const ButtonGroup  = Button.Group;
 
 // 应对 输入 b 搜索 β
 // 修改后的 提交可能还要改一下
@@ -30,13 +31,52 @@ const TEMPLATE_KEY = {
   zz: 'dmr1', xb: 'dmr2', qt: 'dmr3', zd: 'dmr4', cl: 'dmr5', rs: 'dmr6'
 }
 
+/**
+ * TODO
+ * 1、差提交的功能还没有补上
+ *
+ *  大致的页面逻辑理一下
+ *   1 - Button的选中 和 哪一个div展现是绑定的  使用 formType
+ *   2 - currentTreeKeys，当存在大于0的keys值，button组要隐藏，新建的默认key为-1，回写服务器后重新获取就好
+ *   3 - 存在的BUG 新建病历后，又加载了新的病历，回选待完善不成功。
+ *       解决，当加载数据时，删除“新建病历” (不行，会导致别人写了一半没了的问题)
+ *        2020-02-10
+ *        最后的方法 就是 做个currentNewingSpecialistemrData，这样才能并行数据吧
+ */
+
 export default class MedicalRecord extends Component{
   constructor(props) {
     super(props);
     this.state = {
-      // control
-      // 病例选择页
-      activeKey: 'tab-0',
+      // data
+      pregnancy_history: {
+        LMD: "",
+        EDD: "",
+        gravidity: "",
+        parity: "",
+        Abortion: "",
+        exfetation: ""
+      },
+      downs_screen: {
+        early: {}, middle: {}, nipt: {}
+      },
+      thalassemia: {
+        wife: {}, husband: {}
+      },
+      ultrasound: { menopause: '', fetus: []},
+      past_medical_history: {},
+      family_history: {},
+      physical_check_up: {},
+
+
+      // 当前数据类型 - 属于数据与控制
+      formType: '',
+      /* control */
+      // 当前选择的书的key
+      currentTreeKeys: '',
+      // 正在创建病历
+      isNewingSpe: false,
+
       // 胎儿疾病 - 超声检查 Tab
       uFetusActiveKey: '',
 
@@ -49,7 +89,6 @@ export default class MedicalRecord extends Component{
     }
   }
 
-
   componentDidMount() {
     service.medicalrecord.getspecialistemr()
       .then(res => {
@@ -57,11 +96,10 @@ export default class MedicalRecord extends Component{
         if(res.code === "200" || 200) {
           this.setState({treeList: res.object.list},() => {
             const { treeList } = this.state;
-
-            service.medicalrecord.getspecialistemrdetail({recordid: treeList[0].children[0]['key']})
-              .then(res => {
-                if(res.code === 200 || "200") this.convertSpecialistemrDetail(res.object)
-              })
+            // service.medicalrecord.getspecialistemrdetail({recordid: treeList[0].children[0]['key'], formType: "1"})
+            //   .then(res => {
+            //     if(res.code === 200 || "200") this.convertSpecialistemrDetail(res.object)
+            //   })
           })
         }
       })
@@ -108,13 +146,13 @@ export default class MedicalRecord extends Component{
     ]
   });
   // 诊断
-  diagnosi_config = () => ({
+  diagnosis_config = () => ({
     step: 1,
     rows: [
       {
         columns:[
-          { name: 'diagnosi[诊断]', type: 'textarea', span: 16 },
-          { name:'diagnosi[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => this.openModal('zd')}
+          { name: 'diagnosis[诊断]', type: 'textarea', span: 16 },
+          { name:'diagnosis[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => this.openModal('zd')}
         ]
       }
     ]
@@ -138,15 +176,15 @@ export default class MedicalRecord extends Component{
     rows: [
       {
         columns: [
-          { name: 'LMD[末次月经]', type: 'date', span: 12, valid: 'required'},
-          { name: 'EDD[预产期]', type: 'date', span: 12, valid: 'required'},
+          { name: 'lmd[末次月经]', type: 'date', span: 12, valid: 'required'},
+          { name: 'edd[预产期]', type: 'date', span: 12, valid: 'required'},
         ]
       },
       {
         columns: [
           { name: 'gravidity[G]', type: 'select', span: 6, showSearch: true, options: baseData.ccOptions, valid: 'required'},
           { name: 'parity[P]',  type: 'select', span: 6, showSearch: true, options: baseData.ccOptions, valid: 'required'},
-          { name: 'Abortion[A]',  type: 'select', span: 6, showSearch: true, options: baseData.ccOptions, valid: 'required'},
+          { name: 'abortion[A]',  type: 'select', span: 6, showSearch: true, options: baseData.ccOptions, valid: 'required'},
           { name: 'exfetation[E]',  type: 'select', span: 6, showSearch: true, options: baseData.ccOptions, valid: 'required'},
         ]
       },
@@ -162,29 +200,23 @@ export default class MedicalRecord extends Component{
       {
         columns: [
           { span: 1 },
-          { name: 'yjcuch(g/L)[Hb]', type: 'input', span: 6, showSearch: true, valid: 'required'},
-          { name: 'yjzhouq(fL)[MCV]',  type: 'input', span: 6, showSearch: true, valid: 'required'},
-          { name: 'yjchix[MCH]',  type: 'input', span: 6, showSearch: true, valid: 'required'},
+          { name: 'hb(g/L)[Hb]', type: 'input', span: 6, showSearch: true, valid: 'required'},
+          { name: 'mcv(fL)[MCV]',  type: 'input', span: 6, showSearch: true, valid: 'required'},
+          { name: 'mch[MCH]',  type: 'input', span: 6, showSearch: true, valid: 'required'},
         ]
       },
       {
         columns: [
           { span: 1 },
-          { name: 'yjcuch[HbA2]', type: 'input', span: 6, showSearch: true, valid: 'required'},
-          { name: 'yjzhouq[血型]',  type: 'select', span: 6, showSearch: true, options: baseData.xuexingOptions, valid: 'required'},
-          {name:'ckrh[RH(D)血型]', type: 'select',span:6, options: baseData.xuexing2Options, valid: 'required'},
-        ]
-      },
-      {
-        columns: [
-          { span: 1 },
-          { name: 'yjchix[地贫基因型]',  type: 'select', span: 11, showSearch: true, options: _genotypeAnemia ,valid: 'required'}
+          { name: 'hbA2[HbA2]', type: 'input', span: 6, showSearch: true, valid: 'required'},
+          { name: 'blood_group[血型]',  type: 'select', span: 6, showSearch: true, options: baseData.xuexingOptions, valid: 'required'},
+          { name: 'genotype[地贫基因型]',  type: 'select', span: 11, showSearch: true, options: _genotypeAnemia ,valid: 'required'}
         ]
       },
       {
         columns:[
           { span: 1 },
-          { name: 'otherExceptEarly[其他异常]', type: 'input', span: 11 }
+          { name: 'other_anomalies[其他异常]', type: 'input', span: 11 }
         ]
       }
     ]
@@ -198,29 +230,23 @@ export default class MedicalRecord extends Component{
       {
         columns: [
           { span: 1 },
-          { name: 'yjcuch(g/L)[Hb]', type: 'input', span: 6, showSearch: true, valid: 'required'},
-          { name: 'yjzhouq(fL)[MCV]',  type: 'input', span: 6, showSearch: true, valid: 'required'},
-          { name: 'yjchix[MCH]',  type: 'input', span: 6, showSearch: true, valid: 'required'},
+          { name: 'hb(g/L)[Hb]', type: 'input', span: 6, showSearch: true, valid: 'required'},
+          { name: 'mcv(fL)[MCV]',  type: 'input', span: 6, showSearch: true, valid: 'required'},
+          { name: 'mch[MCH]',  type: 'input', span: 6, showSearch: true, valid: 'required'},
         ]
       },
       {
         columns: [
           { span: 1 },
-          { name: 'yjcuch[HbA2]', type: 'input', span: 6, showSearch: true, valid: 'required'},
-          { name: 'yjzhouq[血型]',  type: 'select', span: 6, showSearch: true, options: baseData.xuexingOptions, valid: 'required'},
-          {name:'ckrh[RH(D)血型]', type: 'select',span:6, options: baseData.xuexing2Options, valid: 'required'},
-        ]
-      },
-      {
-        columns: [
-          { span: 1 },
-          { name: 'yjchix[地贫基因型]',  type: 'select', span: 11, showSearch: true, options: _genotypeAnemia ,valid: 'required'}
+          { name: 'hbA2[HbA2]', type: 'input', span: 6, showSearch: true, valid: 'required'},
+          { name: 'blood_group[血型]',  type: 'select', span: 6, showSearch: true, options: baseData.xuexingOptions, valid: 'required'},
+          { name: 'genotype[地贫基因型]',  type: 'select', span: 11, showSearch: true, options: _genotypeAnemia ,valid: 'required'}
         ]
       },
       {
         columns:[
           { span: 1 },
-          { name: 'otherExceptEarly[其他异常]', type: 'input', span: 11 }
+          { name: 'other_anomalies[其他异常]', type: 'input', span: 11 }
         ]
       }
     ]
@@ -297,7 +323,7 @@ export default class MedicalRecord extends Component{
       {
         columns:[
           { span: 1 },
-          {name:'que[其他]', type:'checkinput-5',radio:true, valid: 'required', options: baseData.nhOptions,span: 15}
+          {name:'other_disease[其他]', type:'checkinput-5',radio:true, valid: 'required', options: baseData.nhOptions,span: 15}
         ]
       }
     ]
@@ -309,7 +335,7 @@ export default class MedicalRecord extends Component{
       {
         columns:[
           {
-            name: 'BP(mmHg)[血@@@压 ]', type: ['input(/)','input'], span: 8, valid: (value)=>{
+            name: 'bp(mmHg)[血@@@压 ]', type: ['input(/)','input'], span: 8, valid: (value)=>{
               let message = '';
               if(value){
                 // 缺少valid
@@ -322,7 +348,7 @@ export default class MedicalRecord extends Component{
             }
           },
           {
-            name:'add_FIELD_pulse[浮@@@肿 ]', type:'select', span:8, showSearch: true, options: baseData.xzfOptions
+            name:'edema[浮@@@肿 ]', type:'select', span:8, showSearch: true, options: baseData.xzfOptions
           },
         ]
       },
@@ -369,9 +395,9 @@ export default class MedicalRecord extends Component{
       {
          columns: [
           { span: 2 },
-          { name: 'HCG[β-HCG](mom)', type: 'input', span: 5 },
+          { name: 'hcg[β-HCG](mom)', type: 'input', span: 5 },
           { span: 1 },
-          { name: 'PAPP[PAPP-A](mom)', type: 'input', span: 5 },
+          { name: 'papp[PAPP-A](mom)', type: 'input', span: 5 },
         ]
       },
       {
@@ -398,12 +424,28 @@ export default class MedicalRecord extends Component{
           { name: 'trisomy13[13三体风险]', type: 'input', span: 5 },
         ]
       },
+      // {
+      //   columns: [
+      //     { span: 2 },
+      //     { name: 'HCG[β-HCG](mom)', type: 'input', span: 5 },
+      //     { span: 1 },
+      //     { name: 'PAPP[PAPP-A](mom)', type: 'input', span: 5 },
+      //   ]
+      // },
       {
         columns: [
           { span: 2 },
-          { name: 'HCG[β-HCG](mom)', type: 'input', span: 5 },
+          { name: 'ntd[NTD风险]', type: 'input', span: 5},
           { span: 1 },
-          { name: 'PAPP[PAPP-A](mom)', type: 'input', span: 5 },
+          { name: 'hcg[β-HCG](mom)', type: 'input', span: 5 },
+          { span: 1 },
+          { name: 'afp[AFP](mom)', type: 'input', span: 5 },
+        ]
+      },
+      {
+        columns: [
+          { span: 2 },
+          { name: 'other_anomalies[其他异常]', type: 'input', span: 11 }
         ]
       },
       {
@@ -433,9 +475,11 @@ export default class MedicalRecord extends Component{
       {
         columns: [
           { span: 2 },
-          { name: 'HCG[β-HCG](mom)', type: 'input', span: 5 },
+          { name: 'z21[21三体Z值]', type: 'input', span: 5 },
           { span: 1 },
-          { name: 'PAPP[PAPP-A](mom)', type: 'input', span: 5 },
+          { name: 'z18[18三体Z值]', type: 'input', span: 5 },
+          { span: 1 },
+          { name: 'z13[13三体Z值]', type: 'input', span: 5 },
         ]
       },
       {
@@ -463,15 +507,15 @@ export default class MedicalRecord extends Component{
     rows:[
       {
         columns:[
-          { name: 'CRL(mm)[CRL]', type: 'input', span: 7 },
-          { name: 'gestational_week(周)[如 孕]', type: 'input', span: 7 },
+          { name: 'crl(mm)[CRL]', type: 'input', span: 7 },
+          { name: 'crlweek(周)[如 孕]', type: 'input', span: 7 },
           {span:2},
-          { name: 'NT(mm)[NT]', type: 'input', span: 7 },
+          { name: 'nt(mm)[NT]', type: 'input', span: 7 },
         ]
       },
       {
         columns:[
-          { name: 'other_anomalies[异常结果描述]', type: 'input', span: 8 },
+          { name: 'excdesc[异常结果描述]', type: 'input', span: 8 },
         ]
       },
       {columns: [{label: '术前超声检查' , span: 12}]},
@@ -483,18 +527,17 @@ export default class MedicalRecord extends Component{
     ]
   });
 
-
   /*
   * 遗传病史部分
   * */
   // 染色体核型
-  chromosome_config = () => ({
+  karyotype_config = () => ({
     step: 1,
     rows: [
       {
         columns:[
-          { name: 'diagnosi[诊断]', type: 'textarea', span: 16 },
-          { name:'diagnosi[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => this.openModal('zd')}
+          { name: 'karyotype[诊断]', type: 'textarea', span: 16 },
+          { name:'karyotype[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => this.openModal('zd')}
         ]
       }
     ]
@@ -533,13 +576,47 @@ export default class MedicalRecord extends Component{
 
   /* ========================= 事件交互类 =========================== */
   // 处理三个病例切换的事件
-  handleTabChange = (key) => {
+  handleBtnChange = (key) => {
     // TODO setState重复渲染问题 - 待解决
-    this.setState({activeKey: key});
+    this.setState({formType: key});
   };
   // TODO 处理超声婴儿edit
   handleUFetusEdit = () => {
 
+  };
+  // 树形结构选择
+  handlerTreeSelect = (selectedKeys, {selected, node}) => {
+    // 这里禁用取消
+    console.log(selectedKeys);
+    if(node.props.children || !selected || Number(selectedKeys[0]) < 0) {
+      console.log('不允许父节点请求，不允许取消');
+      return ;
+    }
+    // 先请求好数据再setState， 不然render会报错
+    service.medicalrecord.getspecialistemrdetail({recordid: selectedKeys[0]}).then(res => {
+      console.log(res);
+      if(res.code === "200" || 200) {
+        this.convertSpecialistemrDetail(res.object);
+        this.setState({currentTreeKeys: selectedKeys});
+      }
+    });
+  };
+  // 新建病历
+  newSpecialistemr = () => {
+    const ONE_DAY_MS = 86400000;
+    const { treeList } = this.state;
+    // 判断第一个是否是今天
+    const nD = new Date();
+    if(nD.getTime() - Date.parse(treeList[0]['title']) > ONE_DAY_MS) {
+      //不是今天
+      let m = nD.getMonth() + 1, d = nD.getDate();
+      treeList.splice(0,0,{title: `${nD.getFullYear()}-${m < 10 ? `0${m}`: m}-${d < 1?`0${d}`:d}` , key: "n-1", children: [{title: "待完善病历", key: "-1"}]})
+    }else {
+      treeList[0]['children'].splice(0,0,{title: '待完善病历', key: "-1"})
+    }
+    // 这里也要清空数据
+    this.clearSpecialistemrDetail();
+    this.setState({treeList, isNewingSpe: true, currentTreeKeys: ["-1"]});
   }
 
   /* ========================= 渲染方法 ============================== */
@@ -559,7 +636,12 @@ export default class MedicalRecord extends Component{
         </TreeNode>
       )
     });
-    return <Tree onSelect={this.handlerTreeSelect} defaultExpandAll>{tnDOM}</Tree>;
+    return <Tree
+      onSelect={this.handlerTreeSelect}
+      defaultExpandAll
+      selectedKeys={this.state.currentTreeKeys || []}
+      multiple={false}
+    >{tnDOM}</Tree>;
   };
   // 渲染 超声检查 胎儿Tab
   renderUFetusTabPane = (fetusData) => {
@@ -578,7 +660,29 @@ export default class MedicalRecord extends Component{
   /* ========================= 其他 ================================== */
   // 获取数据 整合进入state
   convertSpecialistemrDetail = (object) => {
-
+    this.clearSpecialistemrDetail();
+    this.setState({...object});
+  };
+  // 清空数据 -- 有必要的话可以开三组数据防止时间过长
+  clearSpecialistemrDetail = () => {
+    const newState = this.state;
+    // 定义不需要清空的值
+    const UNCLEARKEYS = ['treeList','currentTreeKeys','templateObj'];
+    console.log(this.state);
+    // 除控制需要的值以外，其他全部清除掉
+    for(let key in newState){
+      if(key !== 'treeList' && key !== 'currentTreeKeys' && key !== 'templateObj'){
+        const type = typeof newState[key];
+        if(type === 'string') {
+          newState[key] = '';
+        }else if(type === 'array') {
+          newState[key] = [];
+        }else if(type === 'object') {
+          newState[key] = {};
+        }
+      }
+    }
+    this.setState(newState);
   };
 
   /* ============================ 模板功能 ==================================== */
@@ -600,24 +704,20 @@ export default class MedicalRecord extends Component{
         });
     }
   };
-
   // 关闭modal框
   closeModal = () => {
     this.setState({
       templateObj: {isShowTemplateModal: false, type: '', templateList: []}
     })
   }
-
   // data - 新增数据项
   newTemplate = (data,allData) => {
     console.log(data,allData);
   };
-
   // data - 删除 数据项
   deleteTemplate = (data) => {
     console.log(data);
   };
-
   // 选择模板
   getTemplate = (data) => {
     const { type } = this.state.templateObj;
@@ -653,11 +753,12 @@ export default class MedicalRecord extends Component{
     console.log(key,acitonType);
   };
 
-
   render() {
-    const { treeList, activeKey, uFetusActiveKey  } = this.state;
+    const { treeList, uFetusActiveKey, currentTreeKeys, formType  } = this.state;
     const { isShowTemplateModal, templateList } = this.state.templateObj;
-
+    // data
+    const { chief_complaint, medical_history, diagnosis, treatment, other_exam, karyotype } = this.state;
+    const { pregnancy_history, downs_screen, thalassemia, ultrasound, past_medical_history, family_history, physical_check_up } = this.state;
     const tableColumns = [
       {title: '编号', key: 'index', render: (_,__,index) => (<span>{index+1}</span>) },
       {title: '内容', dataIndex: 'content', key: 'content'},
@@ -666,27 +767,40 @@ export default class MedicalRecord extends Component{
     return (
       <Page className='fuzhen font-16 ant-col'>
         <div className="fuzhen-left ant-col-5">
-          {this.renderTree(treeList)}
+          <div style={{textAlign: 'center'}}>
+            <Button size="small" onClick={this.newSpecialistemr}>新增病历</Button>
+          </div>
+          <div>
+            {this.renderTree(treeList)}
+          </div>
         </div>
         <div className="fuzhen-right ant-col-19 main main-pad-small width_7">
-          <Tabs activeKey={activeKey} onChange={this.handleTabChange}>
-            <TabPane tab="胎儿疾病" key="tab-0">
-              <Collapse>
-                <Panel header="主诉" key="fetus-1">{formRender({},this.chief_complaint_config(),() => console.log('c'))}</Panel>
-                <Panel header="预产期" key="fetus-2">{formRender({}, this.pregnancy_history_config(), () => console.log('p'))}</Panel>
-                <Panel header="现病史" key="fetus-3">{formRender({},this.medical_history_config(),() => console.log('c'))}</Panel>
-                <Panel header="唐氏筛查" key="fetus-4">
-                  {formRender({}, this.early_downs_screen_config(), () =>console.log('down_screen'))}
-                  {formRender({}, this.middle_downs_screen_config(), () =>console.log('down_screen'))}
-                  {formRender({}, this.NIPT_downs_screen_config(), () =>console.log('down_screen'))}
+          {/* NOTICE 暂时这样写 可能不太适当 */}
+          {Number(currentTreeKeys[0])  < 0 ? (
+            <ButtonGroup>
+              <Button type={formType === "1" ? "primary" : ""} onClick={() => this.handleBtnChange('1')}>胎儿疾病</Button>
+              <Button type={formType === "2" ? "primary" : ""} onClick={() => this.handleBtnChange('2')}>遗传门诊</Button>
+              <Button type={formType === "3" ? "primary" : ""} onClick={() => this.handleBtnChange('3')}>复诊记录</Button>
+            </ButtonGroup>
+          ) : null}
+          { formType === "1" ? (
+            <div>
+              <Collapse defaultActiveKey={['fetus-0','fetus-1','fetus-2','fetus-3','fetus-4','fetus-5','fetus-6','fetus-7','fetus-8','fetus-9','fetus-10','fetus-11']}>
+                <Panel header="主诉" key="fetus-0">{formRender({chief_complaint: chief_complaint},this.chief_complaint_config(),() => console.log('c'))}</Panel>
+                <Panel header="预产期" key="fetus-1">{formRender(pregnancy_history, this.pregnancy_history_config(), () => console.log('p'))}</Panel>
+                <Panel header="现病史" key="fetus-2">{formRender({medical_history: medical_history},this.medical_history_config(),() => console.log('c'))}</Panel>
+                <Panel header="唐氏筛查" key="fetus-3">
+                  {formRender(downs_screen['early'], this.early_downs_screen_config(), () =>console.log('down_screen'))}
+                  {formRender(downs_screen['middle'], this.middle_downs_screen_config(), () =>console.log('down_screen'))}
+                  {formRender(downs_screen['nipt'], this.NIPT_downs_screen_config(), () =>console.log('down_screen'))}
                 </Panel>
-                <Panel header="地贫/血型检查" key="fetus-5">
-                  {formRender({}, this.wife_thalassemia(), () =>console.log('地贫'))}
-                  {formRender({}, this.husband_thalassemia(), () =>console.log('地贫'))}
+                <Panel header="地贫/血型检查" key="fetus-4">
+                  {formRender(thalassemia['wife'], this.wife_thalassemia(), () =>console.log('地贫'))}
+                  {formRender(thalassemia['husband'], this.husband_thalassemia(), () =>console.log('地贫'))}
                 </Panel>
-                <Panel header="超声检查" key="fetus-6">
+                <Panel header="超声检查" key="fetus-5">
                   <div>
-                    {formRender({}, this.ultrasound_menopause_config(), () => console.log('超声'))}
+                    {formRender({menopause: ultrasound['menopause']}, this.ultrasound_menopause_config(), () => console.log('超声'))}
                   </div>
                   <div>
                     <Tabs
@@ -694,53 +808,58 @@ export default class MedicalRecord extends Component{
                       type="editable-card"
                       onEdit={this.handleUFetusEdit}
                     >
-                      {this.renderUFetusTabPane([])}
+                      {this.renderUFetusTabPane(ultrasound['fetus'] || [])}
                     </Tabs>
                   </div>
                 </Panel>
-                <Panel header="其他检查" key="fetus-7">{formRender({},this.other_exam_config(),() => console.log('c'))}</Panel>
-                <Panel header="既往史" key="fetus-8">
-                  {formRender({}, this.past_medical_history_config(),() => console.log('既往史') )}
+                <Panel header="其他检查" key="fetus-6">{formRender({other_exam: other_exam},this.other_exam_config(),() => console.log('c'))}</Panel>
+                <Panel header="既往史" key="fetus-7">
+                  {formRender(past_medical_history, this.past_medical_history_config(),() => console.log('既往史') )}
                 </Panel>
-                <Panel header="家族史" key="fetus-9">
-                  {formRender({}, this.family_history_config(), () => console.log('家族史'))}
+                <Panel header="家族史" key="fetus-8">
+                  {formRender(family_history, this.family_history_config(), () => console.log('家族史'))}
                 </Panel>
-                <Panel header="体格检查" key="fetus-10">
-                  {formRender({}, this.physical_check_up_config(), () => console.log('tige'))}
+                <Panel header="体格检查" key="fetus-9">
+                  {formRender(physical_check_up, this.physical_check_up_config(), () => console.log('tige'))}
                 </Panel>
-                <Panel header="诊断" key="fetus-11">{formRender({},this.diagnosi_config(),() => console.log('c'))}</Panel>
-                <Panel header="处理" key="fetus-12">{formRender({},this.treatment_config(),() => console.log('c'))}</Panel>
+                <Panel header="诊断" key="fetus-10">{formRender({diagnosis: diagnosis}, this.diagnosis_config(),() => console.log('c'))}</Panel>
+                <Panel header="处理" key="fetus-11">{formRender({treatment: treatment}, this.treatment_config(),() => console.log('c'))}</Panel>
               </Collapse>
-            </TabPane>
-            <TabPane tab="遗传门诊" key="tab-1">
-              <Collapse>
-                <Panel header="主诉" key="genetic-0">{formRender({},this.chief_complaint_config(),() => console.log('c'))}</Panel>
-                <Panel header="预产期" key="genetic-1">{formRender({}, this.pregnancy_history_config(), () => console.log('p'))}</Panel>
-                <Panel header="现病史" key="genetic-2">{formRender({},this.medical_history_config(),() => console.log('c'))}</Panel>
+            </div>
+          ) : null }
+          { formType === "2" ? (
+            <div>
+              <Collapse defaultActiveKey={['genetic-0','genetic-1','genetic-2','genetic-3','genetic-4','genetic-5','genetic-6','genetic-7','genetic-8','genetic-9']}>
+                <Panel header="主诉" key="genetic-0">{formRender({chief_complaint: chief_complaint},this.chief_complaint_config(),() => console.log('c'))}</Panel>
+                <Panel header="预产期" key="genetic-1">{formRender(pregnancy_history, this.pregnancy_history_config(), () => console.log('p'))}</Panel>
+                <Panel header="现病史" key="genetic-2">{formRender({medical_history: medical_history},this.medical_history_config(),() => console.log('c'))}</Panel>
                 <Panel header="地贫/血型检测" key="genetic-3">
-                  {formRender({}, this.wife_thalassemia(), () =>console.log('地贫'))}
-                  {formRender({}, this.husband_thalassemia(), () =>console.log('地贫'))}
+                  {formRender(thalassemia['wife'], this.wife_thalassemia(), () =>console.log('地贫'))}
+                  {formRender(thalassemia['husband'], this.husband_thalassemia(), () =>console.log('地贫'))}
                 </Panel>
-                <Panel header="染色体核型" key="genetic-4">{formRender({} , this.chromosome_config(), () => console.log('a'))}</Panel>
-                <Panel header="其他检查" key="genetic-5">{formRender({},this.other_exam_config(),() => console.log('c'))}</Panel>
-                <Panel header="既往史" key="genetic-6">{formRender({},this.medical_history_config(),() => console.log('c'))}</Panel>
-                <Panel header="家族史" key="genetic-7">{formRender({},this.family_history_config(),() => console.log('c'))}</Panel>
-                <Panel header="诊断" key="genetic-8">{formRender({},this.diagnosi_config(),() => console.log('c'))}</Panel>
-                <Panel header="处理" key="genetic-9">{formRender({},this.treatment_config(),() => console.log('c'))}</Panel>
+                <Panel header="染色体核型" key="genetic-4">{formRender({karyotype: karyotype} , this.karyotype_config(), () => console.log('a'))}</Panel>
+                <Panel header="其他检查" key="genetic-5">{formRender({other_exam: other_exam}, this.other_exam_config(),() => console.log('c'))}</Panel>
+                <Panel header="既往史" key="genetic-6">{formRender(past_medical_history, this.past_medical_history_config(),() => console.log('c'))}</Panel>
+                <Panel header="家族史" key="genetic-7">{formRender(family_history,this.family_history_config(),() => console.log('c'))}</Panel>
+                <Panel header="诊断" key="genetic-8">{formRender({diagnosis: diagnosis},this.diagnosis_config(),() => console.log('c'))}</Panel>
+                <Panel header="处理" key="genetic-9">{formRender({treatment: treatment},this.treatment_config(),() => console.log('c'))}</Panel>
               </Collapse>
-            </TabPane>
-            <TabPane tab="复诊记录" key="tab-2">
-              <Collapse>
+            </div>
+          ) : null}
+          { formType === "3" ? (
+            <div>
+              <Collapse defaultActiveKey={['fuzhen-0','fuzhen-1','fuzhen-2','fuzhen-3','fuzhen-4','fuzhen-5','fuzhen-6']}>
+                {/* 这个位置的数据可能和上边的不一样 */}
                 <Panel header="复诊日期+孕周" key="fuzhen-0"/>
                 <Panel header="主诉" key="fuzhen-1">{formRender({},this.chief_complaint_config(),() => console.log('c'))}</Panel>
                 <Panel header="病情变化" key="fuzhen-2">{formRender({},this.stateChange_config(),() => console.log('c'))}</Panel>
                 <Panel header="体格检查" key="fuzhen-3">{formRender({},this.physical_check_up_config(),() => console.log('c'))}</Panel>
                 <Panel header="前次检查结果" key="fuzhen-4">{formRender({},this.lastResult_config(),() => console.log('c'))}</Panel>
-                <Panel header="诊断" key="fuzhen-5">{formRender({},this.diagnosi_config(),() => console.log('c'))}</Panel>
+                <Panel header="诊断" key="fuzhen-5">{formRender({},this.diagnosis_config(),() => console.log('c'))}</Panel>
                 <Panel header="处理" key="fuzhen-6">{formRender({},this.treatment_config(),() => console.log('c'))}</Panel>
               </Collapse>
-            </TabPane>
-          </Tabs>
+            </div>
+          ) : null}
         </div>
 
         {/* modal */}
