@@ -1,26 +1,43 @@
-import React, { Component } from "react";
-import { Select, Button, Popover, Input, Tabs, Tree, Modal, Row,Col, Spin,Timeline, Collapse,message } from 'antd';
+import React,{ Component} from 'react';
 
+<<<<<<< HEAD
 var Trigger = require('rc-trigger');
 
 import axios from 'axios';
 
 import {valid} from '../../render/common';
+=======
+import { Tree, Button, Collapse, Tabs, Modal, Input } from 'antd';
+>>>>>>> refs/remotes/origin/master
 import Page from '../../render/page';
+
+import formRender from '../../render/form.js';
 import service from '../../service';
-import * as baseData from './data';
-import formRender from '../../render/form';
-import * as util from './util';
-import editors from '../shouzhen/editors';
 
-import EditableTable from '../medicalrecord/editableTable.js';
+// Css
+import './index.less';
+import '../index.less';
 
-import store from '../store';
-import { getAlertAction } from '../store/actionCreators.js';
+// select 数据
+import {
+  yesOptions, nhOptions, characterOptions, statusOptions,
+  operation_itemsOptions, operationLevelOptions, incisionTypeOptions, preoperativeUltrasonographyColumns, puncturePositionOptions,
+  sjTreeOption
+} from './data.js'
+import {valid} from "../../render/common";
 
-import "../index.less";
-import "./index.less";
+/**
+ * TODO
+ * 2020-02-07
+ *  1 ward - 姓名、麻醉方法、麻醉医师、器械护士
+ *  2 送检项目 的 treeselect 有小横线 BUG
+ *  3 新建的Tab 因为类型问题，会console.error
+ *  4 打开otherInput的modal，原来的ant-select遮挡
+ *  5 新建病例功能 未做
+ */
+
 const { TreeNode } = Tree;
+<<<<<<< HEAD
 const Panel = Collapse.Panel;
 const TabPane = Tabs.TabPane;
 
@@ -249,218 +266,106 @@ const TEMPLATE_KEY = {
 }
 
 export default class Operation extends Component {
+=======
+const ButtonGroup = Button.Group;
+const { Panel } = Collapse;
+const { TabPane } = Tabs;
+>>>>>>> refs/remotes/origin/master
 
+export default class Operation extends Component{
   constructor(props) {
     super(props);
     this.state = {
-      loadingTable: true,
-      loading: true,
-      activeElement: '',
-      info: {},
-      diagnosi: '',
-      diagnosis: [],
-      diagnosislist: {},
-      relatedObj: {},
-      recentRvisit: null,
-      recentRvisitAll: null,
-      recentRvisitShow: false,
-      pageCurrent: 1,
-      totalRow: 0,
-      isShowMoreBtn: false,
-      isShowZhenduan: false,
-      isMouseIn: false,
-      isShowSetModal: false,
-      isShowResultModal: false,
-      isShowPlanModal: false,
-      treatTemp: [],
-      templateShow: false,
-      collapseActiveKey: ['1', '2', '3'],
-      jianyanReport: '血常规、尿常规、肝功、生化、甲功、乙肝、梅毒、艾滋、地贫',
-      planData: [],
-      modalState: [
-        {
-          "title": "糖尿病门诊预约",
-          "gesmoc": "2019-07-03",
-          "options": ["本周五", "下周五","下下周五",""]
-        },
-        {
-          "title": "产前诊断预约",
-          "gesmoc": "2019-07-31",
-          "options": ["预约1","预约2","预约3"],
-          "counts": "3"
-        }
-      ],
-      treeData : [],
-      selectedKeys: [], 
-      panes:[
-        { title: '胎儿1', content: '选项卡一内容', key: '0' },
-      ],
-      ipanes:[
-        { title: '胎儿1', content: '选项卡一内容', key: '0' },
-      ],
-      activeKey: '1',
-      iactiveKey :'1',
+      // 左侧树形菜单
+      operationList: [],
 
-       /**
-       * @param
-       * {isShowTemplateModal} - modal框
-       * {type} - template type
-       * {templateList} - templateList from server
-       */
-      templateObj: { 
-        isShowTemplateModal: false,
-        type: '', 
-        templateList: []
+      // 数据
+      operationItem: {
+        incisionType: "",
+        operationLevel: "",
+        operationName: "",
+        rePuncture: []
       },
-    };
+      preoperative_record: {
+        bP: "", operation_date: "",
+        preoperativeUltrasonography: [],
+        temperature: ""
+      },
+      operative_procedure: {
+        fetus: [{
+          id: "test-1",
+          start_time: "00:00",
+          end_time: "00:00",
+        }],
+      },
+      ward: {},
 
-    this.componentWillUnmount = editors();
-  }
-
-  static Title = '孕妇信息';
-  static entityParse(obj = {}){
-    return {
-      ...obj.gravidaInfo,
-      useridtype: JSON.parse(obj.gravidaInfo.useridtype)
-    }
-  }
-  static entitySave(entity = {}){
-    return {
-      ...entity
+      // 控制
+      currentFetusActiveKey: "",  // 当前activeTab
+      isFetusPage: true, // 现在处于哪一个病历页
+      isShowOtherContextModal: false,
+      otherContext: ""
     }
   }
 
   componentDidMount() {
-    Promise.all([
-    service.getoperationdetail().then(res => {
-      console.log(res);
-      let currentpanes = res.object.operative_procedure.fetus;
-      let currentipanes = res.object.inspection_item.fetus;
-      currentpanes.forEach((pane, i) => {
-        pane.key = "fetus-"+i;
-      });
-      currentipanes.forEach((pane, i) => {
-        pane.key = "ifetus-"+i;
-      });
-      this.setState({ entity: res.object,panes:currentpanes,ipanes:currentipanes});
-      // console.log(this.state);
-    })])
-  }
-
-  // 展示使用
-  getOperationDetail = (key) => {
-    service.getoperationdetail().then(res => {
-      console.log(res);
-      let currentpanes = res.object.operative_procedure.fetus;
-      let currentipanes = res.object.inspection_item.fetus;
-      currentpanes.forEach((pane, i) => {pane.key = "fetus-"+i;});
-      currentipanes.forEach((pane, i) => {pane.key = "ifetus-"+i;});
-      this.setState({ entity: res.object,panes:currentpanes,ipanes:currentipanes});
-      // console.log(this.state);
-      // 记录手术项目
-      console.log(res);
+    // 获取手术记录的json
+    service.operation.getOperation().then(res => {
+      // 将数据setState 进入 state 中
+      if(res.code === '200' || 200) {
+        this.setState({operationList: res.object.list}, () => {
+          // 获取list后，默认获取第一个手术项目detail
+          const { operationList } = this.state;
+          // TODO 这里的key值暂时不知道用哪个 完成页面之后再做
+          service.operation.getOperationdetail({recordid: operationList[0].children[0]['key']})
+            .then(res => {
+              if(res.code === 200 || "200") this.convertOperationDetail(res.object)
+            });
+        });
+      }
     })
   }
-  
 
-  ontabChange=(activeKey) =>{
-    this.setState({
-      activeKey
-    });    
-  }
-  ontabEdit=(targetKey, action)=> {
-    //this[action](targetKey);
-    if(action==='add'){
-      this.addtab();
-    }else if(action ==='remove'){
-      this.remove(targetKey);
-    }
-  }
-  addtab() {
-    const panes = this.state.panes;
-    const activeKey = panes.length;
-    panes.push({key: "fetus-"+activeKey});
-    this.setState({ panes, activeKey });
-  }
-  remove(targetKey) {
-    //TODO: 删除提示
-    let activeKey = this.state.activeKey;
-    let lastIndex;
-    this.state.panes.forEach((pane, i) => {
-      if (pane.key === targetKey) {
-        lastIndex = i - 1;
+  /* ========================= formRender渲染UI config  ============================ */
+  /*
+  * 胎儿中心部分
+  * */
+  // 手术项目
+  operationItem_config = () => ({
+    step: 1,
+    rows: [
+      {
+        columns: [
+          {name: 'operationName[手术名称]', type: 'select', options: operation_itemsOptions, span: 6},
+          {name: 'operationLevel[手术级别]', type: 'select', options: operationLevelOptions, span: 6},
+          {name: 'incisionType[切口类型]', type: 'select', options: incisionTypeOptions, span: 6}
+        ]
+      },
+      {
+        columns: [
+          {name: 'rePuncture[是否再次穿刺]', type: 'checkinput-5', radio: true, options: nhOptions }
+        ]
       }
-    });
-    let panes = this.state.panes.filter(pane => pane.key !== targetKey);
-    panes.forEach((pane, i) => {
-      pane.key = "fetus-"+i;
-    });
-    if (lastIndex >= 0 && activeKey === targetKey) {
-      activeKey = panes[lastIndex].key;
-    }
-    this.setState({ panes, activeKey });
-  }
-  oninspectionChange=(activeKey) =>{
-    this.setState({
-      iactiveKey:activeKey
-    });    
-  }
-  oninspectionEdit=(targetKey, action)=> {
-    //this[action](targetKey);
-    if(action==='add'){
-      this.addinspection();
-    }else if(action ==='remove'){
-      this.removeinspection(targetKey);
-    }
-  }
-  addinspection() {
-    const ipanes = this.state.ipanes;
-    const activeKey = ipanes.length;
-    ipanes.push({key: "ifetus-"+activeKey});
-    this.setState({ ipanes:ipanes, iactiveKey:activeKey });
-  }
-  removeinspection(targetKey) {
-    //TODO: 删除提示
-    let activeKey = this.state.iactiveKey;
-    let lastIndex;
-    this.state.ipanes.forEach((pane, i) => {
-      if (pane.key === targetKey) {
-        lastIndex = i - 1;
-      }
-    });
-    let ipanes = this.state.ipanes.filter(pane => pane.key !== targetKey);
-    ipanes.forEach((pane, i) => {
-      pane.key = "ifetus-"+i;
-    });
-    if (lastIndex >= 0 && activeKey === targetKey) {
-      activeKey = ipanes[lastIndex].key;
-    }
-    this.setState({ ipanes:ipanes, iactiveKey:activeKey });
-  }
-
-
-  /* ================================== UI视图 ==================================== */
-
+    ]
+  });
   // 术前记录
-  configpreoperative_record(){
-    return {
-      step: 1,
-        rows: [
-        {
-          columns: [
-            { name: 'operation_date[手术日期]', type: 'date', span: 5, valid: 'required'},
-            {span: 1},
-            { name: 'temperature(℃)[体@@@温 ]', type: 'input', span: 5, valid: 'required'},
-            {span: 1},
-            { name: 'BP(mmHg)[血@@@压 ]', type: ['input(/)','input'], span: 5, valid: (value)=>{
+  preoperative_record_config = () => ({
+    step: 1,
+    rows: [
+      {
+        columns: [
+          {name: 'operation_date[手术日期]', type: 'date', span:6},
+          {name: 'temperature(℃)[体@@@温 ]', type: 'input', span:6},
+          {name: 'bP(mmHg)[血@@@压 ]', type: ['input(/)','input'], span: 8, valid: (value)=>{
               let message = '';
               if(value){
                 message = [0,1].map(i=>valid(`number|required|rang(0,${[139,109][i]})`,value[i])).filter(i=>i).join();
               }else{
-                
+
               }
               return message;
             }},
+<<<<<<< HEAD
           ]
         },
       ]
@@ -511,193 +416,192 @@ export default class Operation extends Component {
       ]
     }
   }
-  // 手术操作
-  configoperative_procedure(){
-    return {
-      step : 3,
-      rows:[
-        {
-          columns:[
-            { name: 'operation_items[手术项目]',  type: 'checkinput', options: baseData.operation_itemsOptions, span: 24},
-          ]
-        },
-        {
-          columns:[
-            { name: 'operation_no[手术编号]', type: 'input', span: 5 },
-            { name: 'operator[术者]', type: 'select', showSearch: true, options: baseData.operaterOptions, valid: 'required',span: 5 },
-            { name: 'assistant[助手]', type: 'select', showSearch: true, options: baseData.assistantOptions, valid: 'required',span: 5},,
-          ]
-        },
-        {
-          columns:[
-            { name: 'start_time[开始时间]', type: 'time',format:"HH:mm", valid: 'required', placeholder: '' ,span: 5},
-            { name: 'end_time[结束时间]', type: 'time', format:"HH:mm", valid: 'required',placeholder: '' ,span: 5},
-            { name: 'duration(min)[持续时间]', type: 'input', valid: 'required',span: 5 }
-          ]
-        },
-        {
-          columns:[
-            { name: 'uterus[子宫]', type: 'select', showSearch: true, options: baseData.uterusOptions, valid: 'required',span: 5},
-            { name: 'method[方法]', type: 'select', options: baseData.methodOptions, valid: 'required',span: 5},
-            { name: 'placenta[胎盘]', type: 'select', options: baseData.placentaOptions, valid: 'required',span: 5},
-            { name: 'instrument[器械]', type: 'select', options: baseData.instrumentOptions, valid: 'required',span: 5}
-          ]
-        },
-        {
-          columns:[
-            { name: 'specimen_location[取样位置]', type: 'input',valid: 'required',span: 5},           
-            { name: 'count[进入宫腔次数]',  type: 'input',valid: 'required',span: 5},
-            { name: 'specimen_amount(ml)[标本]', type: 'input', showSearch: true, valid: 'required',span: 5},
-            { name: 'character[性状]', type: 'select', showSearch: true, options: baseData.characterOptions, valid: 'required',span: 5},
-          ]
-        },
-        {
-          columns:[
-            { name: 'process_evaluation[过程评估]', type: 'checkinput', radio: true, options: baseData.statusOptions, valid: 'required',span: 16}
-          ]
-        },
-        {
-          columns:[
-            { name: 'special_case[术中特殊]', type: 'textarea',span: 20}
-          ]
-        },
-        {
-          columns:[
-            { name: 'pre_fhr(bpm)[术前胎心率]', type: 'input', valid: 'required',span: 5},
-            { name: 'after_fhr(bpm)[术后胎心率]', type: 'input', valid: 'required',span: 5}
-          ]
-        },
-        {
-          columns:[
-            { name: 'diagnosis[诊断]', type: 'textarea', valid: 'required',span: 20},
-            { name: 'diagnosis[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => this.openModal('zz')}
-
-          ]
-        },
-        {
-          columns:[
-            { name: 're_puncture[是否再次穿刺]', type: 'checkinput', radio: true, options: baseData.yesOptions, valid: 'required',span: 5}
-          ]
-        },
-      ]
-    }
-  }
-
-  // 医生嘱咐
-  configdoctors_advice(){
-    return {
-      step: 1,
-      rows: [
-        {
-          columns:[
-            { name: 'doctor_advice[术后医嘱]', type: 'textarea', span: 16 },
-            { name: 'doctor_advice_btn[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => this.openModal('cl')}
-          ]
-        }
-      ]
+=======
+        ]
+      },
+      {
+        columns: [
+          { name: 'preoperativeUltrasonography[术前超声检查]', type: 'table', valid: 'required', pagination: false, editable: true, options: preoperativeUltrasonographyColumns, span: 20 },
+        ]
       }
-  }
+    ]
+  });
+>>>>>>> refs/remotes/origin/master
+  // 手术操作
+  operative_procedure_config = () => ({
+    step: 1,
+    rows: [
+      {
+        columns: [
+          {name: 'operation_no[手术编号]', type: 'input', span: 6},
+          {name: 'operator[术者]', type: 'input', span: 6},
+          {name: 'assistant[助手]', type: 'input', span: 6},
+        ]
+      },
+      {
+        columns: [
+          {name: 'start_time[开始时间]', type: 'time', placeholder: "", format: "HH:mm", span: 6},
+          {name: 'end_time[结束时间]', type: 'time', placeholder: "", format: "HH:mm",span: 6},
+          {name: 'duration[持续时间](min)', type: 'input', span: 6},
+        ]
+      },
+      {
+        columns: [
+          {name: 'puncturePosition[穿刺部位]', type: 'select', options: puncturePositionOptions,span: 6},
+          {name: 'jinrgqcs[进入宫腔次数]', type: 'input', span: 6},
+        ]
+      },
+      {
+        columns: [
+          {name: 'placenta[经否胎盘]', type: 'select',options: [{label: '经',value: '经'},{label: '否',value: '否'}], span: 6},
+          {name: 'placentaHemorrhage[胎盘出血]', type: 'select', options: yesOptions, span: 6},
+          {name: 'uterineWallHemorrhage[宫壁出血]', type: 'select',options: yesOptions, span: 6},
+        ]
+      },
+      {
+        columns: [
+          {name: 'inspectionItems[送检项目]', type: 'treeselect', options: sjTreeOption,span: 6},
+          {name: 'amniotic_fluid[羊水量](min)', type: 'input', span: 6},
+          {name: 'character[性状]', type: 'select',options: characterOptions, span: 6},
+        ]
+      },
+      {
+        columns:[{label: '之后完善药物/用量输入框'}]
+      },
+      {
+        columns: [
+          {name: 'isPharmacy[是否用药](若选择有，请填写药物与用量)', type: 'checkinput', radio: true, options: nhOptions, span: 18}
+        ]
+      },
+      {
+        columns: [
+          {name: 'process_evaluation[过程评估]', type: 'checkinput', radio:true, options:statusOptions, span: 20}
+        ]
+      },
+      {
+        columns: [
+          {name: 'diagnosis[诊断]', type: 'textarea'}
+        ]
+      },
+      {
+        columns: [
+          {name: 'special_case[特殊记录]', type: 'textarea'}
+        ]
+      }
+    ]
+  });
+  // 术后情况
+  afterOperation_config = () => ({
+    step: 1,
+    rows: [
+      {
+        columns: [{name: 'afterFhr[术后胎心率](bpm)', type: 'input', span: 24}]
+      },
+      {
+        columns: [{name: 'doctors_advice[医后叮嘱]', type: 'textarea', span: 24}]
+      }
+    ]
+  });
+  /*
+  * 病房部分
+  * */
+  // 患者信息
+  ward_config = () => ({
+    step: 1,
+    rows: [
+      {columns: [{label: '患者信息'}]},
+      {
+        columns: [
+          {name: 'name[姓名]', type: 'input', span: 6},
+          {name: 'dept[科室]', type: 'input', span: 6},
+          {name: 'inpatientNo[住院号]', type: 'input', span: 6},
+          {name: 'bedNo[床号]', type: 'input', span: 6}
+        ]
+      },
+      {columns: [{label: '手术项目'}]},
+      {
+        columns: [
+          {name: 'operationNameWard[手术名称]', type: 'checkinput', options: operation_itemsOptions},
+          {name: 'operationLevelWard[手术级别]', type: 'select', options: operationLevelOptions, span: 6},
+          {name: 'incisionTypeWard[切口类型]', type: 'select', options: incisionTypeOptions, span: 6},
+        ]
+      },
+      {
+        columns: [
+          {name: 'preoperativeDiagnosis[术前诊断]', type: 'textarea', span: 24}
+        ]
+      },
+      {
+        columns: [
+          {name: 'intraoperativeDiagnosis[术中诊断]', type: 'textarea', span: 24}
+        ]
+      },
+      {columns: [{label: '手术操作'}]},
+      {
+        columns: [
+          {name: 'operationDate[手术日期]', type: 'date', span: 6},
+          {name: 'startTime[开始时间]', type: 'time', placeholder: '', format: "HH:mm", span: 6},
+          {name: 'endTime[结束时间]', type: 'time', placeholder: '', format: "HH:mm", span: 6},
+        ]
+      },
+      {
+        columns: [
+          {name: 'operationNo[手术编号]', type: 'input', span: 6},
+          {name: 'operator[术者]', type: 'input', span: 6},
+          {name: 'assistant[助手]', type: 'input', span: 6},
+        ]
+      },
+      {
+        columns: [
+          {name: 'anesthesiaMethod[麻醉方法]', type: 'input', span: 6},
+          {name: 'anesthesiologist[麻醉医师]', type: 'input', span: 6},
+          {name: 'instrumentNurse[器械护士]', type: 'input', span: 6},
+        ]
+      },
+      {
+        columns:[{name: 'operationProcedure[手术经过]', type: 'textarea'}]
+      }
+    ]
+  });
 
-
-  // configbase(){
-  //   return {
-  //     step: 1,
-  //     rows: [
-  //       {
-  //         label: '早孕超声:', span: 12, className:'labelclass2'
-  //       },
-  //       {
-  //         columns:[
-  //           { name: 'diagnosis(周)[停经]', type: 'input', span: 4 },
-  //         ]
-  //       },
-  //     ]
-  //     }
-  // }
-
-
-  /* ================================== 模板功能 ==================================== */
-
-   // 打开modal框 & 根据type值搜索对应模板
-   openModal = (type) => {
-    if(type){
-      const { id } = this.state;
-      const reqData = {doctor:id, type: TEMPLATE_KEY[type]}
-      service.medicalrecord.getTemplate(reqData)
-        .then(res => {
-          this.setState({
-            templateObj: {
-              isShowTemplateModal: true,
-              type: type,
-              templateList: res.object
-            }
-          })
-        });    
+  /* ========================= 渲染方法 ============================ */
+  // 渲染左侧手术记录树
+  renderTree = (data) => {
+    let tnDOM = [];
+    if(data.length === 0) {
+      return <div>无手术记录</div>;
     }
+    data.forEach(item => {
+      tnDOM.push(
+        <TreeNode title={item['title'].slice(0,12)} key={item['key']}>
+          {item['children'].map(v => (
+            <TreeNode title={v['title']} key={v['key']}/>
+          ))}
+        </TreeNode>
+      )
+    });
+    return <Tree onSelect={this.handlerTreeSelect} defaultExpandAll>{tnDOM}</Tree>;
   };
-
-  // 关闭modal框
-  closeModal = () => {
-    this.setState({
-      templateObj: {isShowTemplateModal: false, type: '', templateList: []}
+  // 渲染 手术操作 胎儿Tab
+  renderFetusTabPane = (fetusData) => {
+    if(fetusData.length === 0) return <div key="none">暂无数据</div>;
+    const fetusTabPaneDOM = [];
+    fetusData.forEach((fetus,index) => {
+      fetusTabPaneDOM.push(
+        <TabPane key={fetus.id} tab={`胎儿-${index+1}`}>
+          {formRender(fetus,this.operative_procedure_config(),this.handleChange)}
+        </TabPane>
+      );
     })
+    return fetusTabPaneDOM;
   }
-
-  // data - 新增数据项
-  newTemplate = (data,allData) => {
-    console.log(data,allData);
-  }
-
-  // data - 删除 数据项
-  deleteTemplate = (data) => {
-    console.log(data);
-  }
-
-   // 选择模板
-   getTemplate = (data) => {
-    console.log(data);
-    // 得到数据 设置值
-    const { type } = this.state.templateObj;
-    console.log(type);
-    // switch(type) {
-    //   case 'zz':
-    //   case 'CL':
-
-    // }
-  }
-
-  adjustOrder = (key,acitonType) => {
-    // 请求服务器，调整后重新获取.......
-    console.log(key,acitonType);
-  }
-
-
-  /* ================================== 事件交互 ==================================== */
-
-  
-  handleChange(e, { name, value, target }){
-    const { onChange } = this.props;
-    console.log(value);
-    // console.log(onChange);
-    // onChange(e, { name, value, target })
-    // 关联变动请按如下方式写，这些onChange页可以写在form配置的行里
-    // if(name === 'test'){
-    //   onChange(e, { name: 'test01', value: [value,value] })
-    // }
-  }
-
-  handleTreatmentClick(e, {text,index},resolve){
-    const { modalState, modalData } = this.state;
-    text==='更多'?this.setState({openTemplate:resolve}):this.addTreatment(e, text);
-    if(text==='糖尿病日间门诊') {
-      this.setState({modalData: modalState[0]}, () => {
-        this.setState({openYy: true});
-      })
-    }else if (text==='产前诊断') {
-      this.setState({modalData: modalState[1]}, () => {
-        this.setState({openYy: true});
-      })
+  /* ========================= 事件交互 ============================ */
+  // 选择树形菜单获取病例
+  handlerTreeSelect = (selectedKeys, {node}) => {
+    if(node.props.children) {
+      return ;
     }
+<<<<<<< HEAD
   }
   
   // 选中节点触发-------如何在这里获取到选中节点的app_id？？？
@@ -708,55 +612,81 @@ export default class Operation extends Component {
       this.setState({
         selectedKeys,
       });
+=======
+    if(selectedKeys.length !== 0) {
+      service.operation.getOperationdetail({specialtyRecordTreeId: selectedKeys[0]})
+        .then(res => {
+          console.log(res);
+          if(res.code === 200 || "200") this.convertOperationDetail(res.object)
+        });
+>>>>>>> refs/remotes/origin/master
     }
   };
-
-
-  /* ================================== 渲染类 ==================================== */
-  
-  
-  
-  /**
-   * 模板
-   */
-  renderTreatment() {
-    const { treatTemp, openTemplate } = this.state;
-    const closeDialog = (e, items = []) => {
-      this.setState({ openTemplate: false }, ()=>openTemplate&&openTemplate());
-      items.forEach(i => i.checked = false);
-      this.addTreatment(e, items.map(i => i.content).join('\n'));
-    }
-
-    const initTree = (pid, level = 0) => treatTemp.filter(i => i.pid === pid).map(node => (
-      <Tree.TreeNode key={node.id} title={node.content}>
-        {level < 10 ? initTree(node.id, level + 1) : null}
-      </Tree.TreeNode>
-    ));
-
-    const handleCheck = (keys, { checked }) => {
-      treatTemp.forEach(tt => {
-        if (keys.indexOf(`${tt.id}`) !== -1) {
-          tt.checked = checked;
-        }
+  // 胎儿Tab Edit
+  handleTabsEdit = (targetKey, action) => {
+    const { operative_procedure } = this.state;
+    const { fetus } = operative_procedure;
+    if( action === 'remove') {
+      // remove
+      let targetIndex = -1;
+      for(let i = 0 ; i < fetus.length ; i++) {
+        if(fetus[i].id === targetKey) { targetIndex = i; break; }
+      }
+      fetus.splice(targetIndex,1);
+      operative_procedure['fetus'] = fetus;
+    }else if( action === 'add') {
+      // add
+      const fetusKeysArr = Object.keys(fetus); const length = fetus.length;
+      let newObj = {};
+      fetusKeysArr.forEach(key => {
+        newObj[key] = "";
       })
-    };
+      newObj['id'] = (Number(fetus[length-1]['id'])+1).toString();
+      operative_procedure['fetus'].splice(length,0,newObj);
+    }
+    this.setState({operative_procedure});
+  }
+  // 胎儿Tab Click
+  handleTabClick = (key) => {
+    this.setState({currentFetusActiveKey: key});
+  }
+  // formRender 元素
+  handleChange = (_,{ name, value }) => {
+    const SJ_KEY = 'other2';
+    // 送检项目 特别处理
+    if(name === "inspectionItems" && value.findIndex((i) => i === SJ_KEY) !== -1){
+      const { operative_procedure, currentFetusActiveKey } = this.state;
+      const index = operative_procedure['fetus'].findIndex((item) => item.id === currentFetusActiveKey);
+      operative_procedure['fetus'][index]['inspectionItems'] = value;
+      this.setState({isShowOtherContextModal: true, operative_procedure});
+    }
+  };
+  // 处理 送检项目 补充信息
+  // 这里使用的 变量来自 state
+  handleSJOtherContext = () => {
+    const SJ_KEY = 'other2';
+    const { operative_procedure, currentFetusActiveKey, otherContext } = this.state;
+    const index = operative_procedure['fetus'].findIndex((item) => item.id === currentFetusActiveKey);
+    // 送检项目 这个地方暂时写死
+    console.log(operative_procedure['fetus'][index]['inspectionItems']);
+    const otherIndex = operative_procedure['fetus'][index]['inspectionItems'].findIndex(i => i === SJ_KEY);
+    console.log(otherIndex);
+    operative_procedure['fetus'][index]['inspectionItems'].splice(otherIndex, 1, otherContext);
+    this.setState({operative_procedure, otherContext: "",  isShowOtherContextModal: false});
+  }
+  /* ========================= 其他 ============================ */
+  // 获取数据整合进入state
+  convertOperationDetail = (object) => {
+    const { operative_procedure } = object;
+    this.setState({...object});
+    this.setState({currentFetusActiveKey: operative_procedure['fetus'][0].id});
+  };
 
-    const treeNodes = initTree(0);
+  modalGetFocus = () => {
 
-    return (
-      <Modal title="处理模板" closable visible={openTemplate} width={800} onCancel={e => closeDialog(e)} onOk={e => closeDialog(e, treatTemp.filter(i => i.checked))}>
-        <Row>
-          <Col span={12}>
-            <Tree checkable defaultExpandAll onCheck={handleCheck} style={{ maxHeight: '90%' }}>{treeNodes.slice(0,treeNodes.length/2)}</Tree>
-          </Col>
-          <Col span={12}>
-            <Tree checkable defaultExpandAll onCheck={handleCheck} style={{ maxHeight: '90%' }}>{treeNodes.slice(treeNodes.length/2)}</Tree>
-          </Col>
-        </Row>
-      </Modal>
-    )
   }
 
+<<<<<<< HEAD
   renderTreeNodes = data =>
     data.map(item => {
       if (item.children) {
@@ -786,31 +716,57 @@ export default class Operation extends Component {
   
   renderLeft() {
     const { planData, collapseActiveKey } = this.state;
+=======
+  render() {
+    const { operationList, isFetusPage, currentFetusActiveKey, isShowOtherContextModal } = this.state;
+    const { operationItem, preoperative_record, operative_procedure, afterFhr, doctors_advice, ward } = this.state;
+    const { otherContext } = this.state;
+>>>>>>> refs/remotes/origin/master
     return (
-      <div className="fuzhen-left ant-col-5">
-        <Collapse defaultActiveKey={collapseActiveKey}>
-          <Panel header="" key="3">
-            <Timeline className="pad-small" pending={planData.length>0 ? <Button type="ghost" size="small" onClick={() => this.setState({isShowPlanModal: true})}>管理</Button> : null}>
-              {planData.length>0 ? planData.map((item, index) => (
-                <Timeline.Item key={`planData-${item.id || index}-${Date.now()}`}>
-                  <p className="font-16">{item.time}周后 - {item.gestation}孕周</p>
-                  <p className="font-16">{item.event}</p>
-                </Timeline.Item>
-              ))
-                : <div>无</div>}
-            </Timeline>
-          </Panel>
-        </Collapse>
-      </div>
-    );
-  }
+      <Page className="fuzhen font-16">
+        <div className="fuzhen-left ant-col-5">
+          {/* 这里无用的重新渲染问题 */}
+        {this.renderTree(operationList)}
 
-  render(){
-    //const { entity={} } = this.props;
-    const { entity, treeData} = this.state;
+        </div>
+        <div className="fuzhen-right ant-col-19 main main-pad-small width_7">
+          <div className="btn-group">
+            <ButtonGroup>
+              <Button type={isFetusPage ? "primary" : ""} onClick={() => this.setState({isFetusPage: true})}>胎儿中心</Button>
+              <Button type={isFetusPage ? "" : "primary"} onClick={() => this.setState({isFetusPage: false})}>病房</Button>
+            </ButtonGroup>
+          </div>
+          <div>
+            {/* 渲染哪一个病例 */}
+            {isFetusPage ? (
+              <Collapse defaultActiveKey={["f-0","f-1","f-2","f-3"]}>
+                <Panel header="手术项目" key="f-0">
+                  {formRender(operationItem, this.operationItem_config(), () => console.log('c'))}
+                </Panel>
+                <Panel header="术前记录" key="f-1">
+                  {formRender(preoperative_record, this.preoperative_record_config(), () => console.log('c'))}
+                </Panel>
+                <Panel header="手术操作" key="f-2">
+                  <Tabs
+                    active={currentFetusActiveKey}
+                    onTabClick={this.handleTabClick}
+                    type="editable-card"
+                    onEdit={this.handleTabsEdit}
+                  >
+                    {this.renderFetusTabPane(operative_procedure['fetus'])}
+                  </Tabs>
+                </Panel>
+                <Panel header="术后情况" key="f-3">
+                  {formRender({afterFhr,doctors_advice}, this.afterOperation_config(), () => console.log('e'))}
+                </Panel>
+              </Collapse>
+            ) : (
+              <div className="bgWhite" style={{padding: "10px"}}>
+                {formRender(ward, this.ward_config(), () => console.log('c'))}
+              </div>
+            )}
 
-    const { isShowTemplateModal, templateList } = this.state.templateObj;
-
+<<<<<<< HEAD
     const tableColumns = [
       {title: '编号', key: 'index', render: (_,__,index) => (<span>{index+1}</span>) },
       {title: '内容', dataIndex: 'content', key: 'content'},
@@ -906,30 +862,37 @@ export default class Operation extends Component {
           <Button className="blue-btn " onClick={() => window.print()}>打印</Button>
           <Button className=" blue-btn save-btn" type="ghost" onClick={() => this.handleSave(document.querySelector('.fuzhen-form'))}>保存</Button>
           <Button className=" blue-btn" type="ghost" onClick={() => this.handleSave(document.querySelector('.fuzhen-form'), "open")}>保存并开立医嘱</Button>
-        </div>
-
-        {this.renderTreatment()}
-        </div>
-
-        {/* modal */}
-        <Modal
-          visible={isShowTemplateModal}
-          onCancel={this.closeModal}
-          footer={false}
-          width="800px"
-        >
-          <div>
-            <EditableTable
-              columns={tableColumns}
-              dataSource={templateList}
-              newTemplate={this.newTemplate}
-              deleteTemplate={this.deleteTemplate}
-              adjustOrder={this.adjustOrder}
-              getTemplate={this.getTemplate}
-            />
+=======
           </div>
-        </Modal>
+          <div className="btn-group pull-right bottom-btn">
+            <Button className="blue-btn">打印</Button>
+            <Button className="blue-btn">重置</Button>
+            <Button className="blue-btn">保存</Button>
+          </div>
+        </div>
+
+        {/* 补充modal */}
+        <div>
+          <Modal
+            style={{zIndex: 9999}}
+            title="请输入补充信息"
+            visible={isShowOtherContextModal}
+            maskClosable={false}
+            onOk={this.handleSJOtherContext}
+            onCancel={() => this.setState({isShowOtherContextModal: false, otherContext: ''})}
+          >
+            <Input
+              value={otherContext}
+              onChange={(e) => this.setState({otherContext: e.target.value})}
+            />
+          </Modal>
+>>>>>>> refs/remotes/origin/master
+        </div>
+        {/*  新建病例modal */}
+        <div>
+
+        </div>
       </Page>
-    )
+    );
   }
 }

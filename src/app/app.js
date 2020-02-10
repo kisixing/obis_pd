@@ -15,6 +15,7 @@ import Lis from 'bundle-loader?lazy&name=lis!./lis';
 import Pacs from 'bundle-loader?lazy&name=pacs!./pacs';
 import HistoricalRecord from 'bundle-loader?lazy&name=historicalrecord!./historicalrecord';
 import Outcome from 'bundle-loader?lazy&name=outcome!./outcome';
+import OpenCase from 'bundle-loader?lazy&name=opencase!./opencase';
 
 import "./app.less";
 
@@ -27,7 +28,8 @@ const routers = [
   { name: '检验报告', path: '/lis', component: bundle(Lis) },
   { name: '影像报告', path: '/pacs', component: bundle(Pacs) },
   { name: '历史病历', path: '/historicalrecord', component: bundle(HistoricalRecord) },
-  { name: '分娩结局', path: '/outcome', component: bundle(Outcome) }
+  { name: '分娩结局', path: '/outcome', component: bundle(Outcome) },
+  { name: '孕妇建册(暂时显示在这)', path: '/opencase', component: bundle(OpenCase) }
 ];
 
 export default class App extends Component {
@@ -39,14 +41,19 @@ export default class App extends Component {
       highriskEntity: null,
       highriskShow: false,
       muneIndex: 0, // 从0开始
-      ...store.getState()
+      ...store.getState(),
+      searchObj: {
+        menzhenNumber: "", IDCard: "", phoneNUmber: ""
+      }
     };
     store.subscribe(this.handleStoreChange);
-    
+
     service.getuserDoc().then(
-      res => this.setState({
-      ...res.object, loading: false,
-    }));
+      res => {
+        this.setState({
+          ...res.object, loading: false,
+        })
+      });
 
     // service.highrisk().then(res => this.setState({
     //   highriskList: res.object
@@ -118,6 +125,7 @@ export default class App extends Component {
 
   renderHeader() {
     const { username, userage, tuserweek,tuseryunchan,gesexpect,usermcno,chanjno,risklevel,infectious } =this.state;
+    const { searchObj } = this.state;
     console.log(username,userage);
     return (
       <div className="main-header">
@@ -130,6 +138,34 @@ export default class App extends Component {
           <div><strong>就诊卡:</strong>{usermcno}</div>
           <div><strong>产检编号:</strong>{chanjno}</div>
         </div>
+        {/* 这里做个搜索栏 */}
+        <div className="search-block patient-Info_title">
+          <div>
+            <strong>门诊号:</strong><Input value={searchObj['menzhenNumber']} onChange={(e) => {
+              searchObj['menzhenNumber'] = e.target.value;
+              this.setState({searchObj});
+            }}/>
+          </div>
+          <div>
+            <strong>身份证:</strong><Input value={searchObj['IDCard']} onChange={(e) => {
+            searchObj['IDCard'] = e.target.value;
+            this.setState({searchObj});
+          }}/>
+          </div>
+          <div>
+            <strong>手机:</strong><Input value={searchObj['phoneNumber']} onChange={(e) => {
+            searchObj['phoneNumber'] = e.target.value;
+            this.setState({searchObj});
+          }}/>
+          </div>
+          <div className="search-btn">
+            {/* 功能还没有写 */}
+            <Button>搜索</Button>
+            <Button>重置</Button>
+            <Button>建册</Button>
+          </div>
+        </div>
+
         <p className="patient-Info_tab">
           {routers.map((item, i) => <Button key={"mune" + i}
             type={this.state.muneIndex != i ? 'dashed' : 'primary'}

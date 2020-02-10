@@ -57,8 +57,11 @@ const myAxios = axios.create({
     //若地址带有子路径，需要配置此项，否则网址后面加/，以便寻找正确的相对目录'./'，如sdafs.cn/qqaa/
     // baseURL:'/peas',
     timeout: 10000,
-    headers: {'X-Requested-With': 'XMLHttpRequest'},
-    headers: {'Content-Type': 'application/json;charset=utf-8'},
+    // headers: {'Content-Type': 'application/json;charset=utf-8'},
+    headers: {
+        // "X-Requested-With": "XMLHttpRequest",
+        "Content-Type": "application/json;charset=utf-8",
+    },
     // headers: {'Content-Type': 'application/x-www-form-urlencode;charset=utf-8'},
 });
 
@@ -77,6 +80,14 @@ myAxios.interceptors.request.use(config => {
             config.headers['Content-Type'] = 'application/json;charset=utf-8';
         }
     }
+
+    // if(config.method === 'get' && !config.data) {
+    //     config.data = true;
+    //     config.headers['Content-Type'] = 'application/json;charset=utf-8';
+    //     config.headers['X-Requested-With'] = 'XMLHttpRequest';
+    //     // config.headers['Accept'] = '*/*';
+    // }
+
     config.url = getUrl(config.url);
     return config;
 }, error => {
