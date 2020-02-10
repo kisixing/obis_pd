@@ -1,7 +1,13 @@
 import React, { Component } from "react";
 import { TreeSelect } from 'antd';
+  
+// 应该要重写
 
-export function treeselect({ name, options, width, value='', onChange, onBlur=()=>{}, ...props }){
+/**
+ *  新增 {multiple} 字段      用于支持 多选与单选        default - true
+ *  新增 {onlyChildren} 字段  用于支持 父节点不可选中    default - false
+ */
+export function treeselect({ name, options, width, value='', onChange, onBlur=()=>{}, multiple = true, onlyChildren = false, ...props }){
   const getValue = () => {
     if(value && typeof value === 'object'){
       return value.value;
@@ -15,6 +21,7 @@ export function treeselect({ name, options, width, value='', onChange, onBlur=()
   }
   
   const displayRender = (labels, selectedOptions) => labels.map((label, i) => {
+    console.log(label);
     const option = selectedOptions[i];
     if (i === labels.length - 1) {
       return (
@@ -30,12 +37,22 @@ export function treeselect({ name, options, width, value='', onChange, onBlur=()
     onChange(e, options.filter(o=>o.value==e).pop()).then(()=>onBlur({checkedChange:true}));
   }
 
+  const handleSelect = (value, node, event) => {
+    // 检测是否为最低一层
+    const { props } = node;
+    if(onlyChildren && props.child){
+      
+    }
+    console.log(node);
+  }
+
   return (
     <TreeSelect
-    treeData={options}
-    displayRender={displayRender}
-    multiple= {true}
-    style={{ width: 200 }}>
+      treeData={options}
+      displayRender={displayRender}
+      multiple= {multiple}
+      onSelect={handleSelect}
+      style={{ width: 200 }}>
     </TreeSelect>
   )
 }

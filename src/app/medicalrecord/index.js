@@ -32,47 +32,31 @@ const _genotypeAnemia = baseData.genotypeAnemia.map(item => {
   }
   return item;
 })
-// function modal(type, title) {
-//   message[type](title, 3)
-// }
 
 const TEMPLATE_KEY = {
   zz: 'dmr1', xb: 'dmr2', qt: 'dmr3', zd: 'dmr4', cl: 'dmr5', rs: 'dmr6'
 }
 
 export default class MedicalRecord extends Component {
+  static Title = '专科病历';
 
   constructor(props) {
     super(props);
     this.state = {
-      loadingTable: true,
-      loading: true,
-      activeElement: '',
-      info: {},
+      
       doctor: "",
       id: "",
-      // 4个textarea的state
-      // 主诊
-      chief_complaint: '',
-      // 现病史
-      medical_history: '',
-      // 诊断
-      diagnosi: '',
-      diagnosis: [],
-      diagnosislist: {},
-      // 处理措施
-      treatment: '',
-      //
-      chromosome: '',
-      //
-      other: '',
-
+      // 6个textarea的state
+      chief_complaint: '', // 主诊
+      medical_history: '', // 现病史
+      diagnosi: '', // 诊断
+      treatment: '', // 处理措施
+      chromosome: '', // 染色体核型
+      other: '', // 其他检查
       // 预产期
       pregnancy_history: {},
       // 唐氏筛查
-      downs_screen: {
-        fkjc: true
-      },
+      downs_screen: {},
       // 地贫
       thalassemia: {},
       // 超声
@@ -107,38 +91,6 @@ export default class MedicalRecord extends Component {
         current_weight: "",
         weight_gain: ""
       },
-
-      relatedObj: {},
-      recentRvisit: null,
-      recentRvisitAll: null,
-      recentRvisitShow: false,
-      pageCurrent: 1,
-      totalRow: 0,
-      isShowMoreBtn: false,
-      isShowZhenduan: false,
-      isMouseIn: false,
-      isShowSetModal: false,
-      isShowResultModal: false,
-      isShowPlanModal: false,
-      treatTemp: [],
-      templateShow: false,
-      collapseActiveKey: ['1', '2', '3'],
-      jianyanReport: '血常规、尿常规、肝功、生化、甲功、乙肝、梅毒、艾滋、地贫',
-      planData: [],
-      modalState: [
-        {
-          "title": "糖尿病门诊预约",
-          "gesmoc": "2019-07-03",
-          "options": ["本周五", "下周五","下下周五",""]
-        },
-        {
-          "title": "产前诊断预约",
-          "gesmoc": "2019-07-31",
-          "options": ["预约1","预约2","预约3"],
-          "counts": "3"
-        }
-      ],
-
       treeData : [],
       selectedKeys: [], 
       
@@ -164,18 +116,8 @@ export default class MedicalRecord extends Component {
     this.componentWillUnmount = editors();
   }
 
-  static Title = '专科病历';
-  static entityParse(obj = {}){
-    return {
-      ...obj.gravidaInfo,
-      useridtype: JSON.parse(obj.gravidaInfo.useridtype)
-    }
-  }
-  static entitySave(entity = {}){
-    return {
-      ...entity
-    }
-  }
+
+
 
   componentDidMount() {
 
@@ -775,19 +717,6 @@ export default class MedicalRecord extends Component {
     // }
   }
 
-  handleTreatmentClick(e, {text,index},resolve){
-    const { modalState, modalData } = this.state;
-    text==='更多'?this.setState({openTemplate:resolve}):this.addTreatment(e, text);
-    if(text==='糖尿病日间门诊') {
-      this.setState({modalData: modalState[0]}, () => {
-        this.setState({openYy: true});
-      })
-    }else if (text==='产前诊断') {
-      this.setState({modalData: modalState[1]}, () => {
-        this.setState({openYy: true});
-      })
-    }
-  }
 
   
   // 切换胎儿选项卡

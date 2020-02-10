@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { Select, Button, Popover, Input, Tabs, Tree, Modal, Row,Col, Spin,Timeline, Collapse,message } from 'antd';
 
+var Trigger = require('rc-trigger');
+
 import axios from 'axios';
 
 import {valid} from '../../render/common';
@@ -25,6 +27,7 @@ const TabPane = Tabs.TabPane;
 const coptions = [{
   value: 'genic',
   label: '遗传学检查',
+  disabled: true,
   children: [{
     value: 'chromosome_karyotype',
     label: '染色体核型',
@@ -41,6 +44,7 @@ const coptions = [{
 }, {
   value: 'infection',
   label: '感染',
+  disabled: true,
   children: [{
     value: 'infection3',
     label: '感染三项DNA/RNA',
@@ -67,6 +71,7 @@ const coptions = [{
 }, {
   value: 'hemolytic_anemia',
   label: '溶血性贫血',
+  disabled: true,
   children: [{
     value: 'hemolytic_anemia1',
     label: '血常规全套',
@@ -93,6 +98,7 @@ const coptions = [{
 }, {
   value: 'thalassemia',
   label: '地中海贫血检测',
+  disabled: true,
   children: [{
     value: 'thalassemia1',
     label: '地贫筛查组合',
@@ -110,6 +116,7 @@ const coptions = [{
 }, {
   value: 'hydrothorax_ascites',
   label: '胸腹水检查',
+  disabled: true,
   children: [{
     value: 'hydrothorax_ascites1',
     label: '胸腹水全套',
@@ -123,6 +130,7 @@ const coptions = [{
 ]}, {
   value: 'HF',
   label: '心衰检查',
+  disabled: true,
   children: [{
     value: 'HF1',
     label: '心质组合',
@@ -459,20 +467,34 @@ export default class Operation extends Component {
     }
   }
   
-  // 送检项目
-  configinspection_item() {
+  // 羊水
+  config_amniotic_fluid(){
     return {
       step: 1,
       rows: [
-        {
-          columns:[
-            { name: 'amniotic_fluid[羊水]', type: 'treeselect', options:coptions, span: 16 },
-            { name: 'umbilical_blood[脐血]', type: 'treeselect', options:coptions, span: 16 },
-            { name: 'villus[绒毛]', type: 'treeselect', options:qoptions, span: 16 }
-          ]
-        },     
+        {columns:[{ name: 'amniotic_fluid[羊水]', type: 'treeselect',multiple:true, options:coptions, span: 16 }]}
       ]
-    };
+    }
+  }
+
+  // 脐血
+  config_umbilical_blood(){
+    return {
+      step: 1,
+      rows: [
+        {columns:[{ name: 'amniotic_fluid[羊水]', type: 'treeselect',multiple: true, options:coptions, span: 16 }]}
+      ]
+    }
+  }
+
+  // 绒毛
+  config_villus() {
+    return {
+      step: 1,
+      rows: [
+        {columns:[{ name: 'villus[绒毛]', type: 'treeselect',multiple: true, options:qoptions, span: 16 }]}
+      ]
+    }
   }
 
   // 病史 暂不用
@@ -677,8 +699,6 @@ export default class Operation extends Component {
       })
     }
   }
-
-  
   
   // 选中节点触发-------如何在这里获取到选中节点的app_id？？？
   onSelect = (selectedKeys) => {
@@ -741,12 +761,11 @@ export default class Operation extends Component {
     data.map(item => {
       if (item.children) {
         return (
-          <TreeNode title={item.title} key={item.key} dataRef={item}>
+          <TreeNode title={item.title} key={item.key} dataRef={item} disabled={true}>
             {this.renderTreeNodes(item.children)}
           </TreeNode>
         );
       }
-      console.log(item);
       return <TreeNode key={item.key} {...item} dataRef={item} />;
     });
 
@@ -767,7 +786,6 @@ export default class Operation extends Component {
   
   renderLeft() {
     const { planData, collapseActiveKey } = this.state;
-
     return (
       <div className="fuzhen-left ant-col-5">
         <Collapse defaultActiveKey={collapseActiveKey}>
@@ -797,8 +815,26 @@ export default class Operation extends Component {
       {title: '编号', key: 'index', render: (_,__,index) => (<span>{index+1}</span>) },
       {title: '内容', dataIndex: 'content', key: 'content'},
     ]
-
-    // console.log(this.state.treeData,entity);
+    
+   
+    let stateArr = [[false,false,false],[false,false,false]];
+    if(entity) {
+      const { operative_procedure } = entity;
+      if(operative_procedure) {
+        operative_procedure.fetus.forEach((v, index) => {
+          const len = v.operation_items.length;
+          for(let i = 0; i < len;i++){
+            if( v.operation_items[i].value === "绒毛活检"){
+              stateArr[index][0] = true;
+            }else if( v.operation_items[i].value === "羊膜腔穿刺"){
+              stateArr[index][1] = true;
+            }else if( v.operation_items[i].value === "脐带穿刺"){
+              stateArr[index][2] = true;
+            }
+          }
+        })
+      }
+    }
     return (
       <Page className='fuzhen font-16 ant-col'>
         <div className="fuzhen-left ant-col-5">
@@ -846,12 +882,24 @@ export default class Operation extends Component {
               type="editable-card"
               onEdit={this.oninspectionEdit}
             >
-              {this.state.ipanes.map((pane, index) => <TabPane tab={'胎儿'+(index+1)}  key={pane.key}>{formRender(pane, this.configinspection_item(), this.handleChange.bind(this))}</TabPane>)}
+            {/* 这个位置又渲染的问题 */}
+            {entity !== undefined ? (
+                this.state.ipanes.map((pane,index) => (<TabPane tab={'胎儿'+(index+1)}  key={pane.key}>
+                    {stateArr[index][0] ? formRender(pane, this.config_villus(), this.handleChange.bind(this)) : null}
+                    {stateArr[index][1] ? formRender(pane, this.config_amniotic_fluid(), this.handleChange.bind(this)) : null}
+                    {stateArr[index][2] ? formRender(pane, this.config_umbilical_blood(), this.handleChange.bind(this)) : null}
+                  </TabPane>)
+                  )
+                ): null      
+              }
             </Tabs>
           </Panel>
           <Panel header="术后医嘱" key="4">
             
-        <div className="single">{formRender(entity, this.configdoctors_advice(), this.handleChange.bind(this))}</div>
+            <div className="single">{formRender(entity, this.configdoctors_advice(), this.handleChange.bind(this))}</div>
+            <Trigger popupAlign={{points: ['tl', 'bl'],offset: [0, 3]}} trigger={['click']} popup={<span>popup</span>}>
+              <a>hover</a>
+            </Trigger>
           </Panel>
         </Collapse>
         <div className="pull-right bottom-btn">
