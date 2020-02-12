@@ -3,7 +3,9 @@ import {Tree, Tabs, Collapse, Modal, Button} from 'antd';
 
 import formRender from '../../render/form';
 import Page from '../../render/page';
+import valid from '../../render/common/valid';
 import service from "../../service";
+
 
 import './index.less';
 import '../index.less';
@@ -33,53 +35,27 @@ const TEMPLATE_KEY = {
 
 /**
  * TODO
- * 1、差提交的功能还没有补上
+ * 1、提交保存的功能
+ * 2、复诊病历数据
+ * 3、新增表单key的自动生成需要另外做，暂定全为-1
  *
  *  大致的页面逻辑理一下
- *   1 - Button的选中 和 哪一个div展现是绑定的  使用 formType
- *   2 - currentTreeKeys，当存在大于0的keys值，button组要隐藏，新建的默认key为-1，回写服务器后重新获取就好
- *   3 - 存在的BUG 新建病历后，又加载了新的病历，回选待完善不成功。
- *       解决，当加载数据时，删除“新建病历” (不行，会导致别人写了一半没了的问题)
- *        2020-02-10
- *        最后的方法 就是 做个currentNewingSpecialistemrData，这样才能并行数据吧
+ *   使用 specialistemrList 保存树形结构
+ *   使用 specialistemrData 保存病历数据
+ *   使用 specialistemrData['formType'] 控制页面的显示表单类型
+ *
  */
 
 export default class MedicalRecord extends Component{
   constructor(props) {
     super(props);
     this.state = {
-      // data
-      pregnancy_history: {
-        LMD: "",
-        EDD: "",
-        gravidity: "",
-        parity: "",
-        Abortion: "",
-        exfetation: ""
-      },
-      downs_screen: {
-        early: {}, middle: {}, nipt: {}
-      },
-      thalassemia: {
-        wife: {}, husband: {}
-      },
-      ultrasound: { menopause: '', fetus: []},
-      past_medical_history: {},
-      family_history: {},
-      physical_check_up: {},
+      specialistemrList: [],  // 左侧病历树形菜单
+      specialistemrData: [],  // 病历数据  主键-key
 
-
-      // 当前数据类型 - 属于数据与控制
-      formType: '',
       /* control */
-      // 当前选择的书的key
-      currentTreeKeys: '',
-      // 正在创建病历
-      isNewingSpe: false,
-
-      // 胎儿疾病 - 超声检查 Tab
-      uFetusActiveKey: '',
-
+      currentTreeKeys: '',  // 当前选择的书的key
+      uFetusActiveKey: '',  // 胎儿疾病 - 超声检查 Tab
       // 模板功能
       templateObj: {
         isShowTemplateModal: false,
@@ -94,7 +70,7 @@ export default class MedicalRecord extends Component{
       .then(res => {
         console.log(res);
         if(res.code === "200" || 200) {
-          this.setState({treeList: res.object.list},() => {
+          this.setState({specialistemrList: res.object.list},() => {
             const { treeList } = this.state;
             // service.medicalrecord.getspecialistemrdetail({recordid: treeList[0].children[0]['key'], formType: "1"})
             //   .then(res => {
@@ -575,10 +551,15 @@ export default class MedicalRecord extends Component{
   });
 
   /* ========================= 事件交互类 =========================== */
-  // 处理三个病例切换的事件
+  // 设置新建病历的formType
   handleBtnChange = (key) => {
-    // TODO setState重复渲染问题 - 待解决
-    this.setState({formType: key});
+    const { currentTreeKeys, specialistemrData  } = this.state;
+    const index = specialistemrData.findIndex(item => item.id === currentTreeKeys[0]);
+    console.log(index);
+    console.log(specialistemrData[index]);
+    specialistemrData[index]['formType'] = key;
+
+    this.setState({specialistemrData});
   };
   // TODO 处理超声婴儿edit
   handleUFetusEdit = () => {
@@ -587,9 +568,13 @@ export default class MedicalRecord extends Component{
   // 树形结构选择
   handlerTreeSelect = (selectedKeys, {selected, node}) => {
     // 这里禁用取消
-    console.log(selectedKeys);
-    if(node.props.children || !selected || Number(selectedKeys[0]) < 0) {
-      console.log('不允许父节点请求，不允许取消');
+    if(node.props.children || !selected) {
+      console.log('不允许父节点请求,不允许取消');
+      return ;
+    }
+    if(Number(selectedKeys[0]) < 0) {
+      console.log('不允许待完善请求');
+      this.setState({currentTreeKeys: selectedKeys});
       return ;
     }
     // 先请求好数据再setState， 不然render会报错
@@ -604,23 +589,28 @@ export default class MedicalRecord extends Component{
   // 新建病历
   newSpecialistemr = () => {
     const ONE_DAY_MS = 86400000;
-    const { treeList } = this.state;
-    // 判断第一个是否是今天
+    const { specialistemrList, specialistemrData } = this.state;
+    // 新建 树型记录
+      // 判断第一个是否是今天
     const nD = new Date();
-    if(nD.getTime() - Date.parse(treeList[0]['title']) > ONE_DAY_MS) {
+    if(nD.getTime() - Date.parse(specialistemrList[0]['title']) > ONE_DAY_MS) {
       //不是今天
       let m = nD.getMonth() + 1, d = nD.getDate();
-      treeList.splice(0,0,{title: `${nD.getFullYear()}-${m < 10 ? `0${m}`: m}-${d < 1?`0${d}`:d}` , key: "n-1", children: [{title: "待完善病历", key: "-1"}]})
+      specialistemrList.splice(0,0,{title: `${nD.getFullYear()}-${m < 10 ? `0${m}`: m}-${d < 1?`0${d}`:d}` , key: "n-1", children: [{title: "待完善病历", key: "-1"}]})
     }else {
-      treeList[0]['children'].splice(0,0,{title: '待完善病历', key: "-1"})
+      specialistemrList[0]['children'].splice(0,0,{title: '待完善病历', key: "-1"})
     }
-    // 这里也要清空数据
-    this.clearSpecialistemrDetail();
-    this.setState({treeList, isNewingSpe: true, currentTreeKeys: ["-1"]});
+    // 新建数据实体
+    specialistemrData.push({id: "-1", formType: ''});
+    // 将formType设置为空 用户选择
+    this.setState({specialistemrList, currentTreeKeys: ["-1"],specialistemrData},() => console.log(this.state));
+  };
+  // 处理form表单变化
+  handleFormChange = (e,t) => {
+    console.log(e,t);
   }
-
   /* ========================= 渲染方法 ============================== */
-  // 渲染左侧记录树
+  // 渲染左侧记录树 - 二级
   renderTree = (data) => {
     let tnDOM = [];
     // 统一接口格式后可对此处封装
@@ -660,33 +650,26 @@ export default class MedicalRecord extends Component{
   /* ========================= 其他 ================================== */
   // 获取数据 整合进入state
   convertSpecialistemrDetail = (object) => {
-    this.clearSpecialistemrDetail();
-    this.setState({...object});
-  };
-  // 清空数据 -- 有必要的话可以开三组数据防止时间过长
-  clearSpecialistemrDetail = () => {
-    const newState = this.state;
-    // 定义不需要清空的值
-    const UNCLEARKEYS = ['treeList','currentTreeKeys','templateObj'];
-    console.log(this.state);
-    // 除控制需要的值以外，其他全部清除掉
-    for(let key in newState){
-      if(key !== 'treeList' && key !== 'currentTreeKeys' && key !== 'templateObj'){
-        const type = typeof newState[key];
-        if(type === 'string') {
-          newState[key] = '';
-        }else if(type === 'array') {
-          newState[key] = [];
-        }else if(type === 'object') {
-          newState[key] = {};
-        }
-      }
+    const {specialistemrData} = this.state;
+    // TODO 检测数据是否已经存入 function check（）
+    if(!this.checkIsGot(specialistemrData,object)) {
+      specialistemrData.push(object);
+    }else{
+      const index = specialistemrData.findIndex(item => item.id === object.id);
+      specialistemrData.splice(index,1,object);
     }
-    this.setState(newState);
+    this.setState({specialistemrData});
   };
-
+  // 检测data中是否存在这个key值
+  checkIsGot = (dataList, object) => (
+    dataList.findIndex((item) => item['id'] === object['id']) !== -1
+  );
+  // 根据key值返回对应
+  getTargetObject = (dataList, key) => {
+    const index = dataList.findIndex(data => (data.id === key ));
+    return dataList[index];
+  }
   /* ============================ 模板功能 ==================================== */
-
   // 打开modal框 & 根据type值搜索对应模板
   openModal = (type) => {
     if(type){
@@ -754,16 +737,25 @@ export default class MedicalRecord extends Component{
   };
 
   render() {
-    const { treeList, uFetusActiveKey, currentTreeKeys, formType  } = this.state;
+    const { specialistemrList, specialistemrData, uFetusActiveKey, currentTreeKeys  } = this.state;
     const { isShowTemplateModal, templateList } = this.state.templateObj;
     // data
-    const { chief_complaint, medical_history, diagnosis, treatment, other_exam, karyotype } = this.state;
-    const { pregnancy_history, downs_screen, thalassemia, ultrasound, past_medical_history, family_history, physical_check_up } = this.state;
+    const renderData = this.getTargetObject(specialistemrData, currentTreeKeys[0]) || {};
+    const { formType } = renderData;
+    const { chief_complaint = '', medical_history ='', diagnosis = '', treatment = '', other_exam = '' , karyotype = '' } = renderData;
+    const {
+      pregnancy_history = {},
+      downs_screen = {early:{}, middle:{}, nipt: {}},
+      thalassemia = {wife:{}, husband: {}},
+      ultrasound = {menopause:'' , middle: []},
+      past_medical_history = {},
+      family_history = {},
+      physical_check_up = {}
+    } = renderData;
     const tableColumns = [
       {title: '编号', key: 'index', render: (_,__,index) => (<span>{index+1}</span>) },
       {title: '内容', dataIndex: 'content', key: 'content'},
     ];
-
     return (
       <Page className='fuzhen font-16 ant-col'>
         <div className="fuzhen-left ant-col-5">
@@ -771,12 +763,12 @@ export default class MedicalRecord extends Component{
             <Button size="small" onClick={this.newSpecialistemr}>新增病历</Button>
           </div>
           <div>
-            {this.renderTree(treeList)}
+            {this.renderTree(specialistemrList)}
           </div>
         </div>
         <div className="fuzhen-right ant-col-19 main main-pad-small width_7">
           {/* NOTICE 暂时这样写 可能不太适当 */}
-          {Number(currentTreeKeys[0])  < 0 ? (
+          {(Number(currentTreeKeys[0])<0) && formType === '' ? (
             <ButtonGroup>
               <Button type={formType === "1" ? "primary" : ""} onClick={() => this.handleBtnChange('1')}>胎儿疾病</Button>
               <Button type={formType === "2" ? "primary" : ""} onClick={() => this.handleBtnChange('2')}>遗传门诊</Button>
@@ -786,7 +778,7 @@ export default class MedicalRecord extends Component{
           { formType === "1" ? (
             <div>
               <Collapse defaultActiveKey={['fetus-0','fetus-1','fetus-2','fetus-3','fetus-4','fetus-5','fetus-6','fetus-7','fetus-8','fetus-9','fetus-10','fetus-11']}>
-                <Panel header="主诉" key="fetus-0">{formRender({chief_complaint: chief_complaint},this.chief_complaint_config(),() => console.log('c'))}</Panel>
+                <Panel header="主诉" key="fetus-0">{formRender({chief_complaint: chief_complaint},this.chief_complaint_config(),this.handleFormChange)}</Panel>
                 <Panel header="预产期" key="fetus-1">{formRender(pregnancy_history, this.pregnancy_history_config(), () => console.log('p'))}</Panel>
                 <Panel header="现病史" key="fetus-2">{formRender({medical_history: medical_history},this.medical_history_config(),() => console.log('c'))}</Panel>
                 <Panel header="唐氏筛查" key="fetus-3">
@@ -860,7 +852,16 @@ export default class MedicalRecord extends Component{
               </Collapse>
             </div>
           ) : null}
+
+          {currentTreeKeys!=="" ? (
+            <div className="btn-group pull-right bottom-btn">
+              <Button className="blue-btn">打印</Button>
+              <Button className="blue-btn">保存</Button>
+            </div>
+          ) : null}
         </div>
+
+
 
         {/* modal */}
         <Modal

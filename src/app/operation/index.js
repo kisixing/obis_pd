@@ -4,6 +4,7 @@ import { Tree, Button, Collapse, Tabs, Modal, Input } from 'antd';
 import Page from '../../render/page';
 
 import formRender from '../../render/form.js';
+import valid from '../../render/common/valid.js';
 import service from '../../service';
 
 // Css
@@ -16,7 +17,6 @@ import {
   operation_itemsOptions, operationLevelOptions, incisionTypeOptions, preoperativeUltrasonographyColumns, puncturePositionOptions,
   sjTreeOption
 } from './data.js'
-import {valid} from "../../render/common";
 
 /**
  * TODO
@@ -33,6 +33,37 @@ const { TreeNode } = Tree;
 const ButtonGroup = Button.Group;
 const { Panel } = Collapse;
 const { TabPane } = Tabs;
+
+/**
+ * 手术项目对应itemTemplateId
+ * @param str[string] - 手术项目/operationList 的名称
+ *
+ * return templateId[number] - 对应的模板编号
+ */
+const operationItemTemplateId = (str) => {
+  const ITEM_KEY_WORD = ['羊膜腔穿刺','绒毛活检','脐带穿刺','羊膜腔灌注','选择性减胎','羊水减量','宫内输血','胸腔积液|腹水|囊液穿刺'];
+  const splitKey = '|';
+  const len = ITEM_KEY_WORD.length;
+  let templateId = -1;
+  for(let i = 0; i < len ; i++) {
+    if(ITEM_KEY_WORD[i].indexOf(splitKey) !== -1){
+      const arr = ITEM_KEY_WORD[i].split(splitKey);
+      console.log('in');
+      arr.forEach(v => {
+        if(str.indexOf(v)){
+          templateId = i;
+        }
+      })
+    }else {
+      if(str.indexOf(ITEM_KEY_WORD[i]) !== -1){
+        templateId = i;
+        break;
+      }
+    }
+  }
+  return templateId;
+}
+
 
 export default class Operation extends Component{
   constructor(props) {
@@ -67,7 +98,7 @@ export default class Operation extends Component{
       isFetusPage: true, // 现在处于哪一个病历页
       isShowOtherContextModal: false,
       otherContext: ""
-    }
+    };
   }
 
   componentDidMount() {
@@ -89,9 +120,11 @@ export default class Operation extends Component{
   }
 
   /* ========================= formRender渲染UI config  ============================ */
+  /* 胎儿中心部分 */
+
   /*
-  * 胎儿中心部分
-  * */
+   *  通用型
+   */
   // 手术项目
   operationItem_config = () => ({
     step: 1,
@@ -212,6 +245,8 @@ export default class Operation extends Component{
       }
     ]
   });
+
+
   /*
   * 病房部分
   * */

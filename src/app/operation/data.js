@@ -663,6 +663,11 @@ export const wssOptions = toOptions([{k: '有{#FF3300}(input)', addspan: 2}]);
 export const iumOption = toOptions('有(右)(input),无');
 
 /**
+ * 是否出现 （含特殊输入框）
+ */
+export const wbOptions = toOptions('有，无')
+
+/**
  *乳头
  */
 export const rtOptions = toOptions('凸起,凹陷');
@@ -1035,8 +1040,53 @@ export const operationLevelOptions = toOptions('一级,二级,三级,四级');
 export const incisionTypeOptions = toOptions('0Ⅰ,0Ⅱ,0Ⅲ,Ⅰ,Ⅱ,Ⅲ,Ⅳ');
 
 /**
+ * 羊膜腔穿刺
+ */
+// 超声检查
+export const preoperativeUltrasonographyColumns0 = [
+  {title: '胎儿', key: 'fetus', type: 'input'},
+  {title: 'BPD(mm)', key: 'bpd', type: 'input'},
+  {title: '超声孕周', key: 'gestationalWeek', type: 'input'},
+  {title: 'FL(mm)', key: 'fl', type: 'input'},
+  {title: 'HL(mm)', key: 'hl', type: 'input'},
+  {title: 'AFV(mm)', key: 'afv', type: 'input'},
+  {title: '胎盘厚度(mm)', key: 'fetalThickness', type: 'input'},
+  {title: '胎盘位置', key: 'fetalPosition', type: 'input'},
+  {title: '脐静脉直径(mm)', key: 'umbilicalVeins', type: 'input'},
+  {title: '胎心率(bpm)', key: 'fhr', type: 'input'},
+  {title: '备注', key: 'remark', type: 'input'},
+];
+// 穿刺部位
+export const puncturePositionOptions0 = toOptions('经胎盘,经羊膜');
+// 形状
+export const characterOptions0 = toOptions('淡黄色,水样,血染,新鲜血性,陈旧血性');
+
+/**
+ * 绒毛活检 -
+ */
+// 超声检查
+export const preoperativeUltrasonographyColumns1 = [
+  {title: '胎儿', key: 'fetus', type: 'input'},
+  {title: 'BPD(mm)', key: 'bpd', type: 'input'},
+  {title: '超声孕周', key: 'gestationalWeek', type: 'input'},
+  // 暂时不知道是不是crl
+  {title: 'crl(mm)', key: 'crl', type: 'input'},
+  // TODO #孕囊大小 #胎心搏动
+  {title: '孕囊大小(cm&sup2)', key: '', type: 'input'},
+  {title: '胎心搏动(bpm)', key: '', type: 'input'},
+  {title: '孕囊与宫璧分离部位', key: '', type: 'input'},
+  {title: '分离部分面积(cm&sup2)', key: '', type: 'input'},
+  {title: '胎盘位置', key: 'fetalPosition', type: 'input'},
+]
+// 穿刺部位
+export const puncturePositionOptions1 = toOptions('经宫颈,经腹部');
+export const instrumentOptions1 = toOptions('穿刺针16/18G,穿刺针17/19G,穿刺针20G,穿刺针21G,活检钳');
+export const characterOptions1 = toOptions('典型,不典型');
+
+/**
  * 术前超声检查
  */
+
 export const preoperativeUltrasonographyColumns = [
   {title: '胎儿', key: 'fetus', type: 'input'},
   {title: 'BPD(mm)', key: 'bpd', type: 'input'},
@@ -1049,13 +1099,7 @@ export const preoperativeUltrasonographyColumns = [
   {title: '脐静脉直径(mm)', key: 'umbilicalVeins', type: 'input'},
   {title: '胎心率(bpm)', key: 'fhr', type: 'input'},
   {title: '备注', key: 'remark', type: 'input'},
-]
-
-/**
- * 穿刺部位
- */
-export const puncturePositionOptions = toOptions('经胎盘,经羊膜');
-
+];
 /**
  *  麻醉方法
  */
@@ -1132,3 +1176,5 @@ export const sjTreeOption = [
 				{value: 'other2', label: '其他',}
     	]
   }];
+
+
