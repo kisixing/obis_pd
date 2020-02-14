@@ -7,7 +7,7 @@ export default {
    */
   getOperation: function () {
     let uri = 'getoperation';
-    return this.userId().then(r => myAxios.get(`${FRONT_URL}${uri}?userid=25121`,));
+    return this.userId().then(r => myAxios.get(`${FRONT_URL}${uri}?userid=${r.object.userid}`,));
   },
   /**
    *
@@ -15,6 +15,6 @@ export default {
   getOperationdetail: function (entity) {
     let uri = 'getoperationdetail';
     // NOTICE 这里使用25121
-    return this.userId().then(r => myAxios.get(`${FRONT_URL}${uri}?userid=25121&operationRecordsTreeId=${entity.recordid}`));
+    return this.userId().then(r => myAxios.get(`${FRONT_URL}${uri}?userid=${r.object.userid}&operationRecordsTreeId=${entity.recordid}`));
   }
 }
