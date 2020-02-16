@@ -1,5 +1,5 @@
 import React,{ Component} from 'react';
-import {Tree, Tabs, Collapse, Modal, Button, Checkbox} from 'antd';
+import {Tree, Tabs, Collapse, Modal, Button, Checkbox, message} from 'antd';
 
 import formRender,{fireForm} from '../../render/form';
 import Page from '../../render/page';
@@ -62,6 +62,40 @@ const convertString2Json = function(str) {
   console.log(resArr);
   return resArr;
 };
+
+// 根据字符串在一个对象中确定最下层键值
+/**
+ * 在此函数内对value赋值
+ * @param obj 赋值对象 NOTICE 一定是对象，不能为数组
+ * @param keyStr 路径 形式为 "key1.key2-key3"  .代表对象 -代表数组   如果没有. - 代表第一层
+ * @param val value
+ */
+const OBJECT_SPLIT_KEY = ".";
+const ARRAY_SPLIT_KEY = "-";
+const mapValueToKey = (obj, keyStr = "", val) => {
+  if(keyStr === "") return;
+  // check "." "-"
+  const objectIndex = keyStr.indexOf(OBJECT_SPLIT_KEY);
+  const arrayIndex = keyStr.indexOf(ARRAY_SPLIT_KEY);
+  const len = keyStr.length;
+  if(objectIndex === -1 && arrayIndex === -1) {
+    obj[keyStr] = val;
+  }else if(objectIndex > arrayIndex){
+    const nextKey = keyStr.slice(0,objectIndex);
+    if(!obj.hasOwnProperty(nextKey)) {
+      obj[nextKey] = {};
+    }
+    mapValueToKey(obj[nextKey], keyStr.slice(objectIndex+1, len), val);
+  }else{
+    // 检查到 - ，是数组，try-catch
+    const nextKey = keyStr.slice(0,objectIndex);
+    // 这个位置可能会BUG
+    if(!obj[nextKey].hasOwnProperty('length')){
+      obj[nextKey] = [];
+    }
+    mapValueToKey(obj[nextKey], keyStr.slice(arrayIndex+1, len), val);
+  }
+}
 
 /**
  * TODO
@@ -288,7 +322,7 @@ export default class MedicalRecord extends Component{
       },
       {
         columns:[
-          { name: 'operation_history[手术史]', type: 'table', valid: 'required', pagination: false, editable: true, options: baseData.shoushushiColumns },
+          { name: 'operation_history[手术史]', type: 'table', pagination: false, editable: true, options: baseData.shoushushiColumns },
         ]
       },
     ]
@@ -514,7 +548,7 @@ export default class MedicalRecord extends Component{
       {columns: [{label: '术前超声检查' , span: 12}]},
       {
         columns:[
-          { name: 'middle[中孕超声]', type: 'table', valid: 'required', pagination: false, editable: true, options: baseData.BvColumns },
+          { name: 'middle[中孕超声]', type: 'table', pagination: false, editable: true, options: baseData.BvColumns },
         ]
       },
     ]
@@ -615,8 +649,8 @@ export default class MedicalRecord extends Component{
     // 新建 树型记录
     // 判断第一个是否是今天
     const nD = new Date();
-    if(nD.getTime() - Date.parse(specialistemrList[0]['title']) > ONE_DAY_MS) {
-      //不是今天
+    if(specialistemrList.length === 0 || nD.getTime() - Date.parse(specialistemrList[0]['title']) > ONE_DAY_MS) {
+      // 以往的记录不是今天 || 病例为空
       let m = nD.getMonth() + 1, d = nD.getDate();
       specialistemrList.splice(0,0,{title: `${nD.getFullYear()}-${m < 10 ? `0${m}`: m}-${d < 1?`0${d}`:d}` , key: "n-1", children: [{title: "待完善病历", key: "-1"}]})
     }else {
@@ -645,27 +679,54 @@ export default class MedicalRecord extends Component{
   };
 
 
-  // 处理form表单变化
-  handleFormChange = (e,t) => {
+  // 处理form表单变化 公共处理 -
+  // TODO 修改组件后必须改 - 暂时手动传入父键名
+  /**
+   *
+   * @param path        多层结构路径 不包含最后一个键值
+   * @param name        键名路径
+   * @param value       值
+   */
+  handleFormChange = (path, name, value) => {
+
     const { specialistemrData, currentTreeKeys} = this.state;
     // 之后考虑将index加入
     const index = specialistemrData.findIndex(item => item.id === currentTreeKeys[0]);
+    if(path === ""){
+      // 为第一层值
+      mapValueToKey(specialistemrData[index], name, value);
+    }else {
+      // 分割.
+      mapValueToKey(specialistemrData[index], `${path}.${name}`, value);
+    }
+    this.setState({specialistemrData},() => console.log(this.state));
+
   };
+
   // 表单保存
   handleSave = () => {
-    const { formType, currentTreeKeys } = this.state;
+    const { formType, currentTreeKeys, specialistemrData } = this.state;
     const FORM_BLOCK = "form-block";
     fireForm(document.getElementById(FORM_BLOCK),'valid').then(validCode => {
       if(validCode){
         // 保存
         console.log('save');
+        const index = specialistemrData.findIndex(item => item['id'] === currentTreeKeys[0]);
+        // 整合bp的格式
+        specialistemrData[index]['physical_check_up']['bp'] = '0';
+        service.medicalrecord.savespecialistemrdetail(specialistemrData[index]).then(res => {
+          if(res.code === "200" && res.message === "OK") {
+            message.success('以成功保存');
+          }else if(res.code === "500"){
+            message.error('500 保存失败')
+          }
+        }).catch(err => console.log(err));
       }else{
         // 提示
-        console.log('error');
+        message.error('请填写所有信息后再次提交');
       }
-      console.log(validCode);
     })
-  }
+  };
   /* ========================= 渲染方法 ============================== */
   // 渲染左侧记录树 - 二级
   renderTree = (data) => {
@@ -697,7 +758,8 @@ export default class MedicalRecord extends Component{
     fetusData.forEach((fetus,index) => {
       fetusTabPaneDOM.push(
         <TabPane key={fetus.id} tab={`胎儿-${index+1}`}>
-          {formRender(fetus,this.ultrasound_fetus_config(),this.handleChange)}
+          // TODO 这里的处理需要另外做
+          {formRender(fetus,this.ultrasound_fetus_config(),(_,{name, value}) => this.handleFormChange(`ultrasound.fetus-${index}]`,name, value))}
         </TabPane>
       );
     })
@@ -811,8 +873,8 @@ export default class MedicalRecord extends Component{
     const { chief_complaint = '', medical_history ='', diagnosis = '', treatment = '', other_exam = '' , karyotype = '', stateChange = '', lastResult = '' } = renderData;
     const {
       pregnancy_history = {},
-      downs_screen = {early:{}, middle:{}, nipt: {}},
-      thalassemia = {wife:{}, husband: {}},
+      downs_screen = {} ,
+      thalassemia ={} ,
       ultrasound = {menopause:'' , middle: []},
       past_medical_history = {},
       family_history = {},
@@ -849,16 +911,16 @@ export default class MedicalRecord extends Component{
           { formType === "1" ? (
             <div>
               <Collapse defaultActiveKey={['fetus-0','fetus-1','fetus-2','fetus-3','fetus-4','fetus-5','fetus-6','fetus-7','fetus-8','fetus-9','fetus-10','fetus-11']}>
-                <Panel  header="主诉" key="fetus-0">{formRender({chief_complaint: chief_complaint},this.chief_complaint_config(),this.handleFormChange)}</Panel>
-                <Panel header="预产期" key="fetus-1">{formRender(pregnancy_history, this.pregnancy_history_config(), this.handleFormChange)}</Panel>
-                <Panel header="现病史" key="fetus-2">{formRender({medical_history: medical_history},this.medical_history_config(),this.handleFormChange)}</Panel>
+                <Panel  header="主诉" key="fetus-0">{formRender({chief_complaint: chief_complaint},this.chief_complaint_config(),(_,{name, value}) => this.handleFormChange("",name, value))}</Panel>
+                <Panel header="预产期" key="fetus-1">{formRender(pregnancy_history, this.pregnancy_history_config(), (_,{name, value}) => this.handleFormChange("pregnancy_history",name, value))}</Panel>
+                <Panel header="现病史" key="fetus-2">{formRender({medical_history: medical_history},this.medical_history_config(),(_,{name, value}) => this.handleFormChange("",name, value))}</Panel>
                 <Panel header="唐氏筛查" key="fetus-3">
                   <Checkbox checked={isDownsScreenChecked} onChange={(e) => this.setState({isDownsScreenChecked: e.target.checked})}>未检查</Checkbox>
                   { isDownsScreenChecked ? null : (
                     <div>
-                      {formRender(downs_screen['early'], this.early_downs_screen_config(), this.handleFormChange)}
-                      {formRender(downs_screen['middle'], this.middle_downs_screen_config(), this.handleFormChange)}
-                      {formRender(downs_screen['nipt'], this.NIPT_downs_screen_config(), this.handleFormChange)}
+                      {formRender(downs_screen.hasOwnProperty('early') ?  downs_screen['early'] : {}, this.early_downs_screen_config(), (_,{name, value}) => this.handleFormChange("downs_screen.early",name, value))}
+                      {formRender(downs_screen.hasOwnProperty('middle') ? downs_screen['middle'] : {}, this.middle_downs_screen_config(), (_,{name, value}) => this.handleFormChange("downs_screen.middle",name, value))}
+                      {formRender(downs_screen.hasOwnProperty('nipt') ? downs_screen['nipt'] : {}, this.NIPT_downs_screen_config(), (_,{name, value}) => this.handleFormChange("downs_screen.nipt",name, value))}
                     </div>
                   )}
                 </Panel>
@@ -866,8 +928,8 @@ export default class MedicalRecord extends Component{
                   <Checkbox checked={isThalassemiaChecked} onChange={(e) => this.setState({isThalassemiaChecked: e.target.checked})}>未检查</Checkbox>
                   { isThalassemiaChecked ? null : (
                     <div>
-                      {formRender(thalassemia['wife'], this.wife_thalassemia(), () =>console.log('地贫'))}
-                      {formRender(thalassemia['husband'], this.husband_thalassemia(), () =>console.log('地贫'))}
+                      {formRender(thalassemia.hasOwnProperty('wife') ? thalassemia['wife'] : {}, this.wife_thalassemia(), (_,{name, value}) => this.handleFormChange("thalassemia.wife",name, value))}
+                      {formRender(thalassemia.hasOwnProperty('husband') ? thalassemia['husband'] : {} , this.husband_thalassemia(), (_,{name, value}) => this.handleFormChange("thalassemia.husband",name, value))}
                     </div>
                   )}
                 </Panel>
@@ -876,7 +938,7 @@ export default class MedicalRecord extends Component{
                   { isUltrasoundChecked ? null : (
                     <div>
                       <div>
-                        {formRender({menopause: ultrasound['menopause']}, this.ultrasound_menopause_config(), () => console.log('超声'))}
+                        {formRender({menopause: ultrasound['menopause']}, this.ultrasound_menopause_config(), (_,{name, value}) => this.handleFormChange("ultrasound",name, value))}
                       </div>
                       <div>
                         <Tabs
@@ -892,18 +954,18 @@ export default class MedicalRecord extends Component{
                   )}
 
                 </Panel>
-                <Panel header="其他检查" key="fetus-6">{formRender({other_exam: other_exam},this.other_exam_config(),this.handleFormChange)}</Panel>
+                <Panel header="其他检查" key="fetus-6">{formRender({other_exam: other_exam},this.other_exam_config(),(_,{name, value}) => this.handleFormChange("",name, value))}</Panel>
                 <Panel header="既往史" key="fetus-7">
-                  {formRender(past_medical_history, this.past_medical_history_config(),this.handleFormChange )}
+                  {formRender(past_medical_history, this.past_medical_history_config(),(_,{name, value}) => this.handleFormChange("past_medical_history",name, value))}
                 </Panel>
                 <Panel header="家族史" key="fetus-8">
-                  {formRender(family_history, this.family_history_config(), this.handleFormChange)}
+                  {formRender(family_history, this.family_history_config(),(_,{name, value}) => this.handleFormChange("family_history",name, value))}
                 </Panel>
                 <Panel header="体格检查" key="fetus-9">
-                  {formRender(physical_check_up, this.physical_check_up_config(), this.handleFormChange)}
+                  {formRender(physical_check_up, this.physical_check_up_config(), (_,{name, value}) => this.handleFormChange("physical_check_up",name, value))}
                 </Panel>
-                <Panel header="诊断" key="fetus-10">{formRender({diagnosis: diagnosis}, this.diagnosis_config(),this.handleFormChange)}</Panel>
-                <Panel header="处理" key="fetus-11">{formRender({treatment: treatment}, this.treatment_config(),this.handleFormChange)}</Panel>
+                <Panel header="诊断" key="fetus-10">{formRender({diagnosis: diagnosis}, this.diagnosis_config(),(_,{name, value}) => this.handleFormChange("",name, value))}</Panel>
+                <Panel header="处理" key="fetus-11">{formRender({treatment: treatment}, this.treatment_config(),(_,{name, value}) => this.handleFormChange("",name, value))}</Panel>
               </Collapse>
             </div>
           ) : null }
