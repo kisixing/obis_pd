@@ -28,7 +28,7 @@
 - handleChange 传出参数
 ```
 {
-    e, // target
+    e, // event
     {
         name,       // 当前输入键名
         value,      // 当前值

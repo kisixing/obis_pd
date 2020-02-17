@@ -1072,10 +1072,10 @@ export const preoperativeUltrasonographyColumns1 = [
   // 暂时不知道是不是crl
   {title: 'CRL(mm)', key: 'crl', type: 'input'},
   // TODO #孕囊大小 #胎心搏动
-  {title: '孕囊大小(cm&sup2)', key: '', type: 'input'},
-  {title: '胎心搏动(bpm)', key: '', type: 'input'},
-  {title: '孕囊与宫璧分离部位', key: '', type: 'input'},
-  {title: '分离部分面积(cm&sup2)', key: '', type: 'input'},
+  // {title: '孕囊大小(cm&sup2)', key: '', type: 'input'},
+  // {title: '胎心搏动(bpm)', key: '', type: 'input'},
+  // {title: '孕囊与宫璧分离部位', key: '', type: 'input'},
+  // {title: '分离部分面积(cm&sup2)', key: '', type: 'input'},
   {title: '胎盘位置', key: 'fetalPosition', type: 'input'},
 ]
 // 穿刺部位

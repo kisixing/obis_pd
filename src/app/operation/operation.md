@@ -19,7 +19,7 @@
 > 流程说明
 
 1.先从服务获取operationList并渲染为一个tree型的结构
-
+w
 2.通过点击treeNode从服务器获取operationdetail保存至operationDataList数组
 
 3.以currentTreeKeys中第一个数字（有且仅有一个）作为参数，进入operationDataList中寻找需要显示的数据

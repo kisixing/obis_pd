@@ -94,7 +94,7 @@ export default class Operation extends Component{
     this.state = {
       // 左侧树形菜单
       operationList: [],
-      operationDataList: [],
+      operationData: [],
 
 
       // 控制
@@ -235,10 +235,30 @@ export default class Operation extends Component{
     operative_procedure['fetus'][index]['inspectionItems'].splice(otherIndex, 1, otherContext);
     this.setState({operative_procedure, otherContext: "",  isShowOtherContextModal: false});
   }
+
+  // 新建病历
+  newOperation = () => {
+    const ONE_DAY_MS = 86400000;
+    const { operationList, operationData } = this.state;
+    // 新建 树型记录
+    // 判断第一个是否是今天
+    const nD = new Date();
+    if(operationList.length === 0 || nD.getTime() - Date.parse(operationList[0]['title']) > ONE_DAY_MS) {
+      // 以往的记录不是今天 || 病例为空
+      let m = nD.getMonth() + 1, d = nD.getDate();
+      operationList.splice(0,0,{title: `${nD.getFullYear()}-${m < 10 ? `0${m}`: m}-${d < 1?`0${d}`:d}` , key: "n-1", children: [{title: "待完善病历", key: "-1"}]})
+    }else {
+      operationList[0]['children'].splice(0,0,{title: '待完善病历', key: "-1"})
+    }
+    // 新建数据实体
+    operationData.push({id: "-1"});
+    // 将formType设置为空 用户选择
+    this.setState({operationList, currentTreeKeys: ["-1"],operationData},() => console.log(this.state));
+  };
   /* ========================= 其他 ============================ */
   // 获取数据整合进入state
   convertOperationDetail = (object) => {
-    const { operationDataList, currentTreeKeys } = this.state;
+    const { operationData, currentTreeKeys } = this.state;
     const { operative_procedure, operationItem } = object;
     // 识别类型
     const templateId = operationItemTemplateId(operationItem['operationName']);
@@ -250,14 +270,14 @@ export default class Operation extends Component{
     // 转换时间戳
     object['preoperative_record']['operation_date'] = new Date(object['preoperative_record']['operation_date']);
     // 判断数据列表中是否存在
-    if(!this.checkIsGot(operationDataList,object)) {
-      operationDataList.push(object);
+    if(!this.checkIsGot(operationData,object)) {
+      operationData.push(object);
     }else{
       // TODO 之后优化吧
-      const index = operationDataList.findIndex(item => item.id === object.id);
-      operationDataList.splice(index,1,object);
+      const index = operationData.findIndex(item => item.id === object.id);
+      operationData.splice(index,1,object);
     }
-    this.setState({operationDataList,templateId},() => {
+    this.setState({operationData,templateId},() => {
       console.log(this.state);
     });
   };
@@ -267,11 +287,11 @@ export default class Operation extends Component{
   );
   // 根据templateId组装数据
   assembledRenderData = (templateId, currentTreeKey) => {
-    const { operationDataList } = this.state;
-    const index = operationDataList.findIndex((item) => item['key'] === currentTreeKey);
+    const { operationData } = this.state;
+    const index = operationData.findIndex((item) => item['key'] === currentTreeKey);
     console.log(index);
-    console.log(operationDataList);
-    return  operationDataList[index];
+    console.log(operationData);
+    return  operationData[index];
     // console.log(targetData);
     // let renderData = {
     //   operationItem: targetData
@@ -299,13 +319,17 @@ export default class Operation extends Component{
 
   render() {
     const { operationList, isFetusPage, isShowOtherContextModal, templateId, currentTreeKeys } = this.state;
-    const { operationItem, preoperative_record, operative_procedure, afterFhr, doctors_advice, ward } = this.state;
     const { otherContext } = this.state;
+
     return (
       <Page className="fuzhen font-16">
         <div className="fuzhen-left ant-col-5">
-          {/* 这里无用的重新渲染问题 */}
-        {this.renderTree(operationList)}
+          <div style={{textAlign: 'center'}}>
+            <Button size="small" onClick={this.newOperation}>新增病历</Button>
+          </div>
+          <div>
+            {this.renderTree(operationList)}
+          </div>
 
         </div>
         <div className="fuzhen-right ant-col-19 main main-pad-small width_7">
@@ -323,30 +347,34 @@ export default class Operation extends Component{
             ((templateId,currentTreeKeys) => {
               if(templateId < 0) return <div>尚未选择</div>
               // 组装数据
-              const renderData = this.assembledRenderData(templateId, currentTreeKeys[0]);
+              const renderData = this.assembledRenderData(templateId, currentTreeKeys[0]) || {
+                operationItem: {}, preoperative_record: {}, operative_procedure: {fetus:[]}, surgery: {}
+              };
+              console.log(templateId);
+              console.log(formRenderConfig);
               return (<div>
-                <div>
-                  {formRender(renderData['operationItem'],formRenderConfig[`config${templateId}`]['operationItem_config'](), () => console.log('change'))}
-                </div>
-                <div>
-                  {formRender(renderData['preoperative_record'],formRenderConfig[`config${templateId}`]['preoperative_record_config'](), () => console.log('change'))}
-                </div>
-                <div>
-                  <Tabs>
-                    {
-                      renderData['operative_procedure']['fetus'].map((item, index) => (
-                        <TabPane tab={`胎儿${index+1}`} key={item.id}>
-                          {formRender(item, formRenderConfig[`config${templateId}`]['operative_procedure_config'](), () => console.log('a'))}
-                        </TabPane>
-                      ))
-                    }
-                  </Tabs>
-                </div>
-                {/*{formRender(renderData['operationItem'],formRenderConfig[`operationItem${templateId}`], () => console.log('change'))}*/}
-                <div>
-                  {formRender(renderData['surgery'],formRenderConfig[`config${templateId}`]['surgery_config'](), () => console.log('change'))}
-                </div>
-
+                <Collapse defaultActiveKey={["operationItem", "preoperative_record", "operative_procedure", "surgery"]}>
+                  <Panel header="手术项目" key="operationItem">
+                    {formRender(renderData['operationItem'] || {},formRenderConfig[`config${templateId}`]['operationItem_config'](), () => console.log('change'))}
+                  </Panel>
+                  <Panel header="术前记录" key="preoperative_record">
+                    {formRender(renderData['preoperative_record'] || {},formRenderConfig[`config${templateId}`]['preoperative_record_config'](), () => console.log('change'))}
+                  </Panel>
+                  <Panel header="手术过程" key="operative_procedure">
+                    <Tabs>
+                      {renderData['operative_procedure']['fetus'].length !== 0 ? (
+                        renderData['operative_procedure']['fetus'].map((v,index) => (
+                          <TabPane tab={`胎儿${index+1}`} key={v.id}>
+                            {formRender(v, formRenderConfig[`config${templateId}`][`operative_procedure_config`](), () => console.log('change'))}
+                          </TabPane>
+                        ))
+                      ) : null}
+                    </Tabs>
+                  </Panel>
+                  <Panel header="术后情况" key="surgery">
+                    {formRender(renderData['surgery'],formRenderConfig[`config${templateId}`]['surgery_config'](), () => console.log('change'))}
+                  </Panel>
+                </Collapse>
               </div>)
             })(templateId,currentTreeKeys)
           }

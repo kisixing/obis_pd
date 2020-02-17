@@ -78,19 +78,21 @@ const mapValueToKey = (obj, keyStr = "", val) => {
   const objectIndex = keyStr.indexOf(OBJECT_SPLIT_KEY);
   const arrayIndex = keyStr.indexOf(ARRAY_SPLIT_KEY);
   const len = keyStr.length;
+  console.log(keyStr);
   if(objectIndex === -1 && arrayIndex === -1) {
     obj[keyStr] = val;
-  }else if(objectIndex > arrayIndex){
+  }else if(objectIndex < arrayIndex || (objectIndex !== -1 && arrayIndex === -1)){
     const nextKey = keyStr.slice(0,objectIndex);
+    console.log(nextKey);
     if(!obj.hasOwnProperty(nextKey)) {
       obj[nextKey] = {};
     }
     mapValueToKey(obj[nextKey], keyStr.slice(objectIndex+1, len), val);
   }else{
     // 检查到 - ，是数组，try-catch
-    const nextKey = keyStr.slice(0,objectIndex);
+    const nextKey = keyStr.slice(0,arrayIndex);
     // 这个位置可能会BUG
-    if(!obj[nextKey].hasOwnProperty('length')){
+    if(Object.prototype.toString.call(obj[nextKey]) !== "[object Array]") {
       obj[nextKey] = [];
     }
     mapValueToKey(obj[nextKey], keyStr.slice(arrayIndex+1, len), val);
@@ -114,9 +116,10 @@ export default class MedicalRecord extends Component{
   constructor(props) {
     super(props);
     this.state = {
+      // data
       specialistemrList: [],  // 左侧病历树形菜单
       specialistemrData: [],  // 病历数据  主键-key
-
+      ultrasoundMiddleData: [],
       /* control */
       currentTreeKeys: '',  // 当前选择的书的key
       uFetusActiveKey: '',  // 胎儿疾病 - 超声检查 Tab
@@ -546,13 +549,20 @@ export default class MedicalRecord extends Component{
         ]
       },
       {columns: [{label: '术前超声检查' , span: 12}]},
+
+    ]
+  });
+  // 中孕超声
+  middle_config = () => ({
+    step: 1,
+    rows:[
       {
         columns:[
           { name: 'middle[中孕超声]', type: 'table', pagination: false, editable: true, options: baseData.BvColumns },
         ]
       },
     ]
-  });
+  })
   /*
   * 遗传病史部分
   * */
@@ -627,9 +637,11 @@ export default class MedicalRecord extends Component{
     // 换页操作
 
     // 先请求好数据再setState， 不然render会报错
+    // 获取病历详情
     service.medicalrecord.getspecialistemrdetail({recordid: selectedKeys[0]}).then(res => {
       if(res.code === "200" || 200) {
         const { specialistemrData  } = this.state;
+
         // 获取已经整合的数据
         const obj = this.convertSpecialistemrDetail(res.object);
         if(!this.checkIsGot(specialistemrData,obj)) {
@@ -639,6 +651,11 @@ export default class MedicalRecord extends Component{
           specialistemrData.splice(index,1,obj);
         }
         this.setState({currentTreeKeys: selectedKeys, specialistemrData},() => {});
+      }
+    });
+    service.ultrasound.getPrenatalPacsMg({recordid: selectedKeys[0]}).then(res => {
+      if(res.code === "200" || 200){
+        this.setState({ultrasoundMiddleData: res.object})
       }
     });
   };
@@ -674,8 +691,16 @@ export default class MedicalRecord extends Component{
   // fetusTab
   handleTabsClick = (key) => (this.setState({uFetusActiveKey: key}));
   // TODO 处理超声婴儿edit
-  handleUFetusEdit = () => {
-
+  handleUFetusEdit = (targetKey, action) => {
+    const { specialistemrData, currentTreeKeys } = this.state
+    const index = specialistemrData.findIndex(item => item.id === currentTreeKeys[0]);
+    if(action === 'remove') {
+      const uIndex = specialistemrData[index].ultrasound.fetus.findIndex(v => v.id === targetKey);
+      specialistemrData[index].ultrasound.fetus.splice(uIndex,1);
+    }else if(action === 'add'){
+      specialistemrData[index].ultrasound.fetus.push({id: Math.random(), userId: specialistemrData.userid});
+    }
+    this.setState({specialistemrData});
   };
 
 
@@ -688,29 +713,40 @@ export default class MedicalRecord extends Component{
    * @param value       值
    */
   handleFormChange = (path, name, value) => {
-
     const { specialistemrData, currentTreeKeys} = this.state;
-    // 之后考虑将index加入
     const index = specialistemrData.findIndex(item => item.id === currentTreeKeys[0]);
+    // 手动 特殊处理bp
+    console.log(name);
+
+    // 之后考虑将index加入
+
     if(path === ""){
       // 为第一层值
       mapValueToKey(specialistemrData[index], name, value);
     }else {
-      // 分割.
-      mapValueToKey(specialistemrData[index], `${path}.${name}`, value);
+      if(name === 'bp'){
+        if(value["0"]){
+          name = 'systolic_pressure';
+          mapValueToKey(specialistemrData[index], `${path}.${name}`, value["0"]);
+        }
+        if(value["1"]){
+          name = 'diastolic_pressure';
+          mapValueToKey(specialistemrData[index], `${path}.${name}`, value["1"]);
+        }
+      }else {
+        mapValueToKey(specialistemrData[index], `${path}.${name}`, value);
+      }
     }
     this.setState({specialistemrData},() => console.log(this.state));
-
   };
 
   // 表单保存
   handleSave = () => {
-    const { formType, currentTreeKeys, specialistemrData } = this.state;
+    const { formType, currentTreeKeys, specialistemrData, ultrasoundMiddleData } = this.state;
     const FORM_BLOCK = "form-block";
     fireForm(document.getElementById(FORM_BLOCK),'valid').then(validCode => {
       if(validCode){
         // 保存
-        console.log('save');
         const index = specialistemrData.findIndex(item => item['id'] === currentTreeKeys[0]);
         // 整合bp的格式
         specialistemrData[index]['physical_check_up']['bp'] = '0';
@@ -721,6 +757,9 @@ export default class MedicalRecord extends Component{
             message.error('500 保存失败')
           }
         }).catch(err => console.log(err));
+        console.log(ultrasoundMiddleData);
+        ultrasoundMiddleData.forEach(v => v.writeOperationType = "1");
+        service.ultrasound.writePrenatalPacsMg({pacsMgVOList: ultrasoundMiddleData, recordid:  currentTreeKeys[0]}).then(res => console.log(res));
       }else{
         // 提示
         message.error('请填写所有信息后再次提交');
@@ -758,8 +797,8 @@ export default class MedicalRecord extends Component{
     fetusData.forEach((fetus,index) => {
       fetusTabPaneDOM.push(
         <TabPane key={fetus.id} tab={`胎儿-${index+1}`}>
-          // TODO 这里的处理需要另外做
-          {formRender(fetus,this.ultrasound_fetus_config(),(_,{name, value}) => this.handleFormChange(`ultrasound.fetus-${index}]`,name, value))}
+          {/*// TODO 这里的处理需要另外做*/}
+          {formRender(fetus,this.ultrasound_fetus_config(),(_,{name, value}) => this.handleFormChange(`ultrasound.fetus-${index}`,name, value))}
         </TabPane>
       );
     })
@@ -866,6 +905,7 @@ export default class MedicalRecord extends Component{
   render() {
     const { specialistemrList, specialistemrData, uFetusActiveKey, currentTreeKeys  } = this.state;
     const { isDownsScreenChecked, isThalassemiaChecked, isUltrasoundChecked  } = this.state;
+    const { ultrasoundMiddleData  } = this.state;
     const { isShowTemplateModal, templateList } = this.state.templateObj;
     // data index用于回调赋值
     const renderData = this.getTargetObject(specialistemrData, currentTreeKeys[0]) || {};
@@ -950,9 +990,11 @@ export default class MedicalRecord extends Component{
                           {this.renderUFetusTabPane(ultrasound['fetus'] || [])}
                         </Tabs>
                       </div>
+                      <div>
+                        {formRender({middle: ultrasoundMiddleData}, this.middle_config(), (_,{value}) => {this.setState({ultrasoundMiddleData: value})})}
+                      </div>
                     </div>
                   )}
-
                 </Panel>
                 <Panel header="其他检查" key="fetus-6">{formRender({other_exam: other_exam},this.other_exam_config(),(_,{name, value}) => this.handleFormChange("",name, value))}</Panel>
                 <Panel header="既往史" key="fetus-7">
@@ -972,19 +1014,19 @@ export default class MedicalRecord extends Component{
           { formType === "2" ? (
             <div>
               <Collapse defaultActiveKey={['genetic-0','genetic-1','genetic-2','genetic-3','genetic-4','genetic-5','genetic-6','genetic-7','genetic-8','genetic-9']}>
-                <Panel header="主诉" key="genetic-0">{formRender({chief_complaint: chief_complaint},this.chief_complaint_config(),() => console.log('c'))}</Panel>
-                <Panel header="预产期" key="genetic-1">{formRender(pregnancy_history, this.pregnancy_history_config(), () => console.log('p'))}</Panel>
-                <Panel header="现病史" key="genetic-2">{formRender({medical_history: medical_history},this.medical_history_config(),() => console.log('c'))}</Panel>
+                <Panel header="主诉" key="genetic-0">{formRender({chief_complaint: chief_complaint},this.chief_complaint_config(),(_,{name, value}) => this.handleFormChange("",name, value))}</Panel>
+                <Panel header="预产期" key="genetic-1">{formRender(pregnancy_history, this.pregnancy_history_config(), (_,{name, value}) => this.handleFormChange("pregnancy_history",name, value))}</Panel>
+                <Panel header="现病史" key="genetic-2">{formRender({medical_history: medical_history},this.medical_history_config(),(_,{name, value}) => this.handleFormChange("",name, value))}</Panel>
                 <Panel header="地贫/血型检测" key="genetic-3">
-                  {formRender(thalassemia['wife'], this.wife_thalassemia(), () =>console.log('地贫'))}
-                  {formRender(thalassemia['husband'], this.husband_thalassemia(), () =>console.log('地贫'))}
+                  {formRender(thalassemia.hasOwnProperty('wife') ? thalassemia['wife'] : {}, this.wife_thalassemia(), (_,{name, value}) => this.handleFormChange("thalassemia.wife",name, value))}
+                  {formRender(thalassemia.hasOwnProperty('husband') ? thalassemia['husband'] : {} , this.husband_thalassemia(), (_,{name, value}) => this.handleFormChange("thalassemia.husband",name, value))}
                 </Panel>
-                <Panel header="染色体核型" key="genetic-4">{formRender({karyotype: karyotype} , this.karyotype_config(), () => console.log('a'))}</Panel>
-                <Panel header="其他检查" key="genetic-5">{formRender({other_exam: other_exam}, this.other_exam_config(),() => console.log('c'))}</Panel>
-                <Panel header="既往史" key="genetic-6">{formRender(past_medical_history, this.past_medical_history_config(),() => console.log('c'))}</Panel>
-                <Panel header="家族史" key="genetic-7">{formRender(family_history,this.family_history_config(),() => console.log('c'))}</Panel>
-                <Panel header="诊断" key="genetic-8">{formRender({diagnosis: diagnosis},this.diagnosis_config(),() => console.log('c'))}</Panel>
-                <Panel header="处理" key="genetic-9">{formRender({treatment: treatment},this.treatment_config(),() => console.log('c'))}</Panel>
+                <Panel header="染色体核型" key="genetic-4">{formRender({karyotype: karyotype} , this.karyotype_config(), (_,{name, value}) => this.handleFormChange("",name, value))}</Panel>
+                <Panel header="其他检查" key="genetic-5">{formRender({other_exam: other_exam}, this.other_exam_config(),(_,{name, value}) => this.handleFormChange("",name, value))}</Panel>
+                <Panel header="既往史" key="genetic-6">{formRender(past_medical_history, this.past_medical_history_config(),(_,{name, value}) => this.handleFormChange("past_medical_history",name, value))}</Panel>
+                <Panel header="家族史" key="genetic-7">{formRender(family_history,this.family_history_config(),(_,{name, value}) => this.handleFormChange("family_history",name, value))}</Panel>
+                <Panel header="诊断" key="genetic-8">{formRender({diagnosis: diagnosis},this.diagnosis_config(),(_,{name, value}) => this.handleFormChange("",name, value))}</Panel>
+                <Panel header="处理" key="genetic-9">{formRender({treatment: treatment},this.treatment_config(),(_,{name, value}) => this.handleFormChange("",name, value))}</Panel>
               </Collapse>
             </div>
           ) : null}
@@ -992,13 +1034,13 @@ export default class MedicalRecord extends Component{
             <div>
               <Collapse defaultActiveKey={['fuzhen-0','fuzhen-1','fuzhen-2','fuzhen-3','fuzhen-4','fuzhen-5','fuzhen-6']}>
                 {/* 这个位置的数据可能和上边的不一样 */}
-                <Panel header="复诊日期+孕周" key="fuzhen-0">{formRender({ckweek: ckweek || '',createdate: createdate || '' }, this.ckweekAndcreatdate(), () => console.log('c'))}</Panel>
-                <Panel header="主诉" key="fuzhen-1">{formRender({chief_complaint: chief_complaint},this.chief_complaint_config(),() => console.log('c'))}</Panel>
-                <Panel header="病情变化" key="fuzhen-2">{formRender({stateChange: stateChange},this.stateChange_config(),() => console.log('c'))}</Panel>
-                <Panel header="体格检查" key="fuzhen-3">{formRender(physical_check_up, this.physical_check_up_config(),() => console.log('c'))}</Panel>
-                <Panel header="前次检查结果" key="fuzhen-4">{formRender({lastResult: lastResult},this.lastResult_config(),() => console.log('c'))}</Panel>
-                <Panel header="诊断" key="fuzhen-5">{formRender({diagnosis: diagnosis},this.diagnosis_config(),() => console.log('c'))}</Panel>
-                <Panel header="处理" key="fuzhen-6">{formRender({treatment: treatment},this.treatment_config(),() => console.log('c'))}</Panel>
+                <Panel header="复诊日期+孕周" key="fuzhen-0">{formRender({ckweek: ckweek || '',createdate: createdate || '' }, this.ckweekAndcreatdate(), (_,{name, value}) => this.handleFormChange("",name, value))}</Panel>
+                <Panel header="主诉" key="fuzhen-1">{formRender({chief_complaint: chief_complaint},this.chief_complaint_config(),(_,{name, value}) => this.handleFormChange("",name, value))}</Panel>
+                <Panel header="病情变化" key="fuzhen-2">{formRender({stateChange: stateChange},this.stateChange_config(),(_,{name, value}) => this.handleFormChange("",name, value))}</Panel>
+                <Panel header="体格检查" key="fuzhen-3">{formRender(physical_check_up, this.physical_check_up_config(),(_,{name, value}) => this.handleFormChange("physical_check_up",name, value))}</Panel>
+                <Panel header="前次检查结果" key="fuzhen-4">{formRender({lastResult: lastResult},this.lastResult_config(),(_,{name, value}) => this.handleFormChange("",name, value))}</Panel>
+                <Panel header="诊断" key="fuzhen-5">{formRender({diagnosis: diagnosis},this.diagnosis_config(),(_,{name, value}) => this.handleFormChange("",name, value))}</Panel>
+                <Panel header="处理" key="fuzhen-6">{formRender({treatment: treatment},this.treatment_config(),(_,{name, value}) => this.handleFormChange("",name, value))}</Panel>
               </Collapse>
             </div>
           ) : null}

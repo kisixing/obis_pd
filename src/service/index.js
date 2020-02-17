@@ -6,6 +6,8 @@ import { default as fuzhen } from './fuzhen';
 import { default as shouzhen } from './shouzhen';
 import { default as medicalrecord } from './medicalrecord';
 import { default as operation } from './operation.js';
+import { default as historicalrecord } from './historicalrecord.js';
+import { default as ultrasound } from './ultrasound.js';
 
 let userId = null;
 let watchInfoList = [];
@@ -73,5 +75,13 @@ export default {
     /**
      * 手术记录所需API
      */
-    operation: Object.assign(operation, {userId: () => userId, fireWatch: (...args)=>watchInfoList.forEach(fn=>fn(...args)) })
+    operation: Object.assign(operation, {userId: () => userId, fireWatch: (...args)=>watchInfoList.forEach(fn=>fn(...args)) }),
+    /**
+     * 历史记录所需API
+     */
+    historicalrecord: Object.assign(historicalrecord, {userId: () => userId, fireWatch: (...args)=>watchInfoList.forEach(fn=>fn(...args))}),
+    /**
+     * 历史记录所需API
+     */
+    ultrasound: Object.assign(ultrasound, {userId: () => userId, fireWatch: (...args)=>watchInfoList.forEach(fn=>fn(...args))})
 }

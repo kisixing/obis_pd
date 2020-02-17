@@ -112,7 +112,7 @@ const config0 = {
     step: 1,
     rows: [
       {columns: [operation_date,temperature,bP]},
-      {columns: [{ name: 'preoperativeUltrasonography[术前超声检查]', type: 'table', valid: 'required', pagination: false, editable: true, options: preoperativeUltrasonographyColumns0, span: 20 },]}
+      // {columns: [{ name: 'preoperativeUltrasonography[术前超声检查]', type: 'table', valid: 'required', pagination: false, editable: true, options: preoperativeUltrasonographyColumns0, span: 20 }]}
     ]
   }),
   // 手术操作
