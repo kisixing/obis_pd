@@ -1069,13 +1069,11 @@ export const preoperativeUltrasonographyColumns1 = [
   {title: '胎儿', key: 'fetus', type: 'input'},
   {title: 'BPD(mm)', key: 'bpd', type: 'input'},
   {title: '超声孕周', key: 'gestationalWeek', type: 'input'},
-  // 暂时不知道是不是crl
   {title: 'CRL(mm)', key: 'crl', type: 'input'},
-  // TODO #孕囊大小 #胎心搏动
-  // {title: '孕囊大小(cm&sup2)', key: '', type: 'input'},
-  // {title: '胎心搏动(bpm)', key: '', type: 'input'},
-  // {title: '孕囊与宫璧分离部位', key: '', type: 'input'},
-  // {title: '分离部分面积(cm&sup2)', key: '', type: 'input'},
+  {title: '孕囊大小(cm&sup2)', key: 'cellNatureSize', type: 'input'},
+  {title: '胎心搏动(bpm)', key: 'fhb', type: 'input'},
+  {title: '孕囊与宫璧分离部位', key: 'gsUwSeparationPart', type: 'input'},
+  {title: '分离部分面积(cm&sup2)', key: 'gsUwSeparationSize', type: 'input'},
   {title: '胎盘位置', key: 'fetalPosition', type: 'input'},
 ]
 // 穿刺部位
@@ -1121,15 +1119,15 @@ export const preoperativeUltrasonographyColumns3 = [
   {title: '胎心率(bpm)', key: 'fhr', type: 'input'},
   {title: '胎盘厚度(mm)', key: 'fetalThickness', type: 'input'},
   {title: '胎盘位置', key: 'fetalPosition', type: 'input'},
-  {title: '其他项目', key: '', type: 'input'}
+  {title: '其他项目', key: 'otherProject', type: 'input'}
 ];
 
 /*
 * 选择性减胎术
 * */
 export const preoperativeUltrasonographyColumns4 = [
-  {title: '绒毛膜形状', key: 'fetus', type: 'input'},
-  {title: '胎儿位置', key: '', type: 'input'},
+  {title: '绒毛膜性质', key: 'chorionicity', type: 'input'},
+  {title: '胎儿位置', key: 'fetusPosition', type: 'input'},
   {title: '超声孕周', key: 'gestationalWeek', type: 'input'},
   {title: 'BPD(mm)', key: 'bpd', type: 'input'},
   {title: 'NT(mm)', key: 'nt', type: 'input'},
@@ -1138,7 +1136,7 @@ export const preoperativeUltrasonographyColumns4 = [
   {title: '胎心率(bpm)', key: 'fhr', type: 'input'},
   {title: '胎盘厚度(mm)', key: 'fetalThickness', type: 'input'},
   {title: '胎盘位置', key: 'fetalPosition', type: 'input'},
-  {title: '其他项目', key: '', type: 'input'}
+  {title: '备注', key: 'remark', type: 'input'}
 ];
 
 /*
@@ -1154,7 +1152,7 @@ export const preoperativeUltrasonographyColumns5 = [
   {title: '胎心率(bpm)', key: 'fhr', type: 'input'},
   {title: '胎盘厚度(mm)', key: 'fetalThickness', type: 'input'},
   {title: '胎盘位置', key: 'fetalPosition', type: 'input'},
-  {title: '其他项目', key: '', type: 'input'}
+  {title: '其他项目', key: 'otherProject', type: 'input'}
 ];
 // 穿刺针
 // TODO 不知道键名是不是器械
@@ -1163,23 +1161,56 @@ export const instrumentOptions5 = toOptions('16/18G,17/19G,20G,21G');
 /*
 * 宫内输血
 * */
+// 术前超声检查
 export const preoperativeUltrasonographyColumns6 = [
   {title: '胎儿', key: 'fetus', type: 'input'},
   {title: '超声孕周', key: 'gestationalWeek', type: 'input'},
   {title: 'BPD(mm)', key: 'bpd', type: 'input'},
-  {title: 'NT(mm)', key: 'nt', type: 'input'},
   {title: 'FL(mm)', key: 'fl', type: 'input'},
   {title: 'AFV(mm)', key: 'afv', type: 'input'},
-  // TODO
   {title: 'AC(mm)', key: 'ac', type: 'input'},
-  {title: '胎重(g)', key: '', type: 'input'},
-  {title: 'H/C', key: '', type: 'input'},
+  {title: '胎重(g)', key: 'fetalWeight', type: 'input'},
+  {title: 'H/C', key: 'hc', type: 'input'},
   {title: '胎盘厚度(mm)', key: 'fetalThickness', type: 'input'},
   {title: '胎盘位置', key: 'fetalPosition', type: 'input'},
   {title: '脐静脉直径(mm)', key: 'umbilicalVeins', type: 'input'},
   {title: '胎心率(bpm)', key: 'fhr', type: 'input'},
-  {title: '其他项目', key: '', type: 'input'},
   {title: '备注', key: 'remark', type: 'input'},
+];
+
+// 术后血流指标
+export const afterBloodFlowColumns = [
+  {title: '日期', key: 'checkDate', type: 'input'},
+  {
+    title: 'UA', key: 'UA', children: [
+      {title: 'EDF', key: 'edf', type: 'input'},
+      {title: 'PI', key: 'piUa', type: 'input'},
+      {title: 'RI', key: 'riUa', type: 'input'},
+      {title: 'S/D', key: 'sdua', type: 'input'},
+    ]
+  },
+  {title: 'DV', key: 'dv', type: 'input'},
+  {
+    title: 'MCA', key: 'MCA', children: [
+      {title: 'PSV', key: 'psv', type: 'input'},
+      {title: 'PI', key: 'piMca', type: 'input'},
+      {title: 'RI', key: 'riMca', type: 'input'},
+      {title: 'S/D', key: 'sdmca', type: 'input'},
+    ]
+  }
+];
+
+// 术后血象检查
+export const afterHemogramColumns = [
+  // {title: ' ', key: 'checkDate', type: 'input'},
+  {title: 'WBC(*10&sup9 /L)', key: 'wbc', type: 'input'},
+  {title: 'RBC(*10&sup12 /L)', key: 'rbc', type: 'input'},
+  {title: 'HGB(g/L)', key: 'hgb', type: 'input'},
+  {title: 'HCT', key: 'hct', type: 'input'},
+  {title: 'PLT(*10&sup9 /L)', key: 'reticulocyte', type: 'input'},
+  {title: '红织网(%)', key: 'nucleatedrbc', type: 'input'},
+  {title: '有核红(*10&sup9 /L)', key: 'bilirubin', type: 'input'},
+  {title: 'coomb\'s', key: 'coomb', type: 'input'},
 ];
 
 /*
@@ -1202,6 +1233,16 @@ export const puncturePositionOptions7 = toOptions('胸腔,腹腔膜');
 // 性状
 export const characterOptions7 = toOptions('清亮，金黄色,血型，浅黄色,浑浊');
 
+// 术后测量值
+export const measurementColumns = [
+  {title: '左胸腔积液(mm)', key: 'lefteffusion', type: 'input'},
+  {title: '右胸腔积液(mm)', key: 'righteffusion', type: 'input'},
+  {title: '腹水(mm)', key: 'ascites', type: 'input'},
+  {title: '囊肿(mm)', key: 'cyst', type: 'input'},
+  {title: '肺压缩', key: 'pneumoniacompression', type: 'input'},
+  {title: '心和纵隔', key: 'heartmediastinum', type: 'input'}
+];
+
 /**
  * 术前超声检查
  */
@@ -1222,7 +1263,7 @@ export const preoperativeUltrasonographyColumns = [
 /**
  *  麻醉方法
  */
-export const o = toOptions('全部麻醉,局部麻醉,复合麻醉,其他');
+export const anesthesiaMethodOptions = toOptions('全部麻醉,局部麻醉,复合麻醉,其他');
 
 
 /**
