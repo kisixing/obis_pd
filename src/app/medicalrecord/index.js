@@ -119,7 +119,8 @@ export default class MedicalRecord extends Component{
       // data
       specialistemrList: [],  // 左侧病历树形菜单
       specialistemrData: [],  // 病历数据  主键-key
-      ultrasoundMiddleData: [],
+      ultrasoundMiddleData: [], // 中孕超声数据
+      operationHistoryData: [], // 胎儿疾病 - 手术史数据
       /* control */
       currentTreeKeys: '',  // 当前选择的书的key
       uFetusActiveKey: '',  // 胎儿疾病 - 超声检查 Tab
@@ -658,6 +659,7 @@ export default class MedicalRecord extends Component{
         this.setState({ultrasoundMiddleData: res.object})
       }
     });
+    service.medicalrecord.getOperationHistory().then(res => console.log(res));
   };
   // 新建病历
   newSpecialistemr = () => {
@@ -905,7 +907,7 @@ export default class MedicalRecord extends Component{
   render() {
     const { specialistemrList, specialistemrData, uFetusActiveKey, currentTreeKeys  } = this.state;
     const { isDownsScreenChecked, isThalassemiaChecked, isUltrasoundChecked  } = this.state;
-    const { ultrasoundMiddleData  } = this.state;
+    const { ultrasoundMiddleData, operationHistoryData  } = this.state;
     const { isShowTemplateModal, templateList } = this.state.templateObj;
     // data index用于回调赋值
     const renderData = this.getTargetObject(specialistemrData, currentTreeKeys[0]) || {};
@@ -924,7 +926,7 @@ export default class MedicalRecord extends Component{
     // 手动修改 physical_check_up bp
     if(Object.keys(physical_check_up).length !== 0) {
       physical_check_up['bp'] = {"0": physical_check_up['systolic_pressure'],"1": physical_check_up['diastolic_pressure']}
-    };
+    }
     const tableColumns = [
       {title: '编号', key: 'index', render: (_,__,index) => (<span>{index+1}</span>) },
       {title: '内容', dataIndex: 'content', key: 'content'},
