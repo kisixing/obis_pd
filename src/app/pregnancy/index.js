@@ -134,6 +134,11 @@ export default class Patient extends Component {
             { name: 'userhjib[现有何病]', type: 'input', span: 12 }
           ]
         },
+        {
+          columns: [
+            {name: 'test[组件测试]',type: 'hemorrhageselect', span:6}
+          ]
+        }
       ]
     };
   }

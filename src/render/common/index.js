@@ -10,6 +10,7 @@ import * as buttons from './button';
 import * as cascader from './cascader';
 import * as treeselect from './treeselect';
 import * as mixs from './mix';
+import { pharacyinput, hemorrhageselect } from "./business";
 
 /**
  * 所有编辑组件
@@ -25,7 +26,7 @@ export const events = eventFns;
 /**
  * 所有的编辑器
  */
-export const editors = {...inputs,...selects,...times,...dates,...buttons,...mixs,...cascader,...treeselect};
+export const editors = {...inputs,...selects,...times,...dates,...buttons,...mixs,...cascader,...treeselect,pharacyinput, hemorrhageselect};
 
 export default {
   types,

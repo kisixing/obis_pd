@@ -245,6 +245,7 @@ export default class Operation extends Component{
    * @param value       值
    */
   handleFormChange = (path, name, value) => {
+    console.log(value);
     const { operationData, index, templateId } = this.state;
     if(name === 'operationName') {
       this.setState({templateId: operationItemTemplateId(value)},() => console.log(this.state));
