@@ -20,29 +20,36 @@ function editOptions(arr, isSelectParent = false) {
   }else {
     console.error(`expect Array but ${Object.prototype.toString.call(arr)}`);
   }
+  return arr;
 }
 
 class MyTreeSelect extends Component{
   constructor(props) {
     super(props);
     this.state = {
-      currentValue: []
+      currentValue: [],
+      nOptions: []
     }
-    console.log(props);
   }
 
   componentDidMount() {
-    const { value }  = this.props['mProps'];
+    const { value, isSelectParent, options }  = this.props['mProps'];
+    const { currentValue } = this.state;
     const type = Object.prototype.toString.call(value);
+    // 设置初始值
     if(type === `[object Object]`) {
-      this.setState({currentValue: value['value'] });
+      currentValue.push(value);
+      this.setState({currentValue});
     }else if(type === `[object Array]`){
       this.setState({currentValue: value})
     }else {
-      console.error(`expect object/array but ${type}`);
+      console.warn(`expect object/array but ${type},setting treeselect's value to empty Array`);
+      this.setState({currentValue: []});
     }
+    // 设置nOption
+    let nOptions = editOptions(options, isSelectParent);
+    this.setState({nOptions});
   }
-
 
   handleChange = (_,__,event) => {
     // 清除
@@ -60,28 +67,24 @@ class MyTreeSelect extends Component{
       const { props } = event['triggerNode'];
       const { currentValue } = this.state;
       if(isSelectParent || props.children === undefined){
-        currentValue.push(props.value);
+        // 暂时这样写
+        currentValue.push({value:event['triggerValue'],label:event['triggerValue']});
         this.setState({currentValue}, () => onChange(event, currentValue).then(()=>onBlur({checkedChange:true})));
       }else{
         console.log('父节点,不可选');
       }
     }
-    // console.log(currentValue);
-    // onChange(event, currentValue).then(()=>onBlur({checkedChange:true}));
   }
 
   render() {
-    const { options, multiple = true, isSelectParent } = this.props['mProps'];
-    const { currentValue } = this.state;
-    let nOption = [];
-    options.forEach(v => {
-      nOption.push(Object.assign({},v));
-    });
-    editOptions(nOption, isSelectParent);
+    const { multiple = true, isSelectParent = false } = this.props['mProps'];
+    const { nOptions = [] ,currentValue = [] } = this.state;
+    // 以后考虑移到别的地方
+    const currentSelections = currentValue.map(v => (v.label));
     return (
       <TreeSelect
-        value={currentValue}
-        treeData={nOption}
+        value={currentSelections}
+        treeData={nOptions}
         multiple={multiple}
         style={{width: 200}}
         onChange={this.handleChange}

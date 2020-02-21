@@ -6,7 +6,7 @@ export default {
   /**
    * 获取专科病历列表
    */
-  getspecialistemr: function() {
+  getspecialistemr: function () {
     let uri = 'getspecialistemr';
     return this.userId().then(r => myAxios.get(`${FRONT_URL}${uri}?userid=${r.object.userid}`,));
   },
@@ -14,38 +14,37 @@ export default {
   /**
    * 查看专科病历详情
    */
-  getspecialistemrdetail: function(entity) {
+  getspecialistemrdetail: function (entity) {
     let uri = 'getspecialistemrdetail';
     return this.userId().then(r => myAxios.get(`${FRONT_URL}${uri}?userid=${r.object.userid}&recordid=${entity.recordid}`));
   },
   /**
    * 保存专科病例
    */
-  savespecialistemrdetail: function(entity) {
+
+  savespecialistemrdetail: function (entity) {
     let uri = 'savespecialistemrdetail';
     console.log(entity);
     entity['ultrasound']['fetus'] = [];
-    return this.userId().then(r => myAxios.post(`${FRONT_URL}${uri}`,entity))
+    return this.userId().then(r => myAxios.post(`${FRONT_URL}${uri}`, entity))
   },
   /**
    * 获取模板
    * entity :{ doctor: "xxxx", type: "drm1/2/3/4/5"}
    */
-  getTemplate: function(entity) {
-      let uri = 'mrTemplate';
-      return this.userId().then(r => myAxios.get(`${FRONT_URL}${uri}?userid=${r.object.userid}&doctor=${entity.doctor}&type=${entity.type}`));
+
+  getTemplate: function (entity) {
+    let uri = 'mrTemplate';
+    return this.userId().then(r => myAxios.get(`${FRONT_URL}${uri}?userid=${r.object.userid}&doctor=${entity.doctor}&type=${entity.type}`));
   },
   /**
-   * 获取专科病例 - 胎儿疾病 - 既往史 的手术史
+   * 专科病历 - 胎儿疾病 - 既往史 - 获取手术记录
    */
-  getOperationHistory: function() {
-    return this.userId().then(r => myAxios.get(`outpatientRestful/getOperationHistory?userid=${r.object.userid}`));
+  getOperationHistory: function () {
+    return this.userId().then(r => myAxios.get(`outpatientRestful/getOperationHistory?userid=${r.object.userid}`))
   },
   /**
-   * 增删改 专科病例 - 胎儿疾病 - 既往史 的手术史
-   * ADD UPDATE DELETE
+   * 专科病历 - 胎儿疾病 - 既往史 - 手术史
    */
-  writeOperationHistory: function(entity) {
-    return this.userId().then(r => myAxios.post(`outpatientWriteRestful/writeOperationHistory`,{userid: r.object.userid, operationHistorys: entity}))
-  }
+  writeOperationHistory: (entity) => (this.userId().then(r => myAxios.post(`outpatientWriteRestful/writeOperationHistory`,{userid: r.object.userid, operationHistory: entity})))
 }

@@ -710,32 +710,25 @@ export default class MedicalRecord extends Component{
   // TODO 修改组件后必须改 - 暂时手动传入父键名
   /**
    *
-   * @param path        多层结构路径 不包含最后一个键值
+   * @param path        多层结构路径 不包含最后一个键值 a.b-c
    * @param name        键名路径
    * @param value       值
    */
   handleFormChange = (path, name, value) => {
     const { specialistemrData, currentTreeKeys} = this.state;
     const index = specialistemrData.findIndex(item => item.id === currentTreeKeys[0]);
-    // 手动 特殊处理bp
-    console.log(name);
-
-    // 之后考虑将index加入
-
     if(path === ""){
       // 为第一层值
       mapValueToKey(specialistemrData[index], name, value);
     }else {
+      // 手动 特殊处理bp
       if(name === 'bp'){
-        if(value["0"]){
-          name = 'systolic_pressure';
-          mapValueToKey(specialistemrData[index], `${path}.${name}`, value["0"]);
-        }
-        if(value["1"]){
-          name = 'diastolic_pressure';
-          mapValueToKey(specialistemrData[index], `${path}.${name}`, value["1"]);
-        }
-      }else {
+        if(value["0"]){name = 'systolic_pressure'; mapValueToKey(specialistemrData[index], `${path}.${name}`, value["0"]);}
+        if(value["1"]){name = 'diastolic_pressure';mapValueToKey(specialistemrData[index], `${path}.${name}`, value["1"]);}
+        // 特殊处理手术史，中孕超声
+      }else if(name === "operation_history"){
+        console.log(value);
+      } else {
         mapValueToKey(specialistemrData[index], `${path}.${name}`, value);
       }
     }
@@ -754,7 +747,7 @@ export default class MedicalRecord extends Component{
         specialistemrData[index]['physical_check_up']['bp'] = '0';
         service.medicalrecord.savespecialistemrdetail(specialistemrData[index]).then(res => {
           if(res.code === "200" && res.message === "OK") {
-            message.success('以成功保存');
+            message.success('成功保存');
           }else if(res.code === "500"){
             message.error('500 保存失败')
           }

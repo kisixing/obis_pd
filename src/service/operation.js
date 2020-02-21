@@ -10,11 +10,17 @@ export default {
     return this.userId().then(r => myAxios.get(`${FRONT_URL}${uri}?userid=${r.object.userid}`,));
   },
   /**
-   *
+   * 获取手术记录详细信息
    */
   getOperationdetail: function (entity) {
     let uri = 'getoperationdetail';
-    // NOTICE 这里使用25121
     return this.userId().then(r => myAxios.get(`${FRONT_URL}${uri}?userid=${r.object.userid}&operationRecordsTreeId=${entity.recordid}`));
+  },
+  /**
+   * 保存手术记录信息
+   */
+  saveOperation: function(entity) {
+    delete entity.key;
+    return this.userId().then(r => myAxios.post(`prenatalWrite/saveOperation`,entity));
   }
 }

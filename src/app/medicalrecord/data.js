@@ -741,7 +741,7 @@ export const shoushushiColumns = [
 		title: '手术日期',
 		key: 'date_of_operation',
 		type: 'date',
-		mode:"ym"
+		mode:"ymd"
 	},
 	{
 		title: '手术医院',

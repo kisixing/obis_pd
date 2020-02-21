@@ -58,7 +58,7 @@ const myAxios = axios.create({
     timeout: 10000,
     // headers: {'Content-Type': 'application/json;charset=utf-8'},
     headers: {
-        // "X-Requested-With": "XMLHttpRequest",
+        "X-Requested-With": "XMLHttpRequest",
         "Content-Type": "application/json;charset=utf-8",
     },
     // headers: {'Content-Type': 'application/x-www-form-urlencode;charset=utf-8'},

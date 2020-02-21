@@ -25,7 +25,10 @@ import {
   preoperativeUltrasonographyColumns6,
   preoperativeUltrasonographyColumns7,
   instrumentOptions1,
-  instrumentOptions5
+  instrumentOptions5,
+  afterBloodFlowColumns,
+  afterHemogramColumns, measurementColumns,
+  anesthesiaMethodOptions
 } from "./data";
 import valid from "../../render/common/valid";
 
@@ -99,8 +102,8 @@ const punctureCount = {name: 'punctureCount[穿刺次数]', type: 'input', span:
 // 术后情况
 const afterFhr = {name: 'afterFhr[术后胎心率](bpm)', type: 'input', span: SPAN_6};
 const doctors_advice = {name: 'doctors_advice[医后叮嘱]', type: 'textarea', span: SPAN_24};
-const afterAfv = {name: 'afterAfv[术后AFV](mm)', type: 'input', span: SPAN_6};
-const retainFhr = {name: 'retainFhr[保留胎胎心率](bpm)', type: 'input', span: SPAN_6};
+const afterAfv = {name: 'afterafv[术后AFV](mm)', type: 'input', span: SPAN_6};
+const retainFhr = {name: 'retainfhr[保留胎胎心率](bpm)', type: 'input', span: SPAN_6};
 /*
 * 羊膜腔穿刺 tempalteId:0
 * */
@@ -112,7 +115,7 @@ const config0 = {
     step: 1,
     rows: [
       {columns: [operation_date,temperature,bP]},
-      // {columns: [{ name: 'preoperativeUltrasonography[术前超声检查]', type: 'table', valid: 'required', pagination: false, editable: true, options: preoperativeUltrasonographyColumns0, span: 20 }]}
+      {columns: [{ name: 'preoperativeUltrasonography[术前超声检查]', type: 'table', valid: 'required', pagination: false, editable: true, options: preoperativeUltrasonographyColumns0, span: 20 }]}
     ]
   }),
   // 手术操作
@@ -144,7 +147,6 @@ const config1 = {
     step: 1,
     rows: [
       {columns: [operation_date,temperature,bP]},
-      // TODO 未完成
       {columns: [{ name: 'preoperativeUltrasonography[术前超声检查]', type: 'table', valid: 'required', pagination: false, editable: true, options: preoperativeUltrasonographyColumns1, span: 20 },]}
     ]
   }),
@@ -155,8 +157,8 @@ const config1 = {
       {columns: [operation_no, operator, assistant]},
       {columns: [start_time, end_time, duration]},
       {columns: [
-          {name: 'puncturePositionOptions[穿刺部位]', type: 'select', options: puncturePositionOptions1 ,span: SPAN_6},
-          {name: 'instrumentOption[器械]', type: 'select', options: instrumentOptions1, span: SPAN_6}
+          {name: 'puncturePosition[穿刺部位]', type: 'select', options: puncturePositionOptions1 ,span: SPAN_6},
+          {name: 'instrument[器械]', type: 'select', options: instrumentOptions1, span: SPAN_6}
         ]
       },
       {columns: [
@@ -200,7 +202,7 @@ const config2 = {
       {columns: [operation_no, operator, assistant]},
       {columns: [start_time, end_time, duration]},
       {columns: [
-          {name: 'puncturePositionOptions[穿刺部位]', type: 'select', options: puncturePositionOptions2, span: SPAN_6},
+          {name: 'puncturePosition[穿刺部位]', type: 'select', options: puncturePositionOptions2, span: SPAN_6},
           timesOfNeedleInsertion,
           numberOfHits
       ]},
@@ -382,19 +384,18 @@ const config6 = {
     step: 1,
     rows: [
       {columns: [operation_date, temperature, bP]},
-      // TODO 未定
       {columns :[
           {name: 'preoperativeUltrasonography[术前超声检查]', type: 'table', valid: 'required', pagination: false, editable: true, options: preoperativeUltrasonographyColumns6, span: SPAN_20 },
       ]},
       {columns:[
-          {name: '[术后血流指标]', type: 'table', valid: 'required', pagination: false, editable: true, options: [], span: SPAN_20},
+          {name: 'bleedIndex[术前血流指标]', type: 'table', valid: 'required', pagination: false, editable: true, options: [], span: SPAN_20},
       ]},
       {columns:[
-          {name: '[血库情况]',},
-          {name: '[采血日期]',}
+          {name: 'bloodBank[血库情况]',},
+          {name: 'collectBloodDate[采血日期]',}
       ]},
       {columns:[
-          {name: '[术前雪象检查]', type: 'table', valid: 'required', pagination: false, editable: true, options: [], span: SPAN_20},
+          {name: 'hemogram[术前雪象检查]', type: 'table', valid: 'required', pagination: false, editable: true, options: [], span: SPAN_20},
       ]},
     ]
   }),
@@ -410,7 +411,7 @@ const config6 = {
       ]},
       {
         columns: [
-          {name: 'targetHCT[目标HCT]', type: 'input', span: SPAN_6},
+          {name: 'targetHct[目标HCT]', type: 'input', span: SPAN_6},
           {name: 'calculationOfBloodTransfusionVolume[计算输血量](ml)', type: 'input', span: SPAN_6},
           {name: 'actualTransfusionVolume[实际输血量]', type: 'input', span: SPAN_6},
         ]
@@ -442,9 +443,10 @@ const config6 = {
   surgery_config:() => ({
     step: 1,
     rows:[
-      {columns: [afterAfv]},
-      {columns: [{name:'[术后血流指标]'}]},
-      {columns: [{name:'[术后血象指标]'}]},
+      {columns: [afterFhr]},
+      // 这两个值需要前端整合已有值
+      {columns: [{name:'bleedIndex[术后血流指标]', type: 'table', editable: true, pagination: false, buttons: false, options: afterBloodFlowColumns}]},
+      {columns: [{name:'hemogram[术后血流指标]', type: 'table', editable: true, pagination: false ,buttons: false, options: afterHemogramColumns}]},
       {columns: [doctors_advice]}
     ]
   })
@@ -465,7 +467,7 @@ const config7 = {
           {name: 'preoperativeUltrasonography[术前超声检查]', type: 'table', valid: 'required', pagination: false, editable: true, options: preoperativeUltrasonographyColumns7, span: SPAN_20 },
       ]},
       {columns :[
-          {name: '[术前测量值]', type: 'table', valid: 'required', pagination: false, editable: true, options: preoperativeUltrasonographyColumns7, span: SPAN_20 },
+          {name: 'measurement[术前测量值]', type: 'table', valid: 'required', pagination: false, editable: true, buttons: false, options: measurementColumns, span: SPAN_20 },
       ]},
     ]
   }),
@@ -477,7 +479,7 @@ const config7 = {
       {columns: [start_time, end_time, duration]},
       {
         columns: [
-          {name: 'puncturePositionOptions[穿刺部位]', type: 'select', options: puncturePositionOptions7,span: SPAN_6},
+          {name: 'puncturePosition[穿刺部位]', type: 'select', options: puncturePositionOptions7,span: SPAN_6},
           punctureCount
         ]
       },
@@ -498,17 +500,81 @@ const config7 = {
   surgery_config:() => ({
     step: 1,
     rows: [
-      {columns:[afterAfv]},
+      {columns:[afterFhr]},
       {
         columns: [
-          {name: '[术后测量值]'}
+          {name: 'measurement[术后测量值]', type: 'table', pagination: false, editable: true, buttons: false, options: measurementColumns, span: SPAN_20 }
         ]
       },
       {columns:[doctors_advice]},
     ]
   })
-}
+};
 
+
+/*
+* 病房病历 与上面模板不相同，
+* */
+const ward_config = () => ({
+  step: 1,
+  rows:[
+    {
+      columns: [
+        {name: 'userName[患者姓名]', type: 'input', valid: 'required', span: SPAN_6},
+        {name: 'dept[科室]', type: 'input', valid: 'required', span: SPAN_6},
+        {name: 'inpatientNo[住院号]', type: 'input', valid: 'required', span: SPAN_6},
+        {name: 'bedNo[床号]', type: 'input', valid: 'required', span: SPAN_6},
+      ]
+    },
+    {
+      columns: [
+        {name: 'operationNameWard[手术名称]', type: 'checkinput', valid: 'required', span: SPAN_24},
+      ]
+    },
+    {
+      columns: [
+        {name: 'operationLevelWard[手术级别]', type: 'select', valid: 'required',options:operationLevelOptions , span: SPAN_6},
+        {name: 'incisionTypeWard[切开类型]', type: 'select', valid: 'required', options: incisionTypeOptions ,span: SPAN_6},
+      ]
+    },
+    {
+      columns:[
+        {name: 'preoperativeDiagnosis[术前诊断]', type: 'textarea', valid: 'required', span: SPAN_24}
+      ]
+    },
+    {
+      columns:[
+        {name: 'intraoperativeDiagnosis[术中诊断]', type: 'textarea', valid: 'required', span: SPAN_24}
+      ]
+    },
+    {
+      columns:[
+        {name: 'operationDate[手术日期]', type: 'date', valid: 'required', span: SPAN_6},
+        {name: 'startTime[开始时间]', type: 'time', valid: 'required', format: "HH:mm" ,span: SPAN_6},
+        {name: 'endTime[结束时间]', type: 'time', valid: 'required', format: "HH:mm", span: SPAN_6}
+      ]
+    },
+    {
+      columns:[
+        {name: 'operationNo[手术编号]', type: 'input', valid: 'required', span: SPAN_6},
+        {name: 'operator[术者]', type: 'input', valid: 'required' ,span: SPAN_6},
+        {name: 'assistant[助手]', type: 'input', valid: 'required', format: "HH:mm", span: SPAN_6}
+      ]
+    },
+    {
+      columns:[
+        {name: 'anesthesiaMethod[麻醉方法]', type: 'select', valid: 'required', options: anesthesiaMethodOptions , span: SPAN_6},
+        {name: 'anesthesiologist[麻醉医师]', type: 'input', valid: 'required' ,span: SPAN_6},
+        {name: 'instrumentNurse[器械护士]', type: 'input', valid: 'required', span: SPAN_6}
+      ]
+    },
+    {
+      columns:[
+        {name: 'operationProcedure[手术经过]', type: 'textarea', valid: 'required', span: SPAN_24}
+      ]
+    }
+  ]
+});
 
 const formRenderConfig = {
   config0,
@@ -519,5 +585,6 @@ const formRenderConfig = {
   config5,
   config6,
   config7,
+  ward_config
 };
 export default formRenderConfig;
