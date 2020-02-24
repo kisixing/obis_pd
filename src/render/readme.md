@@ -100,6 +100,9 @@ const columnsOptions = [
     ]}
 ]
 ```
+传入数据说明
+传入数据的键名需要与tableColumns中定义相同才可以渲染
+> 新增配置：在数据中设置isShow=false，可以不显示数据
 
 补充配置
 
@@ -108,6 +111,8 @@ const columnsOptions = [
 |pagination|boolean|table是否显示分页|
 |editable|boolean|是否可以编辑|
 |buttons|boolean|可编辑模式下是否显示buttons|
+
+
 
 > ##### treeselect
 
@@ -134,3 +139,10 @@ options键值说明
 设置初始值与checkinput相同，在value中请传入字符串`<药物名称>|<用药量>`
 
 本组件会以`|`自动分割，回调值也是如此。
+
+
+### 存在的一些问题
+
+> table
+
+1.使用editable的时候，添加/删除只会传出默认的handleChange，对外是没有说明`删除/增加`事件

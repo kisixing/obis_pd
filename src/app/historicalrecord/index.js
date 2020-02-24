@@ -9,9 +9,7 @@ import '../index.less';
 
 const { TreeNode } = Tree;
 
-/**
-* 此页面不需要修改，所以
-* */
+
 export default class HistoricalRecord extends Component{
   constructor(props) {
     super(props);

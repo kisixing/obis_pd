@@ -3,7 +3,6 @@ import { Input, Select } from 'antd';
 // 业务组件
 const { Option } = Select;
 
-// 中文输入法有问题
 export function pharacyinput(props) {
   const { name, entity, onChange, value, onBlur } = props;
   let targetData = value.split('|') || "";
@@ -21,7 +20,7 @@ export function pharacyinput(props) {
     if (targetData[1] !== e.target.value) {
       if (onChange) {
         targetData[1] = e.target.value;
-        onChange(e, `${targetData[1]}|${targetData[1]}`).then(() => onBlur({checkedChange: true}));
+        onChange(e, `${targetData[0]}|${targetData[1]}`).then(() => onBlur({checkedChange: true}));
       } else {
         console.log('miss onChange: ' + props.name);
       }
@@ -53,16 +52,28 @@ export function hemorrhageselect(props) {
   }
 
   // 回调
-  const handleChange = (key,value,event) => {
-    data[key] = value;
+  const handleSelect = (value,event) => {
+    console.log(event);
+    data['label'] = value;
     onChange(event, data).then(() => onBlur({checkedChange:true}));
   };
 
+  const handleChange = (value,e) => {
+    console.log(e);
+    data['value'] = value;
+    onChange(e, data).then(() => onBlur({checkedChange:true}));
+  };
+
   return (
-    <Select value={data.label} onSelect={(value,event) => handleChange('label',value, event)}>
+    <Select value={data.label} onSelect={(value,event) => handleSelect(value, event)}>
       <Option value="有">
         <div style={{display: 'flex'}}>
-          <div><span>有</span></div> <Input value={data.value} onChange={(e) => handleChange('value', e.target.value, e)} addonAfter="s"/>
+          <div><span>有</span></div>
+          &nbsp;&nbsp;
+          {/* 这个位置只能阻止冒泡，在展开li时貌似li 的 zIndex比较高 */}
+          <div onClick={(e) => {e.cancelBubble = true; e.stopPropagation();}}>
+            <Input value={data.value} onChange={(e) => handleChange(e.target.value, e)}/><span>s</span>
+          </div>
         </div>
       </Option>
       <Option value="无">无</Option>

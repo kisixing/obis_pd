@@ -25,8 +25,9 @@ export default {
   savespecialistemrdetail: function (entity) {
     let uri = 'savespecialistemrdetail';
     console.log(entity);
-    entity['ultrasound']['fetus'] = [];
-    return this.userId().then(r => myAxios.post(`${FRONT_URL}${uri}`, entity))
+    // if()
+    // entity['ultrasound']['fetus'] = [];
+    return this.userId().then(r => myAxios.post(`${FRONT_URL}${uri}`, {userid:r.object.userid,...entity}))
   },
   /**
    * 获取模板

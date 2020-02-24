@@ -91,7 +91,9 @@ export default class Operation extends Component{
       operationNewDataList: [], // 用于新建病例
 
       currentTreeKeys: [], // 树形菜单选择
-      currentShowData: {} // 当前展示的数据
+      currentShowData: {}, // 当前展示的数据
+
+      clear: false // 用于清空表单的渲染，不然会造成前一表单遗留
     };
   }
 
@@ -124,7 +126,7 @@ export default class Operation extends Component{
   renderFetusTemplateForm = (renderData) => {
     if(Object.keys(renderData).length === 0) return <div>无数据展示</div> ;
     const { templateId } = renderData;
-    if(templateId < 0 || templateId > 7) return <div>不是胎儿中心模板</div>;
+    if(templateId < 0 || templateId > 7) return null;
     return (
       <div id="form-block">
         <Collapse defaultActiveKey={["operationItem","preoperative_record","operative_procedure","surgery"]}>
@@ -151,6 +153,8 @@ export default class Operation extends Component{
   };
   // 渲染病房病历
   renderWardForm = (renderData) => {
+    const { templateId } = renderData;
+    if(templateId !== 8) return null;
     return (
       <div>
         {formRender(renderData['ward'], formRenderConfig['ward_config'](), (_,{value, name}) => this.handleFormChange('ward',name,value))}
@@ -169,12 +173,13 @@ export default class Operation extends Component{
   //
   newOperation = () => {
     const { operationList, operationNewDataList } = this.state;
-    const nD = new Date(); const m = nD.getMonth() + 1, d = nD.getDate();
     const todayStr = formateDate();
     // 新建元素的id
     const newId = `${Math.random()*100|0}`;
-    if(todayStr === operationList[0].title) {
-      operationList[0].children.splice(0,0,{title: '待完善病例', key: `-${newId}`});
+    const todayIndex = operationList.findIndex(item => item.title === todayStr);
+    if(todayIndex !== -1){
+    // if(todayStr === operationList[0].title) {
+      operationList[todayIndex].children.splice(0,0,{title: '待完善病例', key: `-${newId}`});
     }else {
       operationList.splice(0,0,{title:  todayStr, key: todayStr, children: [{title: "待完善病历", key: `-${newId}`}]});
     }
@@ -196,10 +201,12 @@ export default class Operation extends Component{
         // 非新建病例
         service.operation.getOperationdetail({recordid: selectedKeys[0]}).then(res => {
           if(res.code === 200 || "200"){
-            this.setState({currentTreeKeys: selectedKeys});
+            this.setState({});
             // 整合请求下来的数据
             let formatData = this.convertOperationDetail(res.object);
-            this.setState({currentShowData: formatData});
+            this.setState({clear: true},() => {
+              this.setState({currentShowData: formatData, currentTreeKeys: selectedKeys, clear: false},() => console.log(this.state));
+            });
             // this.setTemplateIDAndOperationData(formatData);
           }
         });
@@ -207,13 +214,15 @@ export default class Operation extends Component{
         // 为新建病例，数据存储在本地 - 这里要剪
         const { operationNewDataList } = this.state;
         const targetData = operationNewDataList[operationNewDataList.findIndex(item => item.key.toString() === selectedKeys[0])];
-        this.setState({currentTreeKeys: selectedKeys,currentShowData: targetData});
+        this.setState({clear: true}, () => {
+          this.setState({currentTreeKeys: selectedKeys,currentShowData: targetData, clear: false});
+        });
+
       }
     }
   };
 
   handleFormChange = (path, name, value) => {
-    console.log(value);
     const { currentShowData, operationNewDataList } = this.state;
     if(name === 'operationName') {
       // 这里只可能存在 0~7 8种手术模板
@@ -225,7 +234,7 @@ export default class Operation extends Component{
         createdate: currentShowData.createdate,
         templateId: templateId,
         operationItem: {
-          itemName: value
+          operationName: value
         },
         preoperative_record: {},
         operative_procedure: {fetus:[{id: ''}]},
@@ -233,10 +242,41 @@ export default class Operation extends Component{
         ward: {}
       });
       this.setState({currentShowData: newCurrentShowData});
+      // 这个return一定要加
+      return ;
     }
-    // TODO 修改超声
-    if(path.indexOf('preoperativeUltrasonography') !== -1) {
+    // 修改超声
+    if(name.indexOf('preoperativeUltrasonography') !== -1) {
+      // 新增 & 修改 都不用管
 
+      // 删除问题 逻辑
+      let oldValue = currentShowData['preoperative_record'][name];
+      if(oldValue.length > value.length) {
+        // 比较旧值和新值长度
+        for(let i = 0; i < oldValue.length; i++) {
+          // 将所有得旧值isShow设置为false，写操作置为 2 - 删除
+          if(oldValue[i]['docUniqueid'] === "" || oldValue[i]['docUniqueid'] === undefined) {
+            oldValue[i]['isShow'] = true;
+            oldValue[i]['writeOperationType'] = 0;
+          }else {
+            oldValue[i]['isShow'] = false;
+            oldValue[i]['writeOperationType'] = 2;
+          }
+          for(let j = 0; j < value.length; j++) {
+            if(oldValue[i]['docUniqueid'] ===  value[j]['docUniqueid'] && oldValue[i]['docUniqueid']) {
+              oldValue[i]['isShow'] = true;
+              oldValue[i]['writeOperationType'] = 1;
+              break;
+            }
+          }
+        }
+        currentShowData['preoperative_record'][name] = oldValue;
+        // 增加
+        // console.log(currentShowData['preoperative_record'][name]);
+        this.setState({currentShowData},() => console.log(currentShowData));
+      }
+
+      return;
     }
     // 通用
     if(path === "") {
@@ -244,12 +284,17 @@ export default class Operation extends Component{
     }else {
       mapValueToKey(currentShowData, `${path}.${name}`,value);
     }
+    if(currentShowData.templateId === 8) {
+      console.log(value);
+    }
     // 如何时新建病例 ，需要存储本地
     if(currentShowData.id < 0) {
       const index = operationNewDataList.findIndex(item => item.id === currentShowData.id);
       operationNewDataList[index] = currentShowData;
       this.setState({operationNewDataList});
     }
+    console.log(name);
+    console.log(value);
     this.setState({currentShowData},() => console.log(this.state));
   };
   // TODO
@@ -266,6 +311,30 @@ export default class Operation extends Component{
     const { currentShowData } = this.state;
     currentShowData['templateId'] = templateId;
     this.setState({currentShowData});
+  };
+
+  handleSave = () => {
+    const { currentShowData } = this.state;
+    console.log(currentShowData);
+    // 处理
+    try {
+      currentShowData['preoperative_record']['bleedIndex'] = currentShowData['preoperative_record']['bleedIndex'][0] || {};
+      currentShowData['preoperative_record']['hemogram'] = currentShowData['preoperative_record']['hemogram'][0] || {};
+      currentShowData['preoperative_record']['measurement'] = currentShowData['preoperative_record']['measurement'][0] || {};
+      currentShowData['surgery']['bleedIndex'] = currentShowData['surgery']['bleedIndex'][0] || {};
+      currentShowData['surgery']['hemogram'] = currentShowData['surgery']['hemogram'][0] || {};
+      currentShowData['surgery']['measurement'] = currentShowData['surgery']['measurement'][0] | {};
+    }catch (e) {
+      console.log('非');
+    }
+
+
+    service.operation.saveOperation(currentShowData).then(res => {
+      // console.log(res);
+      service.operation.getOperation().then(res => {
+        if(res.code === '200' || 200)  this.setState({operationList: res.object.list, currentShowData: {}});
+      })
+    })
   };
   /* ========================= 其他 ============================ */
   // 获取数据整合进入state
@@ -305,7 +374,7 @@ export default class Operation extends Component{
 
 
   render() {
-    const { operationList, currentTreeKeys, operationNewDataList, currentShowData = {} } = this.state;
+    const { operationList, currentTreeKeys, operationNewDataList, currentShowData = {}, clear } = this.state;
     const { id, templateId = 0 } = currentShowData;
     return (
       <Page className="fuzhen font-16">
@@ -326,11 +395,19 @@ export default class Operation extends Component{
               </ButtonGroup>
             </div>
           ) : null}
-          <div>
-            {this.renderFetusTemplateForm(currentShowData)}
-          </div>
-          <div>
-
+          {clear ? null : (
+            <div>
+              <div>
+                {this.renderFetusTemplateForm(currentShowData)}
+              </div>
+              <div>
+                {this.renderWardForm(currentShowData)}
+              </div>
+            </div>
+          )}
+          <div className="btn-group pull-right bottom-btn">
+            <Button className="blue-btn">打印</Button>
+            <Button className="blue-btn" onClick={this.handleSave}>保存</Button>
           </div>
         </div>
       </Page>

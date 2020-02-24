@@ -118,13 +118,14 @@ class MTable extends Component{
 
   render(){
     const {selected} = this.state;
-    const { buttons, ...props } = this.props;
+    const { buttons, dataSource, ...props } = this.props;
+    const renderDataSource = dataSource.filter(item => item['isShow'] !== false);
     return (
       <div>
         {buttons ? <Button.Group>
           {buttons.map((btn,i)=><Button key={`btn-${i}`} size="small" onClick={()=>btn.fn(selected)}>{btn.title}</Button>)}
         </Button.Group> : null}
-        <Table {...props} onRowClick={row=>this.onRowClick(row)} rowClassName={row=>this.rowClassName(row)} />
+        <Table dataSource={renderDataSource} {...props} onRowClick={row=>this.onRowClick(row)} rowClassName={row=>this.rowClassName(row)} />
       </div>
     )
   }

@@ -48,6 +48,7 @@ class MyTreeSelect extends Component{
     }
     // 设置nOption
     let nOptions = editOptions(options, isSelectParent);
+    console.log(nOptions);
     this.setState({nOptions});
   }
 
@@ -68,7 +69,7 @@ class MyTreeSelect extends Component{
       const { currentValue } = this.state;
       if(isSelectParent || props.children === undefined){
         // 暂时这样写
-        currentValue.push({value:event['triggerValue'],label:event['triggerValue']});
+        currentValue.push({value:event['triggerValue'],label:event['triggerNode']['props']['title']});
         this.setState({currentValue}, () => onChange(event, currentValue).then(()=>onBlur({checkedChange:true})));
       }else{
         console.log('父节点,不可选');
@@ -81,14 +82,14 @@ class MyTreeSelect extends Component{
     const { nOptions = [] ,currentValue = [] } = this.state;
     // 以后考虑移到别的地方
     const currentSelections = currentValue.map(v => (v.label));
-    console.log(this.state);
-    console.log(currentSelections);
     return (
       <TreeSelect
         value={currentSelections}
         treeData={nOptions}
         multiple={multiple}
         style={{width: 200}}
+        showSearch={false}
+        searchPlaceholder={null}
         onChange={this.handleChange}
       />
     )
