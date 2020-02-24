@@ -491,3 +491,23 @@ export const zyOptions = toOptions('国家公务员,专业技术人员,企业管
  * 联系人与患者关系
  */
 export const gxOptions = toOptions('配偶,子,女,孙子、孙女或外孙子女,父母,祖父母或外祖父母,兄弟姐妹,家庭内其他关系,非家庭关系成员');
+
+/**
+ * 是否
+ */
+export const ynOptions = toOptions('是(input),否');
+
+/**
+ * 分娩方式
+ */
+export const deliveryTypeOptions = toOptions('自然分娩,剖腹产');
+
+/**
+ * 胎儿染色体
+ */
+export const chromosomeOptions = toOptions('46xy,46xx');
+
+/**
+ * 性别
+ */
+export const sexOptions = toOptions('男,女');

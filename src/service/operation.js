@@ -21,6 +21,7 @@ export default {
    */
   saveOperation: function(entity) {
     delete entity.key;
-    return this.userId().then(r => myAxios.post(`prenatalWrite/saveOperation`,entity));
+    console.log(entity);
+    // return this.userId().then(r => myAxios.post(`prenatalWrite/saveOperation`,{userid: r.object.userid, ...entity}));
   }
 }

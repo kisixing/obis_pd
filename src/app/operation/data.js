@@ -655,6 +655,8 @@ export const hnOptions = toOptions('无,有');
  */
 export const nhOptions = toOptions('有(input){#FF3300},无');
 
+export const isPharacyOptions = toOptions('有(pharacyinput),无');
+
 export const wssOptions = toOptions([{k: '有{#FF3300}(input)', addspan: 2}]);
 
 /**

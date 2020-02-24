@@ -8,6 +8,7 @@ import { default as medicalrecord } from './medicalrecord';
 import { default as operation } from './operation.js';
 import { default as historicalrecord } from './historicalrecord.js';
 import { default as ultrasound } from './ultrasound.js';
+import { default as outcome } from './outcome.js';
 
 let userId = null;
 let watchInfoList = [];
@@ -83,5 +84,9 @@ export default {
     /**
      * 历史记录所需API
      */
-    ultrasound: Object.assign(ultrasound, {userId: () => userId, fireWatch: (...args)=>watchInfoList.forEach(fn=>fn(...args))})
+    ultrasound: Object.assign(ultrasound, {userId: () => userId, fireWatch: (...args)=>watchInfoList.forEach(fn=>fn(...args))}),
+    /**
+     * 分娩结局结果
+     */
+    outcome: Object.assign(outcome, {userId: () => userId, fireWatch: (...args)=>watchInfoList.forEach(fn=>fn(...args))})
 }

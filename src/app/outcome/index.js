@@ -1,103 +1,69 @@
 import React, { Component } from "react";
 import { Select, Button, Popover, Input, Tabs, Tree, Modal, Icon, Spin, Timeline, Collapse, message } from 'antd';
 
-import tableRender from '../../render/table';
-import FuzhenTable from './table';
-import Page from '../../render/page';
-import service from '../../service';
 import * as baseData from './data';
-import * as util from './util';
-import editors from '../shouzhen/editors';
-
-import store from '../store';
-import { getAlertAction } from '../store/actionCreators.js';
+import service from '../../service/index';
+import formRender from '../../render/form';
 
 import "../index.less";
 import "./index.less";
+import Page from "../../render/page";
 
 const Panel = Collapse.Panel;
 
-function modal(type, title) {
-  message[type](title, 3)
-}
+const diagnosis_config = () => ({
+  step: 1,
+  rows: [
+    {columns:[{name: 'diagnosis[最后诊断]', type: 'textarea', span: 24}]},
+    {columns:[{name: 'followup[产后随访情况]', type: 'textarea', span: 24},]}
+  ]
+});
 
-export default class Outcome extends Component {
-  static Title = '孕妇信息';
-  static entityParse(obj = {}){
-    return {
-      ...obj.gravidaInfo,
-      useridtype: JSON.parse(obj.gravidaInfo.useridtype)
-    }
-  }
-  static entitySave(entity = {}){
-    return {
-      ...entity
-    }
-  }
+console.log(baseData.ynOptions);
+
+const fetus_config = () => ({
+  step: 1,
+  rows: [
+    {
+      columns:[
+        {name: 'deliveryDate[分娩结果]', type: 'date', span: 6},
+        {name: 'deliveryType[分娩方式]', type: 'select', options: baseData.deliveryTypeOptions, ßspan: 6},
+        {name: 'chromosome[胎儿染色体]', type: 'select', options: baseData.chromosomeOptions, span: 6},
+      ]
+    },
+    {
+      columns:[
+        {name: 'sex[新生儿性别]', type: 'select', options: baseData.sexOptions, span: 6},
+        {name: 'length[出生身长](cm)', type: 'input', span: 6},
+        {name: 'weight[出生体重](kg)', type: 'input', span: 6},
+      ]
+    },
+    {columns:[{name: 'maternalComplication[孕妇并发症]', type: 'checkinput', options: baseData.ynOptions,span: 24},]},
+    {columns:[{name: 'neonatalComplication[新生儿并发症]', type: 'checkinput',options: baseData.ynOptions, span: 24},]},
+    {columns:[{name: 'death[胎儿或新生儿有无死亡]', type: 'checkinput',options: baseData.ynOptions, span: 24},]},
+    {columns:[{name: 'specialRecord[特殊记录]', type: 'textarea', span: 24},]},
+
+  ]
+})
+
+export default class OutCome extends Component{
   constructor(props) {
     super(props);
   }
 
-  config() {
-    return {
-      step: 1,
-      rows: [
-        {
-          columns: [
-            { name: 'userage[年龄]', type: 'input', span: 5, valid: 'required|number'},
-            { span: 1 }, 
-            { name: 'userbirth[出生日期]', type: 'date', span: 5,valid: 'required'},
-            { span: 1 },
-            { name: 'usercuzh[建档日期]', type: 'date', span: 5 ,valid: 'required'},
-          ]
-        },
-        {
-          columns: [
-            { name: 'usernation[国籍]', type: 'input', span: 5 ,valid: 'required'},
-            { span: 1 },
-            { name: 'userroots[籍贯]', type: 'input', span: 5 ,valid: 'required'},
-            { span: 1 },
-            { name: 'userpeople[民族]', type: 'input', span: 4 ,valid: 'required'},
-            { span: 1 },
-            { name: 'useroccupation[职业]', type: 'input', span: 6 ,valid: 'required'},
-          ]
-        }, {
-          columns: [
-            { name: 'usermobile[手机]', type: 'input', span: 5, valid: 'number|required' },
-            { span: 1 },
-            { name: 'phone[固话]', type: 'input', span: 5},
-            { span: 1 },
-            { name: 'useridtype[证件类型]', type: 'select', span: 4, showSearch: false, options: baseData.sfzOptions ,valid: 'required'},
-            { span: 1 },
-            { name: 'useridno[证件号码]', type: 'input', span: 6 ,valid: 'required'}
-          ]
-        }, {
-          columns: [
-            { name: 'userconstant[户口地址]', type: 'input', span: 11,valid: 'required'},
-            { span: 1 },
-            { name: 'useraddress[现住地址]', type: 'input', span: 11,valid: 'required'},
-            { span: 1 },
-          ]
-        }
-      ]
-    };
+  componentDidMount() {
+    service.outcome.getDeliveryOutcome().then(res => {console.log(res)});
   }
 
-  handleChange(e, { name, value, target }){
-    const { onChange } = this.props;
-    onChange(e, { name, value, target })
-    // 关联变动请按如下方式写，这些onChange页可以写在form配置的行里
-    // if(name === 'test'){
-    //   onChange(e, { name: 'test01', value: [value,value] })
-    // }
-  }
-
-  render(){
-    const { entity } = this.props;
+  render() {
     return (
-      <div className="">
-        <h2>分娩结局</h2>
-      </div>
-    )
+      <Page className='fuzhen font-16 ant-col'>
+        <div className="bgWhite pad-mid ">
+          {formRender({},diagnosis_config(),() => console.log('e'))}
+          {formRender({},fetus_config(),() => console.log('e'))}
+        </div>
+      </Page>
+    );
   }
 }
+

@@ -126,3 +126,11 @@ options键值说明
 |isSelectParent|boolean|是否可以选中父类|
 |value|object&array|请以{value:"",label:""}形式设置|
 |multiple|boolean|是否支持多选|
+
+> ##### pharacyinput(业务组件)
+
+特定使用用于是否用药后置输入框
+
+设置初始值与checkinput相同，在value中请传入字符串`<药物名称>|<用药量>`
+
+本组件会以`|`自动分割，回调值也是如此。

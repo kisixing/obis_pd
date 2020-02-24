@@ -28,7 +28,8 @@ import {
   instrumentOptions5,
   afterBloodFlowColumns,
   afterHemogramColumns, measurementColumns,
-  anesthesiaMethodOptions
+  anesthesiaMethodOptions,
+  isPharacyOptions
 } from "./data";
 import valid from "../../render/common/valid";
 
@@ -85,11 +86,11 @@ const end_time = {name: 'end_time[结束时间]', type: 'time', placeholder: "",
 const duration = {name: 'duration[持续时间](min)', type: 'input', span: SPAN_6};
 const timesOfNeedleInsertion = {name: 'timesOfNeedleInsertion[进针次术]', type: 'input', span: SPAN_6};
 const placenta = {name: 'placenta[经否胎盘]', type: 'select',options: [{label: '经',value: '经'},{label: '否',value: '否'}], span: SPAN_6};
-const placentaHemorrhage = {name: 'placentaHemorrhage[胎盘出血]', type: 'select', options: yesOptions, span: SPAN_6};
+const placentaHemorrhage = {name: 'placentaHemorrhage[胎盘出血]', type: 'hemorrhageselect', span: SPAN_6};
 const uterineWallHemorrhage = {name: 'uterineWallHemorrhage[宫壁出血]', type: 'select',options: yesOptions, span: SPAN_6};
 const inspectionItems = {name: 'inspectionItems[送检项目]', type: 'treeselect', options: sjTreeOption,span: SPAN_6};
 const amniotic_fluid = {name: 'amniotic_fluid[羊水量](ml)', type: 'input', span: SPAN_6};
-const isPharmacy = {name: 'isPharmacy[是否用药](若选择有，请填写药物与用量)', type: 'checkinput', radio: true, options: nhOptions, span: SPAN_18}
+const isPharmacy = {name: 'isPharmacy[是否用药]', type: 'checkinput', radio: true, options: isPharacyOptions, span: SPAN_18}
 const process_evaluation = {name: 'process_evaluation[过程评估]', type: 'checkinput', radio:true, options:statusOptions, span: SPAN_20};
 const diagnosis = {name: 'diagnosis[诊断]', type: 'textarea', span: SPAN_24};
 const special_case = {name: 'special_case[特殊记录]', type: 'textarea', span: SPAN_24};
@@ -528,7 +529,7 @@ const ward_config = () => ({
     },
     {
       columns: [
-        {name: 'operationNameWard[手术名称]', type: 'checkinput', valid: 'required', span: SPAN_24},
+        {name: 'operationNameWard[手术名称]', type: 'checkinput', valid: 'required', options: operation_itemsOptions,span: SPAN_24},
       ]
     },
     {

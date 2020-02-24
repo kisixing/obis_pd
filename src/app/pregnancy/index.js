@@ -133,12 +133,6 @@ export default class Patient extends Component {
             // },
             { name: 'userhjib[现有何病]', type: 'input', span: 12 }
           ]
-        },
-        // test
-        {
-          columns: [
-            { name: 'test[测试组件]',type: 'pharmacyinput', span: 6}
-          ]
         }
       ]
     };

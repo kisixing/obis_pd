@@ -74,13 +74,15 @@ class MyTreeSelect extends Component{
         console.log('父节点,不可选');
       }
     }
-  }
+  };
 
   render() {
     const { multiple = true, isSelectParent = false } = this.props['mProps'];
     const { nOptions = [] ,currentValue = [] } = this.state;
     // 以后考虑移到别的地方
     const currentSelections = currentValue.map(v => (v.label));
+    console.log(this.state);
+    console.log(currentSelections);
     return (
       <TreeSelect
         value={currentSelections}
