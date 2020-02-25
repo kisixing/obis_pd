@@ -5,7 +5,7 @@ import formRender,{fireForm} from '../../render/form';
 import Page from '../../render/page';
 import valid from '../../render/common/valid';
 import service from "../../service";
-
+import { formateDate } from './util';
 
 import './index.less';
 import '../index.less';
@@ -663,29 +663,32 @@ export default class MedicalRecord extends Component{
   };
   // 新建病历
   newSpecialistemr = () => {
-    const ONE_DAY_MS = 86400000;
     const { specialistemrList, specialistemrData } = this.state;
     // 新建 树型记录
     // 判断第一个是否是今天
-    const nD = new Date();
-    if(specialistemrList.length === 0 || nD.getTime() - Date.parse(specialistemrList[0]['title']) > ONE_DAY_MS) {
+
+    const newId = 0 - Math.random()*100|0;
+    const todayStr = formateDate();
+    if(specialistemrList.findIndex(item => item.title === todayStr) === -1) {
       // 以往的记录不是今天 || 病例为空
-      let m = nD.getMonth() + 1, d = nD.getDate();
-      specialistemrList.splice(0,0,{title: `${nD.getFullYear()}-${m < 10 ? `0${m}`: m}-${d < 1?`0${d}`:d}` , key: "n-1", children: [{title: "待完善病历", key: "-1"}]})
+      specialistemrList.splice(0,0,{title: todayStr , key: "n-1", children: [{title: "待完善病历", key: newId}]})
     }else {
-      specialistemrList[0]['children'].splice(0,0,{title: '待完善病历', key: "-1"})
+      specialistemrList[0]['children'].splice(0,0,{title: '待完善病历', key: newId})
     }
     // 新建数据实体
-    specialistemrData.push({id: "-1", formType: ''});
+    specialistemrData.push({id: newId, formType: ''});
     // 将formType设置为空 用户选择
-    this.setState({specialistemrList, currentTreeKeys: ["-1"],specialistemrData},() => console.log(this.state));
+    this.setState({specialistemrList, currentTreeKeys: [newId],specialistemrData},() => console.log(this.state));
   };
   // 设置新建病历的formType
   handleBtnChange = (key) => {
     const { currentTreeKeys, specialistemrData  } = this.state;
-    const index = specialistemrData.findIndex(item => item.id === currentTreeKeys[0]);
-    console.log(index);
-    console.log(specialistemrData[index]);
+    console.log(currentTreeKeys);
+    console.log(specialistemrData);
+    console.log(specialistemrData[0].id.toString);
+    const index = specialistemrData.findIndex(item => item.id.toString() === currentTreeKeys[0]);
+    // console.log(index);
+    // console.log(specialistemrData[index]);
     specialistemrData[index]['formType'] = key;
     this.setState({specialistemrData});
   };
@@ -745,6 +748,8 @@ export default class MedicalRecord extends Component{
         const index = specialistemrData.findIndex(item => item['id'] === currentTreeKeys[0]);
         // 整合bp的格式
         specialistemrData[index]['physical_check_up']['bp'] = '0';
+        // TODO 未确定
+        // specialistemrData[index]['id'] = "";
         service.medicalrecord.savespecialistemrdetail(specialistemrData[index]).then(res => {
           if(res.code === "200" && res.message === "OK") {
             message.success('成功保存');
@@ -827,7 +832,7 @@ export default class MedicalRecord extends Component{
   );
   // 根据key值返回对应
   getTargetObject = (dataList, key) => {
-    const index = dataList.findIndex(data => (data.id === key ));
+    const index = dataList.findIndex(data => (data.id.toString() === key ));
     return dataList[index];
   };
   /* ============================ 模板功能 ==================================== */
@@ -845,7 +850,7 @@ export default class MedicalRecord extends Component{
               templateList: res.object
             }
           })
-        });
+      });
     }
   };
   // 关闭modal框
@@ -924,6 +929,7 @@ export default class MedicalRecord extends Component{
       {title: '编号', key: 'index', render: (_,__,index) => (<span>{index+1}</span>) },
       {title: '内容', dataIndex: 'content', key: 'content'},
     ];
+
     return (
       <Page className='fuzhen font-16 ant-col'>
         <div className="fuzhen-left ant-col-5">

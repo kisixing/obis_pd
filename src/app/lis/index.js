@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Row, Col, Button, Table, Collapse, Modal } from "antd";
+import service from '../../service';
 import Page from '../../render/page';
 import tableRender from "../../render/table";
 import "./index.less";
@@ -87,6 +88,12 @@ export default class Lis extends Component {
     }
   }
 
+  componentDidMount() {
+    service.getListReport().then(res => {
+      console.log(res);
+    })
+  }
+
   renderLeft() {
     const {leftList} = this.state;
     return (
@@ -150,7 +157,7 @@ export default class Lis extends Component {
           {renderTable()}
         </Modal>
       )
-    }
+    };
     
     return (
       <div className="jianyan-right ant-col-18">

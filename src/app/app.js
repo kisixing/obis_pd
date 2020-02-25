@@ -30,7 +30,7 @@ const routers = [
   { name: '影像报告', path: '/pacs', component: bundle(Pacs) },
   { name: '历史病历', path: '/historicalrecord', component: bundle(HistoricalRecord) },
   { name: '分娩结局', path: '/outcome', component: bundle(Outcome) },
-  { name: '孕妇建册(暂时显示在这)', path: '/opencase', component: bundle(OpenCase) }
+  { name: '孕妇建册', path: '/opencase', component: bundle(OpenCase) }
 ];
 
 export default class App extends Component {
@@ -44,16 +44,17 @@ export default class App extends Component {
       muneIndex: 0, // 从0开始
       ...store.getState(),
       searchObj: {
-        menzhenNumber: "", IDCard: "", phoneNUmber: ""
+        menzhenNumber: "", IDCard: "", phoneNumber: ""
       }
     };
     store.subscribe(this.handleStoreChange);
 
     service.getuserDoc().then(
       res => {
+        console.log(res);
         store.dispatch(setUserData(res.object));
         this.setState({
-          ...res.object, loading: false,
+          ...res.object, loading: false
         })
       });
 
@@ -64,7 +65,7 @@ export default class App extends Component {
 
   handleStoreChange = () => {
     this.setState(store.getState());
-  }
+  };
 
   componentDidMount() {
     const { location = {} } = this.props;
@@ -128,7 +129,6 @@ export default class App extends Component {
   renderHeader() {
     const { username, userage, tuserweek,tuseryunchan,gesexpect,usermcno,chanjno,risklevel,infectious } =this.state;
     const { searchObj } = this.state;
-    console.log(username,userage);
     return (
       <div className="main-header">
         <div className="patient-Info_title font-16">
@@ -162,19 +162,20 @@ export default class App extends Component {
           </div>
           <div className="search-btn">
             {/* 功能还没有写 */}
-            <Button>搜索</Button>
-            <Button>重置</Button>
-            <Button>建册</Button>
+            <Button onClick={this.handleSearch}>搜索</Button>
+            <Button >重置</Button>
+            <Button onClick={() => this.props.history.push('/opencase')}>建册</Button>
           </div>
         </div>
 
         <p className="patient-Info_tab">
-          {routers.map((item, i) => <Button key={"mune" + i}
-            type={this.state.muneIndex != i ? 'dashed' : 'primary'}
-            onClick={() => { this.setState({ muneIndex: i }); this.onClick(item); }}>
-            {item.name}
-          </Button>
-          )}
+          {routers.map((item, i) => {
+            return <Button key={"mune" + i}
+                    type={this.state.muneIndex != i ? 'dashed' : 'primary'}
+                    onClick={() => { this.setState({ muneIndex: i }); this.onClick(item); }}>
+              {item.name}
+            </Button>
+          })}
         </p>
         <div className="patient-Info_btnList">
           <ButtonGroup onClick={()=>this.setState({highriskShow:true})}>
@@ -186,70 +187,83 @@ export default class App extends Component {
     );
   }
 
-renderDanger() {
-  const {highriskList, highriskShow, highriskEntity} = this.state;
-  const searchList = highriskEntity && highriskList.filter(i => !highriskEntity.search || i.name.indexOf(highriskEntity.search) !==-1);
-  const handleOk = () => {
-    this.setState({ highriskShow: false });
-    console.log('保存高危数据: ', highriskEntity);
-  };
-  const handleChange = (name, value) => {
-    highriskEntity[name] = value;
-    this.setState({highriskEntity});
-  }
-  const handleSelect = (keys) => {
-    const node = searchList.filter(i => i.id == keys[0]).pop();
-    const gettitle = n => {
-      const p = searchList.filter(i => i.id === n.pId).pop();
-      if(p){
-        return [...gettitle(p), n.name];
+  renderDanger() {
+    const {highriskList, highriskShow, highriskEntity} = this.state;
+    const searchList = highriskEntity && highriskList.filter(i => !highriskEntity.search || i.name.indexOf(highriskEntity.search) !==-1);
+    const handleOk = () => {
+      this.setState({ highriskShow: false });
+      console.log('保存高危数据: ', highriskEntity);
+    };
+    const handleChange = (name, value) => {
+      highriskEntity[name] = value;
+      this.setState({highriskEntity});
+    }
+    const handleSelect = (keys) => {
+      const node = searchList.filter(i => i.id == keys[0]).pop();
+      const gettitle = n => {
+        const p = searchList.filter(i => i.id === n.pId).pop();
+        if(p){
+          return [...gettitle(p), n.name];
+        }
+        return [n.name];
       }
-      return [n.name];
-    }
-    if(node && !searchList.filter(i => i.pId === node.id).length && highriskEntity.highrisk.split('\n').indexOf(node.name) === -1){
-      handleChange('highrisk', highriskEntity.highrisk.replace(/\n+$/,'') + '\n' + gettitle(node).join(':'));
-    }
-  };
-  const initTree = (pid, level = 0) => searchList.filter(i => i.pId === pid).map(node => (
-    <Tree.TreeNode key={node.id} title={node.name} onClick={()=>handleCheck(node)} isLeaf={!searchList.filter(i => i.pId === node.id).length}>
-      {level < 10 ? initTree(node.id, level + 1) : null}
-    </Tree.TreeNode>
-  ));
-  
-  return highriskEntity ? (
-    <Modal className="highriskPop" title="高危因素" visible={highriskShow} width={1000} maskClosable={true} onCancel={() => this.setState({ highriskShow: false })} onOk={()=>handleOk()}>
-      <div>
-        <Row>
-          <Col span={2}></Col>
-          <Col span={20}>
-            <Row>
-              <Col span={3}>高危等级：</Col>
-              <Col span={7}><Select value={highriskEntity.risklevel} onChange={e=>handleChange('risklevel', e)}>{'Ⅰ,Ⅱ,Ⅲ,Ⅳ,Ⅴ'.split(',').map(i=><Select.Option value={i}>{i}</Select.Option>)}</Select></Col>
-              <Col span={2}>传染病：</Col>
-              <Col span={10}><Select multiple value={highriskEntity.infectious&&highriskEntity.infectious.split(',')} onChange={e=>handleChange('infectious', e.join())}>{'<乙肝大三阳,乙肝小三阳,梅毒,HIV,结核病,重症感染性肺炎,特殊病毒感染（H1N7、寨卡等）,传染病：其他'.split(',').map(i=><Select.Option value={i}>{i}</Select.Option>)}</Select></Col>
+      if(node && !searchList.filter(i => i.pId === node.id).length && highriskEntity.highrisk.split('\n').indexOf(node.name) === -1){
+        handleChange('highrisk', highriskEntity.highrisk.replace(/\n+$/,'') + '\n' + gettitle(node).join(':'));
+      }
+    };
+    const initTree = (pid, level = 0) => searchList.filter(i => i.pId === pid).map(node => (
+      <Tree.TreeNode key={node.id} title={node.name} onClick={()=>handleCheck(node)} isLeaf={!searchList.filter(i => i.pId === node.id).length}>
+        {level < 10 ? initTree(node.id, level + 1) : null}
+      </Tree.TreeNode>
+    ));
+
+    return highriskEntity ? (
+      <Modal className="highriskPop" title="高危因素" visible={highriskShow} width={1000} maskClosable={true} onCancel={() => this.setState({ highriskShow: false })} onOk={()=>handleOk()}>
+        <div>
+          <Row>
+            <Col span={2}></Col>
+            <Col span={20}>
+              <Row>
+                <Col span={3}>高危等级：</Col>
+                <Col span={7}><Select value={highriskEntity.risklevel} onChange={e=>handleChange('risklevel', e)}>{'Ⅰ,Ⅱ,Ⅲ,Ⅳ,Ⅴ'.split(',').map(i=><Select.Option value={i}>{i}</Select.Option>)}</Select></Col>
+                <Col span={2}>传染病：</Col>
+                <Col span={10}><Select multiple value={highriskEntity.infectious&&highriskEntity.infectious.split(',')} onChange={e=>handleChange('infectious', e.join())}>{'<乙肝大三阳,乙肝小三阳,梅毒,HIV,结核病,重症感染性肺炎,特殊病毒感染（H1N7、寨卡等）,传染病：其他'.split(',').map(i=><Select.Option value={i}>{i}</Select.Option>)}</Select></Col>
+              </Row>
+              <br />
+              <Row>
+                <Col span={3}>高危因素：</Col>
+                <Col span={16}><Input type="textarea" rows={5} value={highriskEntity.highrisk} onChange={e=>handleChange('highrisk', e.target.value)}/></Col>
+                <Col span={1}></Col>
+                <Col span={2}><Button size="small" onClick={()=>handleChange('highrisk', '')}>重置</Button></Col>
+              </Row>
+              <br />
+              <Row>
+              <Col span={16}><Input value={highriskEntity.search} onChange={e=>handleChange('search', e.target.value)} placeholder="输入模糊查找"/></Col>
+              <Col span={3}><Button size="small" onClick={()=>handleChange('expandAll', false)}>全部收齐</Button></Col>
+              <Col span={3}><Button size="small" onClick={()=>handleChange('expandAll', true)}>全部展开</Button></Col>
             </Row>
-            <br />
-            <Row>
-              <Col span={3}>高危因素：</Col>
-              <Col span={16}><Input type="textarea" rows={5} value={highriskEntity.highrisk} onChange={e=>handleChange('highrisk', e.target.value)}/></Col>
-              <Col span={1}></Col>
-              <Col span={2}><Button size="small" onClick={()=>handleChange('highrisk', '')}>重置</Button></Col>
-            </Row>
-            <br />
-            <Row>
-            <Col span={16}><Input value={highriskEntity.search} onChange={e=>handleChange('search', e.target.value)} placeholder="输入模糊查找"/></Col>
-            <Col span={3}><Button size="small" onClick={()=>handleChange('expandAll', false)}>全部收齐</Button></Col>
-            <Col span={3}><Button size="small" onClick={()=>handleChange('expandAll', true)}>全部展开</Button></Col>
+            </Col>
           </Row>
-          </Col>
-        </Row>
-        <div style={{height:200, overflow:'auto', padding: '0 16px'}}>
-          <Tree defaultExpandAll={highriskEntity.expandAll} onSelect={handleSelect} style={{ maxHeight: '90%' }}>{initTree(0)}</Tree>
+          <div style={{height:200, overflow:'auto', padding: '0 16px'}}>
+            <Tree defaultExpandAll={highriskEntity.expandAll} onSelect={handleSelect} style={{ maxHeight: '90%' }}>{initTree(0)}</Tree>
+          </div>
         </div>
-      </div>
-    </Modal>
-  ) : null;
-}
+      </Modal>
+    ) : null;
+  }
+
+  // 处理搜索
+  handleSearch = () => {
+    const { menzhenNumber, IDCard, phoneNumber} = this.state.searchObj;
+    this.setState({muneIndex: 0},() => {
+        this.onClick(routers[0]);
+        service.findUser({usermcno: menzhenNumber, useridno: IDCard, usermobile: phoneNumber}).then(res => {
+        store.dispatch(store.dispatch(setUserData(res.object)));
+        this.setState({...res.object});
+      })
+    });
+
+  };
 
   render() {
     return (

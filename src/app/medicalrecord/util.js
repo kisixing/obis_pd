@@ -10,7 +10,8 @@ export function countWeek(date){
 
 export function formateDate() {
   let date = new Date();
-  return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+  const m = date.getMonth() + 1, d = date.getDate();
+  return `${date.getFullYear()}-${m < 10 ? `0${m}` : m}-${d < 10 ? `0${d}` : d}`
 }
 
 export function getWeek(param1, param2) {

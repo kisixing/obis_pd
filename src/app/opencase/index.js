@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Select, Button } from 'antd';
 
+import service from '../../service/index.js';
+
 import formRender from '../../render/form';
 import Page from '../../render/page';
 
@@ -21,6 +23,12 @@ const citySelection = (
 export default class OpenCase extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      pregnancyData: {
+        ADD_FIELD_husband_useridtype: {"label":"身份证","value":"身份证"}
+      },
+      benYunData: {}
+    };
   }
   /* ======================= UI视图渲染config =============================== */
   // 孕妇基本信息
@@ -34,37 +42,32 @@ export default class OpenCase extends Component {
       },
       {
         columns: [
-          {name: 'menzhenNumber[门诊号]', type: 'input', span: 6, valid: 'required'},
+          {name: 'usermcno[门诊号]', type: 'input', span: 6, valid: 'required'},
           {name: 'zhunshengzheng[准生证号]', type: 'input', span: 6}
         ]
       },
       {
         columns: [
-          {name: 'name[姓名]', type: 'input', span: 6, valid: 'required'},
+          {name: 'username[姓名]', type: 'input', span: 6, valid: 'required'},
           {name: 'userage[年龄]', type: 'input', span: 6, valid: 'required'},
-          {name: 'IDCard[身份证]', type: 'input', span: 6, valid: 'required'}
+          {name: 'useridno[身份证]', type: 'input', span: 6, valid: 'required'}
         ]
       },
       {
         columns: [
-          {name: 'userhnation[国籍]', type: 'input', span: 6, valid: 'required'},
+          {name: 'usernation[国籍]', type: 'input', span: 6, valid: 'required'},
           {name: 'userroots[籍贯]', type: 'input', span: 6, valid: 'required'},
           {name: 'userpeople[民族]', type: 'input', span: 6, valid: 'required'}
         ]
       },
       {
         columns: [
-          {name: 'danw[工作单位]', type: 'input', span: 6, valid: 'required'},
+          // new
+          // {name: 'danw[工作单位]', type: 'input', span: 6, valid: 'required'},
           {name: 'useroccupation[职业]', type: 'input', span: 6, valid: 'required'},
-          {name: 'phone[手机]', type: 'input', span: 6, valid: 'required'}
+          {name: 'usermobile[手机]', type: 'input', span: 6, valid: 'required'}
         ]
-      }
-    ]
-  });
-  // 丈夫基本信息
-  husband_data_config = () => ({
-    step: 1,
-    rows: [
+      },
       {
         columns: [
           { label: '丈夫信息', span: 12  }
@@ -72,28 +75,28 @@ export default class OpenCase extends Component {
       },
       {
         columns: [
-          {name: 'menzhenNumber[门诊号]', type: 'input', span: 6},
+          {name: 'userhmcno[门诊号]', type: 'input', span: 6},
         ]
       },
       {
         columns: [
-          {name: 'name[姓名]', type: 'input', span: 6},
-          {name: 'userage[年龄]', type: 'input', span: 6},
-          {name: 'IDCard[身份证]', type: 'input', span: 6}
+          {name: 'userhname[姓名]', type: 'input', span: 6},
+          {name: 'userhage[年龄]', type: 'input', span: 6},
+          {name: 'userhidno[身份证]', type: 'input', span: 6}
         ]
       },
       {
         columns: [
           {name: 'userhnation[国籍]', type: 'input', span: 6},
-          {name: 'userroots[籍贯]', type: 'input', span: 6},
-          {name: 'userpeople[民族]', type: 'input', span: 6}
+          {name: 'userhroots[籍贯]', type: 'input', span: 6},
+          {name: 'userhpeople[民族]', type: 'input', span: 6}
         ]
       },
       {
         columns: [
-          {name: 'danw[工作单位]', type: 'input', span: 6},
-          {name: 'useroccupation[职业]', type: 'input', span: 6},
-          {name: 'phone[手机]', type: 'input', span: 6}
+          // {name: 'danw[工作单位]', type: 'input', span: 6},
+          {name: 'userhoccupation[职业]', type: 'input', span: 6},
+          {name: 'userhmobile[手机]', type: 'input', span: 6}
         ]
       },
       {
@@ -106,13 +109,7 @@ export default class OpenCase extends Component {
         columns: [
           { name: 'userhjib[现有何病]', type: 'input', span: 12 }
         ]
-      }
-    ]
-  });
-  // 其他信息 -- 户口&现居
-  other_data_config = () => ({
-    step: 1,
-    rows: [
+      },
       {
         columns: [
           {label: '其他信息', span: 12}
@@ -120,18 +117,18 @@ export default class OpenCase extends Component {
       },
       {
         columns: [
-          {name: 'hk_address[户口地址]', type: 'input', addonBefore: citySelection, placeholder: '请输入详细地址', span: 6, options: hyOptions, valid: 'required'},
+          {name: 'useraddress[户口地址]', type: 'input', addonBefore: citySelection, placeholder: '请输入详细地址', span: 6, options: hyOptions, valid: 'required'},
         ]
       },
       {
         columns: [
-          {name: 'jz_address[居住地址]', type: 'input', addonBefore: citySelection,placeholder: '请输入详细地址',span: 6, options: hyOptions, valid: 'required'},
+          {name: 'userconstant[居住地址]', type: 'input', addonBefore: citySelection,placeholder: '请输入详细地址',span: 6, options: hyOptions, valid: 'required'},
         ]
       }
     ]
   });
-  // 孕产历史信息
-  pregnancy_history_data = () => ({
+
+  benyun_data_config = () => ({
     step: 1,
     rows: [
       {
@@ -146,48 +143,67 @@ export default class OpenCase extends Component {
       },
       {
         columns: [
-          {name: 'y[孕次]', type: 'select', span: 6, options: numberOptions,  valid: 'required'},
-          {name: 'c[产次]', type: 'select', span: 6, options: numberOptions,  valid: 'required'},
+          {name: 'yunc[孕次]', type: 'select', span: 6, options: numberOptions,  valid: 'required'},
+          {name: 'chanc[产次]', type: 'select', span: 6, options: numberOptions,  valid: 'required'},
         ]
       },
       {
         columns: [
-          {name: 'lastyuejing[末次月经]', type: 'date', span: 6,  valid: 'required'},
-          {name: 'pre[预产期]', type: 'date', span: 6,  valid: 'required'},
+          {name: 'gesmoc[末次月经]', type: 'date', span: 6,  valid: 'required'},
+          {name: 'gesexpect[预产期]', type: 'date', span: 6,  valid: 'required'},
         ]
       },
       {
         columns: [
-          {name: 'yq_weight[孕前体重](kg)', type: 'input', span: 6,  valid: 'required'},
-          {name: 'x_weight[现体重](kg)', type: 'input', span: 6,  valid: 'required'},
-          {name: 'height[身高](cm)', type: 'input', span: 6,  valid: 'required'},
+          {name: 'cktizh[孕前体重](kg)', type: 'input', span: 6,  valid: 'required'},
+          {name: 'ckcurtizh[现体重](kg)', type: 'input', span: 6,  valid: 'required'},
+          {name: 'cksheng[身高](cm)', type: 'input', span: 6,  valid: 'required'},
         ]
       }
     ]
-  })
+  });
 
+
+  /* ======================= handler =============================== */
+  handlePregnancyChange = (_,{name,value}) => {
+    const { pregnancyData } = this.state;
+    console.log(name, value);
+    pregnancyData[name] = value;
+    this.setState({pregnancyData});
+  };
+  handleBenYunChange = (_,{name,value}) => {
+    const { benYunData } = this.state;
+    console.log(name, value);
+    benYunData[name] = value;
+    this.setState({benYunData});
+  };
+  //
+  handleSave = () => {
+    const { pregnancyData, benYunData } = this.state;
+    service.opencase.addyc({...pregnancyData, ...benYunData}).then(res => {
+      console.log(res);
+    });
+    service.opencase.useryc({...pregnancyData, ...benYunData}).then(res => {
+      console.log(res);
+    });
+  };
 
 
   render() {
+    console.log(this.state);
     return (
       <Page>
         <div className="bgWhite pad-mid">
           <div>
-            {formRender({},this.pregnancy_data_config(),() => console.log('c') )}
+            {formRender({},this.pregnancy_data_config(), this.handlePregnancyChange)}
           </div>
           <div>
-            {formRender({},this.husband_data_config(),() => console.log('c') )}
-          </div>
-          <div>
-            {formRender({},this.other_data_config(),() => console.log('c') )}
-          </div>
-          <div>
-            {formRender({},this.pregnancy_history_data(),() => console.log('c') )}
+            {formRender({},this.benyun_data_config(), this.handleBenYunChange)}
           </div>
         </div>
         <div className="btn-group pull-right bottom-btn">
           <Button className="blue-btn">重置</Button>
-          <Button className="blue-btn">保存</Button>
+          <Button className="blue-btn" onClick={this.handleSave}>保存</Button>
         </div>
       </Page>
     )

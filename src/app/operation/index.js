@@ -317,17 +317,17 @@ export default class Operation extends Component{
     const { currentShowData } = this.state;
     console.log(currentShowData);
     // 处理
-    try {
-      currentShowData['preoperative_record']['bleedIndex'] = currentShowData['preoperative_record']['bleedIndex'][0] || {};
-      currentShowData['preoperative_record']['hemogram'] = currentShowData['preoperative_record']['hemogram'][0] || {};
-      currentShowData['preoperative_record']['measurement'] = currentShowData['preoperative_record']['measurement'][0] || {};
-      currentShowData['surgery']['bleedIndex'] = currentShowData['surgery']['bleedIndex'][0] || {};
-      currentShowData['surgery']['hemogram'] = currentShowData['surgery']['hemogram'][0] || {};
-      currentShowData['surgery']['measurement'] = currentShowData['surgery']['measurement'][0] | {};
-    }catch (e) {
-      console.log('非');
-    }
-
+    // try {
+    //   currentShowData['preoperative_record']['bleedIndex'] = currentShowData['preoperative_record']['bleedIndex'][0] || {};
+    //   currentShowData['preoperative_record']['hemogram'] = currentShowData['preoperative_record']['hemogram'][0] || {};
+    //   currentShowData['preoperative_record']['measurement'] = currentShowData['preoperative_record']['measurement'][0] || {};
+    //   currentShowData['surgery']['bleedIndex'] = currentShowData['surgery']['bleedIndex'][0] || {};
+    //   currentShowData['surgery']['hemogram'] = currentShowData['surgery']['hemogram'][0] || {};
+    //   currentShowData['surgery']['measurement'] = currentShowData['surgery']['measurement'][0] | {};
+    // }catch (e) {
+    //   console.log('非');
+    // }
+    currentShowData['id'] = currentShowData['id'] || "";
 
     service.operation.saveOperation(currentShowData).then(res => {
       // console.log(res);
@@ -356,13 +356,14 @@ export default class Operation extends Component{
     object['key'] = currentTreeKeys[0];
     // 转换时间戳
     object['preoperative_record']['operation_date'] = new Date(object['preoperative_record']['operation_date']);
+    // 全都做成数组了
     // 包裹数组，表单渲染
-    object['preoperative_record']['bleedIndex'] = [object['preoperative_record']['bleedIndex']] || [];
-    object['preoperative_record']['hemogram'] = [object['preoperative_record']['hemogram']] || [];
-    object['preoperative_record']['measurement'] = [object['preoperative_record']['measurement']] || [];
-    object['surgery']['bleedIndex'] = [object['surgery']['bleedIndex']] || [];
-    object['surgery']['hemogram'] = [object['surgery']['hemogram']] || [];
-    object['surgery']['measurement'] = [object['surgery']['measurement']] || [];
+    // object['preoperative_record']['bleedIndex'] = [object['preoperative_record']['bleedIndex']] || [];
+    // object['preoperative_record']['hemogram'] = [object['preoperative_record']['hemogram']] || [];
+    // object['preoperative_record']['measurement'] = [object['preoperative_record']['measurement']] || [];
+    // object['surgery']['bleedIndex'] = [object['surgery']['bleedIndex']] || [];
+    // object['surgery']['hemogram'] = [object['surgery']['hemogram']] || [];
+    // object['surgery']['measurement'] = [object['surgery']['measurement']] || [];
     // 添加templateId 为渲染使用
     object['templateId'] = operationItemTemplateId(object['operationItem']['operationName'].label);
     if(object['templateId'] === -1 && object['ward']['userName'] !== null){
