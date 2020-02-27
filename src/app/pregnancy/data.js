@@ -1,16 +1,9 @@
-
-import * as util from './util';
-
-
-// function toOptions(data, vfn = ()=>({})){
-// 	if(data instanceof Array){
-// 		return data.map((v,i) => ({ label: v, value: v, ...vfn(v,i) }))
-// 	}
-// 	if(data && typeof data === 'object'){
-// 		return Object.keys(data).map(i => ({ label: data[i], value: i, ...vfn(v,i) }))
-// 	}
-// 	return [];
-// }
+/**
+ * NOTICE
+ * 2020-02-26
+ * 仅保留基本信息页面一份完整data.js
+ * 其他页面全部删除不需使用的data.js - 最后再整合
+ */
 
 /**
  * 如果不想在value里面使用label的数据，可以换成用index作为value

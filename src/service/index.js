@@ -10,6 +10,7 @@ import { default as historicalrecord } from './historicalrecord.js';
 import { default as ultrasound } from './ultrasound.js';
 import { default as outcome } from './outcome.js';
 import { default as opencase } from './opencase.js';
+import { default as template } from "./template";
 
 let userId = null;
 let watchInfoList = [];
@@ -125,6 +126,9 @@ export default {
     /**
      * 孕妇建册
      */
-    opencase: Object.assign(opencase, {userId: () => userId, fireWatch: (...args)=>watchInfoList.forEach(fn=>fn(...args))})
-
+    opencase: Object.assign(opencase, {userId: () => userId, fireWatch: (...args)=>watchInfoList.forEach(fn=>fn(...args))}),
+    /**
+     * template
+     */
+    template: template
 }

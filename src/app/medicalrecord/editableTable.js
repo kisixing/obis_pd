@@ -49,7 +49,7 @@ export default class EditableTable extends Component {
     Object.assign(newDataSource,dataSource);
     for(let key in newCurrentTemplate) {
       newCurrentTemplate[key] = "";
-    } 
+    }
     this.setState({
       dataSource:newDataSource,
       currentRowSelection:dataSource[0].key,

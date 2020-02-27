@@ -48,24 +48,23 @@ export default class App extends Component {
       }
     };
     store.subscribe(this.handleStoreChange);
-
-    service.getuserDoc().then(
-      res => {
-        console.log(res);
-        store.dispatch(setUserData(res.object));
-        this.setState({
-          ...res.object, loading: false
-        })
-      });
-
-    // service.highrisk().then(res => this.setState({
-    //   highriskList: res.object
-    // }))
   }
 
   handleStoreChange = () => {
     this.setState(store.getState());
   };
+
+  componentWillMount() {
+    service.getuserDoc().then(res => {
+        store.dispatch(setUserData(res.object));
+        this.setState({
+          ...res.object, loading: false
+        })
+    });
+    // service.highrisk().then(res => this.setState({
+    //   highriskList: res.object
+    // }))
+  }
 
   componentDidMount() {
     const { location = {} } = this.props;
@@ -164,17 +163,23 @@ export default class App extends Component {
             {/* 功能还没有写 */}
             <Button onClick={this.handleSearch}>搜索</Button>
             <Button >重置</Button>
-            <Button onClick={() => this.props.history.push('/opencase')}>建册</Button>
+            <Button onClick={() => {this.props.history.push('/opencase'); this.setState({ muneIndex: -1 }); }}>建册</Button>
           </div>
         </div>
 
         <p className="patient-Info_tab">
           {routers.map((item, i) => {
-            return <Button key={"mune" + i}
-                    type={this.state.muneIndex != i ? 'dashed' : 'primary'}
-                    onClick={() => { this.setState({ muneIndex: i }); this.onClick(item); }}>
+            if(item.name === '孕妇建册') return null;
+            return (<Button
+              key={"mune" + i}
+              type={this.state.muneIndex != i ? 'dashed' : 'primary'}
+              onClick={() => {
+                this.setState({ muneIndex: i });
+                this.onClick(item);
+              }}
+            >
               {item.name}
-            </Button>
+            </Button>)
           })}
         </p>
         <div className="patient-Info_btnList">

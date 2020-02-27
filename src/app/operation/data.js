@@ -1039,7 +1039,7 @@ export const operationLevelOptions = toOptions('一级,二级,三级,四级');
 /**
  * 切口类型
  */
-export const incisionTypeOptions = toOptions('0Ⅰ,0Ⅱ,0Ⅲ,Ⅰ,Ⅱ,Ⅲ,Ⅳ');
+export const incisionTypeOptions = toOptions('01,02,03,1,2,3,4');
 
 /**
  * 羊膜腔穿刺

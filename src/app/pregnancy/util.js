@@ -1,10 +1,7 @@
-import React, { Component } from "react";
-import { Input } from 'antd';
-
-import tableRender from '../../render/table';
+import React from "react";
 
 export function countWeek(date){
-  var days = Math.ceil(((new Date(date) - new Date()) / (1000 * 3600)) / 24);
+  let days = Math.ceil(((new Date(date) - new Date()) / (1000 * 3600)) / 24);
   return `${Math.floor(days / 7)}+${days % 7}`;
 }
 

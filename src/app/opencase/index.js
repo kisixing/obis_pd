@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Select, Button } from 'antd';
+import { Select, Button, message } from 'antd';
 
 import service from '../../service/index.js';
 
@@ -64,7 +64,7 @@ export default class OpenCase extends Component {
         columns: [
           // new
           // {name: 'danw[工作单位]', type: 'input', span: 6, valid: 'required'},
-          {name: 'useroccupation[职业]', type: 'input', span: 6, valid: 'required'},
+          {name: 'useroccupation[职业]', type: 'input', span: 6},
           {name: 'usermobile[手机]', type: 'input', span: 6, valid: 'required'}
         ]
       },
@@ -117,12 +117,13 @@ export default class OpenCase extends Component {
       },
       {
         columns: [
-          {name: 'useraddress[户口地址]', type: 'input', addonBefore: citySelection, placeholder: '请输入详细地址', span: 6, options: hyOptions, valid: 'required'},
+          // TODO 这里缺少 地级市 级联选择器
+          {name: 'useraddress[户口地址]', type: 'input', addonBefore: citySelection, placeholder: '请输入详细地址', span: 6, options: hyOptions},
         ]
       },
       {
         columns: [
-          {name: 'userconstant[居住地址]', type: 'input', addonBefore: citySelection,placeholder: '请输入详细地址',span: 6, options: hyOptions, valid: 'required'},
+          {name: 'userconstant[居住地址]', type: 'input', addonBefore: citySelection,placeholder: '请输入详细地址',span: 6, options: hyOptions},
         ]
       }
     ]
@@ -143,8 +144,8 @@ export default class OpenCase extends Component {
       },
       {
         columns: [
-          {name: 'yunc[孕次]', type: 'select', span: 6, options: numberOptions,  valid: 'required'},
-          {name: 'chanc[产次]', type: 'select', span: 6, options: numberOptions,  valid: 'required'},
+          {name: 'yunc[孕次]', value: 0, type: 'select', span: 6, options: numberOptions,  valid: 'required'},
+          {name: 'chanc[产次]', value: 0, type: 'select', span: 6, options: numberOptions,  valid: 'required'},
         ]
       },
       {
@@ -167,13 +168,11 @@ export default class OpenCase extends Component {
   /* ======================= handler =============================== */
   handlePregnancyChange = (_,{name,value}) => {
     const { pregnancyData } = this.state;
-    console.log(name, value);
     pregnancyData[name] = value;
     this.setState({pregnancyData});
   };
   handleBenYunChange = (_,{name,value}) => {
     const { benYunData } = this.state;
-    console.log(name, value);
     benYunData[name] = value;
     this.setState({benYunData});
   };
@@ -181,7 +180,10 @@ export default class OpenCase extends Component {
   handleSave = () => {
     const { pregnancyData, benYunData } = this.state;
     service.opencase.addyc({...pregnancyData, ...benYunData}).then(res => {
-      console.log(res);
+      message.success(`成功建册，userid为${res.id}，输入门诊号切换孕妇`);
+      // 新建了一个id，设置到
+      // const userid = res.id;
+
     });
     service.opencase.useryc({...pregnancyData, ...benYunData}).then(res => {
       console.log(res);

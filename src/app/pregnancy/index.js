@@ -1,26 +1,17 @@
 import React, { Component } from "react";
-import { Select, Button, Popover, Input, Tabs, Tree, Modal, Icon, Spin, Timeline, Collapse, message } from 'antd';
-
-import * as baseData from './data';
 import formRender from '../../render/form';
 import Page from '../../render/page';
 import service from '../../service/index';
-import * as util from './util';
-import editors from '../shouzhen/editors';
-
 import store from '../store';
+
+import { sfzOptions } from './data';
+
+import { convertString2Json } from '../../utils/index';
 
 import "../index.less";
 import "./index.less";
 
-const Panel = Collapse.Panel;
-
-function modal(type, title) {
-  message[type](title, 3)
-}
-
 export default class Patient extends Component {
-  static Title = '孕妇信息';
 
   constructor(props) {
     super(props);
@@ -28,26 +19,50 @@ export default class Patient extends Component {
       gravidaInfo: {},
       husbandInfo: {},
       userid: ""
-    }
+    };
     // 订阅store，变化时调用get拿值
     store.subscribe(() => {
-      console.log(store.getState())
-      const { userid } = store.getState()['userData'];
-      service.getgeneralinformation({userId: userid}).then((res) => {
-        if(res['code'] === "200" || 200 && res['object'] ) {
-          // TODO idtype 改成字符串
-          this.setState({...res['object']})
-        }else {
-          console.log("请求失败/object undefined")
-        }
-      })
+      this.getGeneralInformation();
     })
   }
 
   componentDidMount() {
+    this.getGeneralInformation();
+  };
 
-  }
+  getGeneralInformation = () => {
+    const { userid } = store.getState()['userData'];
+    // 防止已进入页面没有userid
+    if(userid) {
+      service.getgeneralinformation({userId: userid}).then((res) => {
+        if(res['code'] === "200" || 200 && res['object'] ) {
+          // TODO idtype 改成字符串
+          const { object } = res;
+          // 职业
 
+          // if(object['gravidaInfo']['useroccupation'] !== null && object['gravidaInfo']['useroccupation'].indexOf('{') !== -1) {
+          //   object['gravidaInfo']['useroccupation'] = convertString2Json(object['gravidaInfo']['useroccupation']).label;
+          // }else {
+          //   object['gravidaInfo']['useroccupation'] = "";
+          // }
+          // if(object['husbandInfo']['useroccupation'] !== null && object['husbandInfo']['useroccupation'].indexOf('{') !== -1) {
+          //   object['husbandInfo']['useroccupation'] = convertString2Json(object['husbandInfo']['useroccupation']).label;
+          // }else {
+          //   object['husbandInfo']['useroccupation'] = "";
+          // }
+          // object['gravidaInfo']['useridtype'] = convertString2Json(object['gravidaInfo']['useridtype']);
+          // object['husbandInfo']['add_FIELD_husband_useridtype'] = convertString2Json(object['husbandInfo']['add_FIELD_husband_useridtype']);
+          this.setState({...object})
+        }else {
+          console.log("请求失败/object undefined")
+        }
+      })
+    }else {
+      console.log('暂无孕妇id');
+    }
+  };
+
+  /* ====================  UI视图渲染 ============================= */
   gravidaInfo_config = () => ({
     step: 1,
     rows: [
@@ -76,7 +91,7 @@ export default class Patient extends Component {
           { span: 1 },
           { name: 'phone[固话]', type: 'input', span: 5},
           { span: 1 },
-          { name: 'useridtype[证件类型]', type: 'select', span: 4, showSearch: false, options: baseData.sfzOptions ,valid: 'required'},
+          { name: 'useridtype[证件类型]', type: 'select', span: 4, showSearch: false, options: sfzOptions ,valid: 'required'},
           { span: 1 },
           { name: 'useridno[证件号码]', type: 'input', span: 6 ,valid: 'required'}
         ]
@@ -89,8 +104,7 @@ export default class Patient extends Component {
         ]
       },
     ]
-  })
-
+  });
   husbandInfo_config() {
     return {
       step: 1,
@@ -116,7 +130,7 @@ export default class Patient extends Component {
         {
           columns: [
             { name: 'userhmobile[手机]', type: 'input', span: 5 },
-            { name: 'add_FIELD_husband_useridtype[证件类型]', type: 'select', span: 4, options: baseData.sfzOptions },
+            { name: 'add_FIELD_husband_useridtype[证件类型]', type: 'select', span: 4, options: sfzOptions },
             { span: 2 },
             { name: 'userhidno[证件号]', type: 'input', span: 6 },
             { span: 1 },
@@ -136,9 +150,9 @@ export default class Patient extends Component {
         }
       ]
     };
-  }
+  };
 
-
+  /* ====================  表单改变处理 ============================= */
   handleGravidaInfoChange = (e, {name, value }) => {
     const { gravidaInfo } = this.state;
     gravidaInfo[name] = value;
@@ -156,11 +170,11 @@ export default class Patient extends Component {
     return (
       <Page className='fuzhen font-16 ant-col'>
         <div className="bgWhite pad-mid ">
-        <div className="">
-          {formRender(gravidaInfo || {}, this.gravidaInfo_config(), this.handleGravidaInfoChange)}
-          {formRender(husbandInfo || {}, this.husbandInfo_config(), this.handleHusbandInfo)}
+          <div className="">
+            {formRender(gravidaInfo || {}, this.gravidaInfo_config(), this.handleGravidaInfoChange)}
+            {formRender(husbandInfo || {}, this.husbandInfo_config(), this.handleHusbandInfo)}
+          </div>
         </div>
-      </div>
       </Page>
     )
   }

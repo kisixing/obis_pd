@@ -46,6 +46,7 @@
 		"mockjs": "^1.0.1-beta3",
 		"postcss-loader": "^2.1.2",
 		"react-hot-loader": "^1.2.7",
+		"redux-devtools-extension": "^2.13.8",
 		"style-loader": "^0.20.3",
 		"uglifyjs-webpack-plugin": "^1.2.4",
 		"url-loader": "^0.5.6",
