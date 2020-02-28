@@ -7,12 +7,12 @@ import Page from '../../render/page';
 import valid from '../../render/common/valid';
 import service from "../../service";
 import { formateDate } from './util';
+import TemplateInput from '../../components/templateInput';
 
 import './index.less';
 import '../index.less';
 import { newDataTemplate } from './data';
 import * as baseData from './data';
-import EditableTable from "./editableTable";
 
 const { TreeNode } = Tree;
 const { TabPane } = Tabs;
@@ -28,11 +28,6 @@ const _genotypeAnemia = baseData.genotypeAnemia.map(item => {
   }
   return item;
 })
-
-// 版本的KEY
-const TEMPLATE_KEY = {
-  zz: 'dmr1', xb: 'dmr2', qt: 'dmr3', zd: 'dmr4', cl: 'dmr5', rs: 'dmr6'
-}
 
 // 将后台返回的string转为object
 const convertString2Json = function (str) {
@@ -103,14 +98,7 @@ const mapValueToKey = (obj, keyStr = "", val) => {
 
 /**
  * TODO
- * 1、提交保存的功能
- * 2、复诊病历数据
- * 3、新增表单key的自动生成需要另外做，暂定全为-1
- *
- *  大致的页面逻辑理一下
- *   使用 specialistemrList 保存树形结构
- *   使用 specialistemrData 保存病历数据
- *   使用 specialistemrData['formType'] 控制页面的显示表单类型
+ * 1、服务器返回id为number，而treeSelectedKeys为string，注意转换
  *
  */
 
@@ -137,7 +125,7 @@ export default class MedicalRecord extends Component {
       templateObj: {
         isShowTemplateModal: false,
         type: '',
-        templateList: []
+        doctor: ''
       },
     }
   }
@@ -162,7 +150,7 @@ export default class MedicalRecord extends Component {
       {
         columns: [
           { name: 'chief_complaint[主诉]', type: 'textarea', valid: 'required', span: 16 },
-          { name: 'chief_complaintBtn[]', type: 'buttons', span: 4, text: '(#1890ff)[模板]', onClick: () => this.openModal('zz') }
+          { name: 'chief_complaintBtn[]', type: 'buttons', span: 4, text: '(#1890ff)[模板]', onClick: () => this.openModal('dmr1') }
         ]
       },
     ]
@@ -174,7 +162,7 @@ export default class MedicalRecord extends Component {
       {
         columns: [
           { name: 'medical_history[现病史]', type: 'textarea', valid: 'required', span: 16 },
-          { name: 'medical_history[]', type: 'buttons', span: 4, text: '(#1890ff)[模板]', onClick: () => this.openModal('xb') }
+          { name: 'medical_history[]', type: 'buttons', span: 4, text: '(#1890ff)[模板]', onClick: () => this.openModal('dmr2') }
         ]
       }
     ]
@@ -186,7 +174,7 @@ export default class MedicalRecord extends Component {
       {
         columns: [
           { name: 'other_exam[其他]', type: 'textarea', valid: 'required', span: 16 },
-          { name: 'other_exam[]', type: 'buttons', span: 4, text: '(#1890ff)[模板]', onClick: () => this.openModal('zd') }
+          { name: 'other_exam[]', type: 'buttons', span: 4, text: '(#1890ff)[模板]', onClick: () => this.openModal('dmr3') }
         ]
       }
     ]
@@ -198,7 +186,7 @@ export default class MedicalRecord extends Component {
       {
         columns: [
           { name: 'diagnosis[诊断]', type: 'textarea', valid: 'required', span: 16 },
-          { name: 'diagnosisBtn[]', type: 'buttons', span: 4, text: '(#1890ff)[模板]', onClick: () => this.openModal('zd'), valid: 'required' }
+          { name: 'diagnosisBtn[]', type: 'buttons', span: 4, text: '(#1890ff)[模板]', onClick: () => this.openModal('dmr4'), valid: 'required' }
         ]
       }
     ]
@@ -210,7 +198,7 @@ export default class MedicalRecord extends Component {
       {
         columns: [
           { name: 'treatment[处理措施]', type: 'textarea', valid: 'required', span: 16 },
-          { name: 'treatment[]', type: 'buttons', span: 4, text: '(#1890ff)[模板]', onClick: () => this.openModal('cl') }
+          { name: 'treatment[]', type: 'buttons', span: 4, text: '(#1890ff)[模板]', onClick: () => this.openModal('dmr5') }
         ]
       },
     ]
@@ -574,7 +562,7 @@ export default class MedicalRecord extends Component {
       {
         columns: [
           { name: 'karyotype[诊断]', type: 'textarea', span: 16 },
-          { name: 'karyotype[]', type: 'buttons', span: 4, text: '(#1890ff)[模板]', onClick: () => this.openModal('zd') }
+          { name: 'karyotype[]', type: 'buttons', span: 4, text: '(#1890ff)[模板]', onClick: () => this.openModal('dmr6') }
         ]
       }
     ]
@@ -602,7 +590,7 @@ export default class MedicalRecord extends Component {
       {
         columns: [
           { name: 'stateChange[病情变化]', type: 'textarea', span: 16 },
-          { name: 'stateChange[]', type: 'buttons', span: 4, text: '(#1890ff)[模板]', onClick: () => this.openModal('cl') }
+          { name: 'stateChange[]', type: 'buttons', span: 4, text: '(#1890ff)[模板]', onClick: () => this.openModal('dmr7') }
         ]
       },
     ]
@@ -614,7 +602,7 @@ export default class MedicalRecord extends Component {
       {
         columns: [
           { name: 'lastResult[前次检查结果]', type: 'textarea', span: 16 },
-          { name: 'lastResult[]', type: 'buttons', span: 4, text: '(#1890ff)[模板]', onClick: () => this.openModal('cl') }
+          { name: 'lastResult[]', type: 'buttons', span: 4, text: '(#1890ff)[模板]', onClick: () => this.openModal('dmr8') }
         ]
       },
     ]
@@ -799,7 +787,7 @@ export default class MedicalRecord extends Component {
     fireForm(document.getElementById(FORM_BLOCK), 'valid').then(validCode => {
       if (validCode) {
         // 保存
-        const index = specialistemrData.findIndex(item => item['id'] === currentTreeKeys[0]);
+        const index = specialistemrData.findIndex(item => item['id'].toString() === currentTreeKeys[0]);
         // 整合bp的格式
         specialistemrData[index]['physical_check_up']['bp'] = '0';
         // TODO 未确定
@@ -895,32 +883,28 @@ export default class MedicalRecord extends Component {
   // 打开modal框 & 根据type值搜索对应模板
   openModal = (type) => {
     if (type) {
-      const { id } = this.state;
-      const reqData = { doctor: id, type: TEMPLATE_KEY[type] }
-      service.medicalrecord.getTemplate(reqData)
-        .then(res => {
-          this.setState({
-            templateObj: {
-              isShowTemplateModal: true,
-              type: type,
-              templateList: res.object
-            }
-          })
-        });
+      const { currentTreeKeys, specialistemrData } = this.state;
+      const doctor = specialistemrData[specialistemrData.findIndex(item => item.id.toString() === currentTreeKeys[0])].doctor;
+      this.setState({templateObj: {isShowTemplateModal: true,type: type,doctor: doctor}});
     }
   };
   // 关闭modal框
   closeModal = () => {
     this.setState({
-      templateObj: { isShowTemplateModal: false, type: '', templateList: [] }
+      templateObj: { isShowTemplateModal: false, type: '', doctor: ''}
     })
   };
+  // 获取template的输入信息
+  getTemplateInput = ({content}) => {
+    console.log(content);
+  }
+
 
   render() {
     const { specialistemrList, specialistemrData, uFetusActiveKey, currentTreeKeys } = this.state;
     const { isDownsScreenChecked, isThalassemiaChecked, isUltrasoundChecked } = this.state;
-    const { ultrasoundMiddleData, operationHistoryData } = this.state;
-    const { isShowTemplateModal, templateList } = this.state.templateObj;
+    const { ultrasoundMiddleData,  } = this.state;
+    const { isShowTemplateModal, doctor, type } = this.state.templateObj;
     // data index用于回调赋值
     const renderData = this.getTargetObject(specialistemrData, currentTreeKeys[0]) || {};
     const { formType } = renderData;
@@ -1078,7 +1062,10 @@ export default class MedicalRecord extends Component {
           width="800px"
         >
           <div>
-            模板
+            <TemplateInput
+              data={{doctor,type}}
+              getData={this.getTemplateInput}
+            /> 
           </div>
         </Modal>
       </Page>

@@ -67,7 +67,7 @@ export default class App extends Component {
             const { gesexpect,gesmoc } = Response.data.object.pregnantInfo;
             if(allPreghiss.length > 0) {
               // P && G
-              let yunc = parseInt(allPreghiss[allPreghiss.length-1].pregnum + 1);
+              let yunc = parseInt(allPreghiss[allPreghiss.length-1].pregnum) + 1;
               let chanc = 0;
               allPreghiss.forEach(item => {
                 if(item.zuych === true) {
