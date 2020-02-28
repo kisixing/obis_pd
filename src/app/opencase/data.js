@@ -22,4 +22,4 @@ function toOptions(data, vfn =()=>({})){
 
 export const hyOptions = toOptions('未婚,已婚,丧偶,离婚');
 
-export const numberOptions = toOptions('1,2,3,4,5,6,7,8,9');
+export const numberOptions = toOptions('0,1,2,3,4,5,6,7,8,9');

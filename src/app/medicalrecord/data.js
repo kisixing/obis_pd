@@ -15,19 +15,19 @@ import * as util from './util';
 /**
  * 如果不想在value里面使用label的数据，可以换成用index作为value
  */
-function toOptions(data, vfn =()=>({})){
-	if(data instanceof Array){
-		return data.map((v,i) => {
+function toOptions(data, vfn = () => ({})) {
+	if (data instanceof Array) {
+		return data.map((v, i) => {
 			const { k, ...rest } = v;
-			return { ...rest, label: k || v, value: k || v, ...vfn(k || v,i) }
+			return { ...rest, label: k || v, value: k || v, ...vfn(k || v, i) }
 		})
 	}
-	if(data && typeof data === 'object'){
-		return Object.keys(data).map((v,i) => ({ label: data[v], value: v, ...vfn(data[v],v,i) }))
-  }
-  if(typeof data === 'string'){
-    return data.split(/[,;]/).map((v,i) => ({ label: v, value: v, ...vfn(v,i) }))
-  }
+	if (data && typeof data === 'object') {
+		return Object.keys(data).map((v, i) => ({ label: data[v], value: v, ...vfn(data[v], v, i) }))
+	}
+	if (typeof data === 'string') {
+		return data.split(/[,;]/).map((v, i) => ({ label: v, value: v, ...vfn(v, i) }))
+	}
 	return [];
 }
 
@@ -92,7 +92,7 @@ function toOptions(data, vfn =()=>({})){
 export const formEntity = {
 	"parseAddFieldLocations": null,
 	"saveInitialData": false,
-	"checkdate": new Date().toLocaleDateString().replace(/\//g,'-'),
+	"checkdate": new Date().toLocaleDateString().replace(/\//g, '-'),
 	"ckdia": "",
 	"ckappointment": "",
 	"ckappointmentArea": "",
@@ -211,7 +211,7 @@ export const tableKey = () => [
 		key: 'checkdate',
 		type: 'date',
 		width: '180',
-		format:i=>(`${i||''}`).replace(/\d{4}-/,'')
+		format: i => (`${i || ''}`).replace(/\d{4}-/, '')
 	},
 	{
 		title: '孕周',
@@ -220,8 +220,8 @@ export const tableKey = () => [
 	},
 	{
 		title: '体重',
-		key: 'cktizh',	
-		children:[
+		key: 'cktizh',
+		children: [
 			{
 				title: '(kg)',
 				key: 'cktizh',
@@ -232,8 +232,8 @@ export const tableKey = () => [
 	{
 		title: '血压',
 		key: 'ckdiastolicpressure',
-		width: 160,	
-		children:[
+		width: 160,
+		children: [
 			{
 				title: '(mmHg)',
 				key: 'ckdiastolicpressure',
@@ -250,7 +250,7 @@ export const tableKey = () => [
 		title: '胎心',
 		key: 'cktaix',
 		width: 130,
-		children:[
+		children: [
 			{
 				title: '(bpm)',
 				key: 'cktaix',
@@ -261,13 +261,13 @@ export const tableKey = () => [
 	{
 		title: '先露',
 		key: 'ckxianl',
-		type:'select',
+		type: 'select',
 		options: xlOptions
 	},
 	{
 		title: '宫高',
 		key: 'ckgongg',
-		children:[
+		children: [
 			{
 				title: '(cm)',
 				key: 'ckgongg',
@@ -278,7 +278,7 @@ export const tableKey = () => [
 	{
 		title: '下肢水肿',
 		key: 'ckfuzh',
-		type:'select',
+		type: 'select',
 		options: ckfuzhOptions
 	},
 	{
@@ -287,17 +287,17 @@ export const tableKey = () => [
 		type: 'input'
 	},
 	{
-        title: '下次复诊',
+		title: '下次复诊',
 		key: 'ckappointment',
-        children:[
-            {
-                title: '预约日期',
+		children: [
+			{
+				title: '预约日期',
 				key: 'ckappointment',
 				type: 'date'
-            }
-        ]
-    },
-	{ 
+			}
+		]
+	},
+	{
 		title: '处理措施',
 		key: 'treatment',
 		type: 'input',
@@ -312,7 +312,7 @@ export const planKey = () => [
 	{
 		title: 'No',
 		key: 'index',
-		format: (v,{row})=>row+1
+		format: (v, { row }) => row + 1
 	},
 	{
 		title: '时间',
@@ -330,7 +330,7 @@ export const planKey = () => [
 		title: '提醒事项',
 		key: 'event',
 	}
-].map(i=>({type:'input',...i}));
+].map(i => ({ type: 'input', ...i }));
 
 /**
  * 管理诊疗组表头
@@ -348,7 +348,7 @@ export const managePlanKey = () => [
 		title: '内容',
 		key: 'content',
 	}
-].map(i=>({type:'input',...i}));
+].map(i => ({ type: 'input', ...i }));
 
 /**
  * 新建诊疗组表头
@@ -366,12 +366,12 @@ export const newPlanKey = () => [
 		title: '提醒事件',
 		key: 'event',
 	}
-].map(i=>({type:'input',...i}));
+].map(i => ({ type: 'input', ...i }));
 
 /**
  * 诊断输入框的联想数据，当没有输入的时候显示top为true的数据
  */
-export const diagnosis = toOptions('瘢痕子宫,妊娠期糖尿病,妊娠高血压,双胎妊娠,子宫平滑肌瘤'.split(','),v=>({top:true})).concat(toOptions(['高血压','冠心病','多胎妊娠','梅毒']));
+export const diagnosis = toOptions('瘢痕子宫,妊娠期糖尿病,妊娠高血压,双胎妊娠,子宫平滑肌瘤'.split(','), v => ({ top: true })).concat(toOptions(['高血压', '冠心病', '多胎妊娠', '梅毒']));
 
 /**
  * 先露
@@ -436,14 +436,14 @@ export const nextRvisitWeekOptions = [
 /**
  * 门诊
  */
-export const rvisitOsTypeOptions = toOptions(['', '普通门诊', '高危门诊', '入院'], (v,i)=>({value:i,describe:v.slice(0,1)}));
+export const rvisitOsTypeOptions = toOptions(['', '普通门诊', '高危门诊', '入院'], (v, i) => ({ value: i, describe: v.slice(0, 1) }));
 
 /**
  * 上午/下午
  */
 export const ckappointmentAreaOptions = [
-	{ label: '上午', describe:'上', value: '1' },
-	{ label: '下午', describe:'下', value: '2' },
+	{ label: '上午', describe: '上', value: '1' },
+	{ label: '下午', describe: '下', value: '2' },
 ];
 /**
  * 产检项目
@@ -469,7 +469,7 @@ export const zyksOptions = toOptions(['孕妇区', '产区', '爱婴区', '产�
 /**
  * 是否在我院住院
  */
-export const sfzyOptions = toOptions([{k: '是(shouzhenyy-原住院号)', addspan: 2}, '否']);
+export const sfzyOptions = toOptions([{ k: '是(shouzhenyy-原住院号)', addspan: 2 }, '否']);
 /**
  * 出生地
  */
@@ -556,8 +556,8 @@ export const gjtpOptions = toOptions('正常,异常,未有检查,不清楚');
 /**
  * 血制品
  */
-export const xzpOptions = toOptions([{k:'红细胞{#FF3300}(shouzhenyy-时间,医院,原因)',addspan:2},{k:'血小板{#FF3300}(shouzhenyy-时间,医院,原因)',addspan:2},{k:'血浆{#FF3300}(shouzhenyy-时间,医院,原因)',addspan:2},{k:'全血{#FF3300}(shouzhenyy2-时间,医院,原因)',addspan:2},{k:'白蛋白{#FF3300}(shouzhenyy2-时间,医院,原因)',addspan:2},{k:'免疫球蛋白{#FF3300}(shouzhenyy2-时间,医院,原因)',addspan:2},'其他{#FF3300}','不清楚']);
-export const sxsOptions = toOptions([{k:'有{#FF3300}(shouzhenyy-时间,原因)',addspan:2}]);
+export const xzpOptions = toOptions([{ k: '红细胞{#FF3300}(shouzhenyy-时间,医院,原因)', addspan: 2 }, { k: '血小板{#FF3300}(shouzhenyy-时间,医院,原因)', addspan: 2 }, { k: '血浆{#FF3300}(shouzhenyy-时间,医院,原因)', addspan: 2 }, { k: '全血{#FF3300}(shouzhenyy2-时间,医院,原因)', addspan: 2 }, { k: '白蛋白{#FF3300}(shouzhenyy2-时间,医院,原因)', addspan: 2 }, { k: '免疫球蛋白{#FF3300}(shouzhenyy2-时间,医院,原因)', addspan: 2 }, '其他{#FF3300}', '不清楚']);
+export const sxsOptions = toOptions([{ k: '有{#FF3300}(shouzhenyy-时间,原因)', addspan: 2 }]);
 
 /**
  * 数量
@@ -567,7 +567,7 @@ export const slOptions = toOptions('多,中,少');
 /**
  * 不孕病史 shouzhenyy-x这个是当前模块的编辑组件
  */
-export const bybsOptions = toOptions('输卵管因素{#FF3300},丈夫少精弱精畸精{#FF3300},PCO{#FF3300}（多囊卵巢）,原因不明{#FF3300}'.split(',').map(i=>`${i}(shouzhenyy-发现时间&date,治疗&input)`).concat(['其他{#FF3300}(input)','不清楚{#FF3300}(input)']));
+export const bybsOptions = toOptions('输卵管因素{#FF3300},丈夫少精弱精畸精{#FF3300},PCO{#FF3300}（多囊卵巢）,原因不明{#FF3300}'.split(',').map(i => `${i}(shouzhenyy-发现时间&date,治疗&input)`).concat(['其他{#FF3300}(input)', '不清楚{#FF3300}(input)']));
 
 /**
  * 频率
@@ -637,7 +637,7 @@ export const hnOptions = toOptions('无,有');
 */
 export const nhOptions = toOptions('有(input){#FF3300},无');
 
-export const wssOptions = toOptions([{k:'有{#FF3300}(input)',addspan:2}]);
+export const wssOptions = toOptions([{ k: '有{#FF3300}(input)', addspan: 2 }]);
 /**
  *乳头
 */
@@ -682,12 +682,12 @@ export const yyw2Options = toOptions('阴性,阳性{#FF3300},未查{#FF3300},其
 /**
  *梅毒
 */
-export const mdOptions = toOptions(['阴性',{k:'阳性{#FF3300}(shouzhenyy1-TPPA滴度,TRUST滴度)',addspan:4},'未查{#FF3300}','其他{#FF3300}(input)']);
+export const mdOptions = toOptions(['阴性', { k: '阳性{#FF3300}(shouzhenyy1-TPPA滴度,TRUST滴度)', addspan: 4 }, '未查{#FF3300}', '其他{#FF3300}(input)']);
 
 /**
  *OGTT
 */
-export const ogttOptions = toOptions(['正常',{k:'GDM{#FF3300}(shouzhenyy-空腹血糖,餐后1H血糖,餐后2H血糖)',addspan:4},'未查{#FF3300}']);
+export const ogttOptions = toOptions(['正常', { k: 'GDM{#FF3300}(shouzhenyy-空腹血糖,餐后1H血糖,餐后2H血糖)', addspan: 4 }, '未查{#FF3300}']);
 
 /**
  *地贫
@@ -707,7 +707,7 @@ export const ywgmOptions = toOptions('药物{#FF3300}(input),食物{#FF3300}(inp
 /**
  *个人史
 */
-export const grsOptions = toOptions(['吸烟{#FF3300}(input)[支/天]','饮酒{#FF3300}(input)[ml/天]','接触有害物质{#FF3300}(input)','接触放射线{#FF3300}(input)',{k:'服用药物{#FF3300}(input-诊断&用药&剂量&备注)',addspan:2},'其他{#FF3300}(input)']);
+export const grsOptions = toOptions(['吸烟{#FF3300}(input)[支/天]', '饮酒{#FF3300}(input)[ml/天]', '接触有害物质{#FF3300}(input)', '接触放射线{#FF3300}(input)', { k: '服用药物{#FF3300}(input-诊断&用药&剂量&备注)', addspan: 2 }, '其他{#FF3300}(input)']);
 
 /**
  *叶酸
@@ -732,7 +732,7 @@ export const xOptions = toOptions('阴性,弱阳性{#FF3300},阳性{#FF3300},未
  * 手术史表头
  */
 export const shoushushiColumns = [
-  {
+	{
 		title: '手术名称',
 		key: 'name',
 		type: 'input'
@@ -741,14 +741,14 @@ export const shoushushiColumns = [
 		title: '手术日期',
 		key: 'date_of_operation',
 		type: 'date',
-		mode:"ymd"
+		mode: "ymd"
 	},
 	{
 		title: '手术医院',
 		key: 'hospital',
 		type: 'input'
-  },
-  {
+	},
+	{
 		title: '术后病理',
 		key: 'pathology',
 		type: 'input'
@@ -807,20 +807,20 @@ export const BvColumns = [
 export const pregnanciesColumns = [
 	{
 		title: '孕次',
-		key: 'index',	
+		key: 'index',
 		width: '50',
-		format: (v,{row})=>row+1
+		format: (v, { row }) => row + 1
 	},
 	{
 		title: '   年-月    ',
 		key: 'datagridYearMonth',
 		type: 'date',
 		width: '160',
-		mode:"ym",
+		mode: "ym",
 	},
 	{
 		title: '流产',
-		children:[
+		children: [
 			{
 				title: '自然',
 				key: 'zir',
@@ -838,7 +838,7 @@ export const pregnanciesColumns = [
 				type: 'input'
 			}
 		]
-    },
+	},
 	{
 		title: '引产',
 		key: 'yinch',
@@ -862,7 +862,7 @@ export const pregnanciesColumns = [
 	},
 	{
 		title: '分娩方式',
-		children:[
+		children: [
 			{
 				title: '顺产',
 				key: 'shunch',
@@ -878,7 +878,7 @@ export const pregnanciesColumns = [
 	},
 	{
 		title: '产后情况',
-		children:[
+		children: [
 			{
 				title: '出血',
 				key: 'chuxue',
@@ -901,28 +901,28 @@ export const pregnanciesColumns = [
 	},
 	{
 		title: '小孩情况',
-		children:[
+		children: [
 			{
 				title: '性别',
 				key: 'xingb',
 				type: 'select',
-				showSearch:true, 
+				showSearch: true,
 				options: [
 					{ label: '男', value: '1' },
 					{ label: '女', value: '2' },
 					{ label: '未知', value: '3' },
-				],		 
+				],
 			},
 			{
 				title: '生存',
 				key: 'child',
 				type: 'select',
-				showSearch:true, 
+				showSearch: true,
 				options: [
 					{ label: '健在', value: '1' },
 					{ label: '死亡', value: '2' },
 					{ label: '未知', value: '3' },
-				],		 
+				],
 			},
 			{
 				title: '死亡时间',
@@ -977,3 +977,174 @@ export const lisiColumns = [
 		key: 'field',
 	}
 ]
+
+export const newDataTemplate = {
+	userid: "",
+	formType: "",
+	id: "",
+	createdate: "",
+	chief_complaint: "",
+	medical_history: "",
+	diagnosis: "",
+	treatment: "",
+	doctor: "",
+	other_exam: "",
+	karyotype: "",
+	pregnancy_history: {
+		gravidity: "",
+		parity: "",
+		exfetation: "",
+		lmd: "",
+		edd: "",
+		abortion: ""
+	},
+	downs_screen: {
+		early: {
+			trisomy21: "",
+			trisomy18: "",
+			trisomy13: "",
+			other_anomalies: "",
+			hcg: "",
+			papp: ""
+		},
+		middle: {
+			trisomy21: "",
+			trisomy18: "",
+			trisomy13: "",
+			other_anomalies: "",
+			hcg: "",
+			ntd: "",
+			e3: "",
+			afp: ""
+		},
+		nipt: {
+			trisomy21: "",
+			trisomy18: "",
+			trisomy13: "",
+			other_anomalies: "",
+			z_value: "",
+			z21: "",
+			z18: "",
+			z13: ""
+		}
+	},
+	thalassemia: {
+		wife: {
+			blood_group: "",
+			genotype: "",
+			other_anomalies: "",
+			mcv: "",
+			mch: "",
+			hb: "",
+			hbA2: ""
+		},
+		husband: {
+			blood_group: "",
+			genotype: "",
+			other_anomalies: "",
+			mcv: "",
+			mch: "",
+			hb: "",
+			hbA2: ""
+		}
+	},
+	ultrasound: {
+		menopause: '',
+		fetus: [
+			{
+				id: '-1',
+				userId: '',
+				status: '',
+				crl: "",
+				crlweek: "",
+				nt: "",
+				excdesc: "",
+				shousxm: '',
+				shousbh: '',
+				shuz: '',
+				zhus: '',
+				startTime: '',
+				endTime: '',
+				chixsj: '',
+				zhig: '',
+				taip: '',
+				fangf: '',
+				qix: '',
+				quywz: '',
+				jinrgqcs: '',
+				yangb: '',
+				xingz: '',
+				yuancpg: '',
+				shuztsqksm: '',
+				shuqtxl: '',
+				shuhtxl: '',
+				diagnose: '',
+				shifzccc: '',
+				yangs: '',
+				qixue: '',
+				longm: '',
+				prenatalOperationId: '',
+				puncturePosition: '',
+				placentaHemorrhage: '',
+				uterineWallHemorrhage: '',
+				inspectionItems: '',
+				isPharmacy: '',
+				operationName: '',
+				operationLevel: '',
+				incisionType: '',
+				punctureCount: '',
+				perfusionVolume: '',
+				intubationFrequency: '',
+				aspirationTimes: '',
+				negativePressure: '',
+				timesOfNeedleInsertion: '',
+				numberOfHits: '',
+				omphalorrhagia: '',
+				villusVolume: '',
+				whetherBleeding: '',
+				cordBloodVolume: '',
+				embryoReductionTarget: '',
+				vanishingTimeOfFetalHeart: '',
+				returnLiquid: '',
+				punctureObject: '',
+				drawSheepWater: '',
+				targetHct: '',
+				calculationOfBloodTransfusionVolume: '',
+				actualTransfusionVolume: '',
+				transfusionSpeed: '',
+				liquidVolume: ''
+			}
+		]
+	},
+	past_medical_history: {
+		hypertension: [],
+		diabetes_mellitus: [],
+		heart_disease: [],
+		injury: [],
+		other_disease: [],
+		allergy: [],
+		blood_transfusion: [],
+		operation_history: []
+	},
+	family_history: {
+		diabetes_mellitus: [],
+		hypertension: [],
+		heritable_disease: [],
+		congenital_malformation: []
+	},
+	physical_check_up: {
+		systolic_pressure: "",
+		diastolic_pressure: "",
+		edema: "",
+		fundal_height: "",
+		waist_hip: "",
+		pre_weight: "",
+		current_weight: "",
+		weight_gain: "",
+		bp: ""
+	},
+	rvisitId: '',
+	ckweek: '',
+	stateChange: '',
+	lastResult: ''
+}

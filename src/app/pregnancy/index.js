@@ -38,20 +38,28 @@ export default class Patient extends Component {
         if(res['code'] === "200" || 200 && res['object'] ) {
           // TODO idtype 改成字符串
           const { object } = res;
-          // 职业
+          // 整合职业数据
+          if(object['gravidaInfo']['useroccupation'] !== null){
+            if(object['gravidaInfo']['useroccupation'].indexOf('{') !== -1) {
+              object['gravidaInfo']['useroccupation'] = convertString2Json(object['gravidaInfo']['useroccupation']).label;
+            }
+          }else {
+            object['gravidaInfo']['useroccupation'] = "";
+          }
 
-          // if(object['gravidaInfo']['useroccupation'] !== null && object['gravidaInfo']['useroccupation'].indexOf('{') !== -1) {
-          //   object['gravidaInfo']['useroccupation'] = convertString2Json(object['gravidaInfo']['useroccupation']).label;
-          // }else {
-          //   object['gravidaInfo']['useroccupation'] = "";
-          // }
-          // if(object['husbandInfo']['useroccupation'] !== null && object['husbandInfo']['useroccupation'].indexOf('{') !== -1) {
-          //   object['husbandInfo']['useroccupation'] = convertString2Json(object['husbandInfo']['useroccupation']).label;
-          // }else {
-          //   object['husbandInfo']['useroccupation'] = "";
-          // }
-          // object['gravidaInfo']['useridtype'] = convertString2Json(object['gravidaInfo']['useridtype']);
-          // object['husbandInfo']['add_FIELD_husband_useridtype'] = convertString2Json(object['husbandInfo']['add_FIELD_husband_useridtype']);
+          if(object['husbandInfo']['userhoccupation'] !== null){
+            if(object['husbandInfo']['userhoccupation'].indexOf('{') !== -1) {
+              object['husbandInfo']['userhoccupation'] = convertString2Json(object['husbandInfo']['userhoccupation']).label;
+            }
+          }else {
+            object['husbandInfo']['userhoccupation'] = "";
+          }
+          object['gravidaInfo']['useridtype'] = convertString2Json(object['gravidaInfo']['useridtype']).label;
+          try {
+            object['husbandInfo']['add_FIELD_husband_useridtype'] = convertString2Json(object['husbandInfo']['add_FIELD_husband_useridtype']).label;
+          } catch(e) {
+            object['husbandInfo']['add_FIELD_husband_useridtype'] = "";
+          }
           this.setState({...object})
         }else {
           console.log("请求失败/object undefined")

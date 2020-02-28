@@ -48,7 +48,6 @@ class MyTreeSelect extends Component{
     }
     // 设置nOption
     let nOptions = editOptions(options, isSelectParent);
-    console.log(nOptions);
     this.setState({nOptions});
   }
 

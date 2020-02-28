@@ -27,7 +27,10 @@ export default class OpenCase extends Component {
       pregnancyData: {
         ADD_FIELD_husband_useridtype: {"label":"身份证","value":"身份证"}
       },
-      benYunData: {}
+      benYunData: {
+        yunc: {label: '0', value: '0'},
+        chanc: {label: '0', value: '0'}
+      }
     };
   }
   /* ======================= UI视图渲染config =============================== */
@@ -118,12 +121,12 @@ export default class OpenCase extends Component {
       {
         columns: [
           // TODO 这里缺少 地级市 级联选择器
-          {name: 'useraddress[户口地址]', type: 'input', addonBefore: citySelection, placeholder: '请输入详细地址', span: 6, options: hyOptions},
+          {name: 'useraddress[户口地址]', type: 'input', addonBefore: citySelection, placeholder: '请输入详细地址', span: 12, options: hyOptions},
         ]
       },
       {
         columns: [
-          {name: 'userconstant[居住地址]', type: 'input', addonBefore: citySelection,placeholder: '请输入详细地址',span: 6, options: hyOptions},
+          {name: 'userconstant[居住地址]', type: 'input', addonBefore: citySelection,placeholder: '请输入详细地址',span: 12, options: hyOptions},
         ]
       }
     ]
@@ -193,14 +196,15 @@ export default class OpenCase extends Component {
 
   render() {
     console.log(this.state);
+    const { pregnancyData, benYunData } = this.state;
     return (
       <Page>
         <div className="bgWhite pad-mid">
           <div>
-            {formRender({},this.pregnancy_data_config(), this.handlePregnancyChange)}
+            {formRender(pregnancyData,this.pregnancy_data_config(), this.handlePregnancyChange)}
           </div>
           <div>
-            {formRender({},this.benyun_data_config(), this.handleBenYunChange)}
+            {formRender(benYunData,this.benyun_data_config(), this.handleBenYunChange)}
           </div>
         </div>
         <div className="btn-group pull-right bottom-btn">

@@ -91,6 +91,7 @@ export default class Operation extends Component{
       operationNewDataList: [], // 用于新建病例
 
       currentTreeKeys: [], // 树形菜单选择
+      currentExpandedKeys: [],
       currentShowData: {}, // 当前展示的数据
 
       clear: false // 用于清空表单的渲染，不然会造成前一表单遗留
@@ -107,6 +108,7 @@ export default class Operation extends Component{
   /* ========================= 渲染类 ============================ */
   // 渲染左侧手术记录树
   renderTree = (data) => {
+    const { currentExpandedKeys } = this.state;
     let tnDOM = [];
     if(data.length === 0) return <div>无手术记录</div>;
     // key-用于请求
@@ -118,6 +120,7 @@ export default class Operation extends Component{
     return <Tree
       onSelect={this.handleTreeSelect}
       defaultExpandAll
+      expandedKeys={currentExpandedKeys}
       selectedKeys={this.state.currentTreeKeys || []}
       multiple={false}
     >{tnDOM}</Tree>;
@@ -172,27 +175,45 @@ export default class Operation extends Component{
   /* ========================= 事件交互 ============================ */
   //
   newOperation = () => {
-    const { operationList, operationNewDataList } = this.state;
+    const { operationList, operationNewDataList, currentExpandedKeys, currentShowData } = this.state;
     const todayStr = formateDate();
     // 新建元素的id
-    const newId = `${Math.random()*100|0}`;
+    const newId = 0 - Math.random()*100|0;
     const todayIndex = operationList.findIndex(item => item.title === todayStr);
     if(todayIndex !== -1){
-    // if(todayStr === operationList[0].title) {
-      operationList[todayIndex].children.splice(0,0,{title: '待完善病例', key: `-${newId}`});
-    }else {
-      operationList.splice(0,0,{title:  todayStr, key: todayStr, children: [{title: "待完善病历", key: `-${newId}`}]});
+      operationList[todayIndex].children.splice(0,0,{title: '待完善病例', key: newId});
+      if(currentExpandedKeys.findIndex(key => key === operationList[index].key) === -1) {
+        currentExpandedKeys.push(operationList[todayIndex].key); 
+      }
+     }else {
+      operationList.splice(0,0,{title:  todayStr, key: todayStr, children: [{title: "待完善病历", key: newId}]});
+      currentExpandedKeys.push(todayStr);
     }
-    operationNewDataList.push({
-      id: 0 - Number(newId), key: 0 - Number(newId), templateId: 0,createdate: todayStr,
+    const currentData = {
+      id: newId, key: newId, templateId: 0,createdate: todayStr,
       operationItem: {}, preoperative_record: {}, operative_procedure: {fetus:[{id: ''}]}, surgery: {},
       ward: {}
-    });
-    this.setState({operationList});
+    };
+    operationNewDataList.push(currentData);
+    this.setState({operationList,currentExpandedKeys, currentTreeKeys: [newId.toString()], currentShowData: currentData});
   };
   //
   handleTreeSelect = (selectedKeys, {selected, node}) => {
-    if(node.props.children || !selected) {
+
+    if(node.props.children) {
+      // 父节点，展开或收起
+      const nodeKey = node.props['eventKey'];
+      const { currentExpandedKeys } = this.state;
+      const i = currentExpandedKeys.findIndex(key => key === nodeKey);
+      if(i !== -1) {
+        currentExpandedKeys.splice(i,1);
+      }else{ 
+        currentExpandedKeys.push(nodeKey);
+      }
+      this.setState({currentExpandedKeys});
+      return ;
+    }
+    if(!selected) {
       console.warn('不允许父节点请求,不允许取消');
       return ;
     }
