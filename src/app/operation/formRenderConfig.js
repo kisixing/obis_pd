@@ -26,8 +26,8 @@ import {
   preoperativeUltrasonographyColumns7,
   instrumentOptions1,
   instrumentOptions5,
-  afterBloodFlowColumns,
-  afterHemogramColumns, measurementColumns,
+  bleedFlowColumns,
+  hemogramColumns, measurementColumns,
   anesthesiaMethodOptions,
   isPharacyOptions
 } from "./data";
@@ -47,7 +47,7 @@ const operationItem_config = () => ({
       columns: [
         {name: 'operationName[手术名称]', type: 'select', options: operation_itemsOptions, span: 6},
         {name: 'operationLevel[手术级别]', type: 'select', options: operationLevelOptions, span: 6},
-        {name: 'incisionType[切口类型]', type: 'select', options: incisionTypeOptions, span: 6}
+        {name: 'incisionType[切口类别]', type: 'select', options: incisionTypeOptions, span: 6}
       ]
     },
     {
@@ -376,7 +376,7 @@ const config5 = {
 };
 /*
 * 宫内输血
-* */
+* */    
 const config6 = {
   // 手术项目
   operationItem_config,
@@ -389,14 +389,14 @@ const config6 = {
           {name: 'preoperativeUltrasonography[术前超声检查]', type: 'table', valid: 'required', pagination: false, editable: true, options: preoperativeUltrasonographyColumns6, span: SPAN_20 },
       ]},
       {columns:[
-          {name: 'bleedIndex[术前血流指标]', type: 'table', valid: 'required', pagination: false, editable: true, options: [], span: SPAN_20},
+          {name: 'bleedIndex[术前血流指标]', type: 'table', valid: 'required', pagination: false, editable: false, options: bleedFlowColumns, span: SPAN_20},
       ]},
       {columns:[
-          {name: 'bloodBank[血库情况]',},
-          {name: 'collectBloodDate[采血日期]',}
+          {name: 'bloodBank[血库情况]', type: 'input', valid: 'required', span: SPAN_6 },
+          {name: 'collectBloodDate[采血日期]', type: 'date', valid: 'required', span: SPAN_6}
       ]},
       {columns:[
-          {name: 'hemogram[术前雪象检查]', type: 'table', valid: 'required', pagination: false, editable: true, options: [], span: SPAN_20},
+          {name: 'hemogram[术前血象检查]', type: 'table', valid: 'required', pagination: false, editable: true, options: hemogramColumns, span: SPAN_20},
       ]},
     ]
   }),
@@ -446,8 +446,8 @@ const config6 = {
     rows:[
       {columns: [afterFhr]},
       // 这两个值需要前端整合已有值
-      {columns: [{name:'bleedIndex[术后血流指标]', type: 'table', editable: true, pagination: false, buttons: false, options: afterBloodFlowColumns}]},
-      {columns: [{name:'hemogram[术后血流指标]', type: 'table', editable: true, pagination: false ,buttons: false, options: afterHemogramColumns}]},
+      {columns: [{name:'bleedIndex[术后血流指标]', type: 'table', editable: true, pagination: false, buttons: false, options: bleedFlowColumns}]},
+      {columns: [{name:'hemogram[术后血象检查]', type: 'table', editable: true, pagination: false ,buttons: false, options: hemogramColumns}]},
       {columns: [doctors_advice]}
     ]
   })

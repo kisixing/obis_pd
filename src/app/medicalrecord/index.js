@@ -233,23 +233,23 @@ export default class MedicalRecord extends Component {
       {
         columns: [
           { span: 1 },
-          { name: 'hb(g/L)[Hb]', type: 'input', span: 6, showSearch: true, valid: 'required' },
-          { name: 'mcv(fL)[MCV]', type: 'input', span: 6, showSearch: true, valid: 'required' },
-          { name: 'mch[MCH]', type: 'input', span: 6, showSearch: true, valid: 'required' },
+          { name: 'hb(g/L)[Hb]', type: 'input', span: 6, showSearch: true},
+          { name: 'mcv(fL)[MCV]', type: 'input', span: 6, showSearch: true},
+          { name: 'mch[MCH]', type: 'input', span: 6, showSearch: true},
         ]
       },
       {
         columns: [
           { span: 1 },
-          { name: 'hbA2[HbA2]', type: 'input', span: 6, showSearch: true, valid: 'required' },
-          { name: 'blood_group[血型]', type: 'select', span: 6, showSearch: true, options: baseData.xuexingOptions, valid: 'required' },
-          { name: 'rh[血型]', type: 'select', span: '6', options: baseData.xuexing2Options, valid: 'required'}
+          { name: 'hbA2[HbA2]', type: 'input', span: 6, showSearch: true},
+          { name: 'blood_group[血型]', type: 'select', span: 6, showSearch: true, options: baseData.xuexingOptions},
+          { name: 'rh[血型]', type: 'select', span: '6', options: baseData.xuexing2Options}
         ]
       },
       {
         columns: [
           { span: 1 },
-          { name: 'genotype[地贫基因型]', type: 'select', span: 11, showSearch: true, options: _genotypeAnemia, valid: 'required' },
+          { name: 'genotype[地贫基因型]', type: 'select', span: 11, showSearch: true, options: _genotypeAnemia},
           { name: 'other_anomalies[其他异常]', type: 'input', span: 11 }
         ]
       }
@@ -264,23 +264,23 @@ export default class MedicalRecord extends Component {
       {
         columns: [
           { span: 1 },
-          { name: 'hb(g/L)[Hb]', type: 'input', span: 6, showSearch: true, valid: 'required' },
-          { name: 'mcv(fL)[MCV]', type: 'input', span: 6, showSearch: true, valid: 'required' },
-          { name: 'mch[MCH]', type: 'input', span: 6, showSearch: true, valid: 'required' },
+          { name: 'hb(g/L)[Hb]', type: 'input', span: 6, showSearch: true},
+          { name: 'mcv(fL)[MCV]', type: 'input', span: 6, showSearch: true},
+          { name: 'mch[MCH]', type: 'input', span: 6, showSearch: true },
         ]
       },
       {
         columns: [
           { span: 1 },
-          { name: 'hbA2[HbA2]', type: 'input', span: 6, showSearch: true, valid: 'required' },
-          { name: 'blood_group[血型]', type: 'select', span: 6, showSearch: true, options: baseData.xuexingOptions, valid: 'required' },
-          { name: 'rh[血型]', type: 'select', span: '6', options: baseData.xuexing2Options, valid: 'required'}
+          { name: 'hbA2[HbA2]', type: 'input', span: 6, showSearch: true},
+          { name: 'blood_group[血型]', type: 'select', span: 6, showSearch: true, options: baseData.xuexingOptions},
+          { name: 'rh[血型]', type: 'select', span: '6', options: baseData.xuexing2Options}
         ]
       },
       {
         columns: [
           { span: 1 },
-          { name: 'genotype[地贫基因型]', type: 'select', span: 11, showSearch: true, options: _genotypeAnemia, valid: 'required' },
+          { name: 'genotype[地贫基因型]', type: 'select', span: 11, showSearch: true, options: _genotypeAnemia},
           { name: 'other_anomalies[其他异常]', type: 'input', span: 11 }
         ]
       }
@@ -795,6 +795,11 @@ export default class MedicalRecord extends Component {
         service.medicalrecord.savespecialistemrdetail(specialistemrData[index]).then(res => {
           if (res.code === "200" && res.message === "OK") {
             message.success('成功保存');
+            service.medicalrecord.getspecialistemr().then(res => {
+              if (res.code === "200" || 200) {
+                this.setState({ specialistemrList: res.object.list }, () => { })
+              }
+            });
           } else if (res.code === "500") {
             message.error('500 保存失败')
           }
@@ -896,7 +901,39 @@ export default class MedicalRecord extends Component {
   };
   // 获取template的输入信息
   getTemplateInput = ({content}) => {
-    console.log(content);
+    const { currentTreeKeys, specialistemrData } = this.state;
+    const { type } = this.state.templateObj;
+    const index = specialistemrData.findIndex(item => item.id.toString() === currentTreeKeys[0]);
+    switch(type) {
+      case 'dmr1':
+        specialistemrData[index]['chief_complaint'] = content;
+        break;
+      case 'dmr2':
+        specialistemrData[index]['medical_history'] = content;
+        break;
+      case 'dmr3':
+        specialistemrData[index]['other_exam'] = content;
+        break;
+      case 'dmr4':
+        specialistemrData[index]['diagnosis'] = content;
+        break;
+      case 'dmr5':
+        specialistemrData[index]['treatment'] = content;
+        break;
+      case 'dmr6':
+        specialistemrData[index]['karyotype'] = content;
+        break;
+      case 'dmr7':
+        specialistemrData[index]['stateChange'] = content;
+        break;
+      case 'dmr8':
+        specialistemrData[index]['lastResult'] = content;
+        break;
+      default:
+        console.log('type error');
+        break;
+    }
+    this.setState({specialistemrData},() => this.closeModal())
   }
 
 

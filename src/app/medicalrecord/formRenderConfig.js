@@ -97,17 +97,17 @@ const config = {
       {
         columns: [
           { span: 1 },
-          { name: 'hb(g/L)[Hb]', type: 'input', span: 6, showSearch: true, valid: 'required'},
-          { name: 'mcv(fL)[MCV]',  type: 'input', span: 6, showSearch: true, valid: 'required'},
-          { name: 'mch[MCH]',  type: 'input', span: 6, showSearch: true, valid: 'required'},
+          { name: 'hb(g/L)[Hb]', type: 'input', span: 6, showSearch: true},
+          { name: 'mcv(fL)[MCV]',  type: 'input', span: 6, showSearch: true},
+          { name: 'mch[MCH]',  type: 'input', span: 6, showSearch: true},
         ]
       },
       {
         columns: [
           { span: 1 },
-          { name: 'hbA2[HbA2]', type: 'input', span: 6, showSearch: true, valid: 'required'},
-          { name: 'blood_group[血型]',  type: 'select', span: 6, showSearch: true, options: baseData.xuexingOptions, valid: 'required'},
-          { name: 'genotype[地贫基因型]',  type: 'select', span: 11, showSearch: true, options: _genotypeAnemia ,valid: 'required'}
+          { name: 'hbA2[HbA2]', type: 'input', span: 6, showSearch: true,},
+          { name: 'blood_group[血型]',  type: 'select', span: 6, showSearch: true, options: baseData.xuexingOptions},
+          { name: 'genotype[地贫基因型]',  type: 'select', span: 11, showSearch: true, options: _genotypeAnemia }
         ]
       },
       {
@@ -127,17 +127,17 @@ const config = {
       {
         columns: [
           { span: 1 },
-          { name: 'hb(g/L)[Hb]', type: 'input', span: 6, showSearch: true, valid: 'required'},
-          { name: 'mcv(fL)[MCV]',  type: 'input', span: 6, showSearch: true, valid: 'required'},
-          { name: 'mch[MCH]',  type: 'input', span: 6, showSearch: true, valid: 'required'},
+          { name: 'hb(g/L)[Hb]', type: 'input', span: 6, showSearch: true},
+          { name: 'mcv(fL)[MCV]',  type: 'input', span: 6, showSearch: true},
+          { name: 'mch[MCH]',  type: 'input', span: 6, showSearch: true},
         ]
       },
       {
         columns: [
           { span: 1 },
-          { name: 'hbA2[HbA2]', type: 'input', span: 6, showSearch: true, valid: 'required'},
-          { name: 'blood_group[血型]',  type: 'select', span: 6, showSearch: true, options: baseData.xuexingOptions, valid: 'required'},
-          { name: 'genotype[地贫基因型]',  type: 'select', span: 11, showSearch: true, options: _genotypeAnemia ,valid: 'required'}
+          { name: 'hbA2[HbA2]', type: 'input', span: 6, showSearch: true},
+          { name: 'blood_group[血型]',  type: 'select', span: 6, showSearch: true, options: baseData.xuexingOptions},
+          { name: 'genotype[地贫基因型]',  type: 'select', span: 11, showSearch: true, options: _genotypeAnemia }
         ]
       },
       {

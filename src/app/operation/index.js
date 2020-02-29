@@ -5,6 +5,8 @@ import Page from '../../render/page';
 import service from '../../service/index.js';
 import { formateDate, convertString2Json } from './util.js';
 
+import templateInput from '../../components/templateInput/index';
+
 import '../index.less';
 import './index.less';
 import formRender from "../../render/form";
@@ -94,7 +96,14 @@ export default class Operation extends Component{
       currentExpandedKeys: [],
       currentShowData: {}, // 当前展示的数据
 
-      clear: false // 用于清空表单的渲染，不然会造成前一表单遗留
+      clear: false, // 用于清空表单的渲染，不然会造成前一表单遗留
+
+      // 模板功能
+      templateObj: {
+        isShowTemplateModal: false,
+        type: '',
+        doctor: ''
+      },
     };
   }
 
@@ -191,7 +200,12 @@ export default class Operation extends Component{
     }
     const currentData = {
       id: newId, key: newId, templateId: 0,createdate: todayStr,
-      operationItem: {}, preoperative_record: {}, operative_procedure: {fetus:[{id: ''}]}, surgery: {},
+      operationItem: {},
+      preoperative_record: {
+        operation_date: todayStr
+      },
+      operative_procedure: {fetus:[{id: ''}]}, 
+      surgery: {},
       ward: {}
     };
     operationNewDataList.push(currentData);
@@ -257,12 +271,16 @@ export default class Operation extends Component{
         operationItem: {
           operationName: value
         },
-        preoperative_record: {},
+        preoperative_record: {
+          operation_date: currentShowData['preoperative_record']['operation_date']
+        },
         operative_procedure: {fetus:[{id: ''}]},
         surgery: {},
         ward: {}
       });
-      this.setState({currentShowData: newCurrentShowData});
+      this.setState({clear: true}, () => {
+        this.setState({currentShowData: newCurrentShowData, clear: false});
+      })
       // 这个return一定要加
       return ;
     }
@@ -393,11 +411,52 @@ export default class Operation extends Component{
     return object;
   };
 
+  openModal = (type) => {
+    if (type) {
+      const { doctor } = this.state.currentShowData;
+      this.setState({templateObj: {isShowTemplateModal: true,type: type,doctor: doctor}});
+    }
+  }
+
+  closeModal = () => {
+    this.setState({
+      templateObj: { isShowTemplateModal: false, type: '', doctor: ''}
+    })
+  }
+
+  getTemplateInput = ({content}) => {
+    const { currentShowData } = this.state;
+    switch(type) {
+      case 'or1':
+        specialistemrData[index]['chief_complaint'] = content;
+        break;
+      case 'or2':
+        specialistemrData[index]['medical_history'] = content;
+        break;
+      case 'or3':
+        specialistemrData[index]['other_exam'] = content;
+        break;
+      case 'or4':
+        specialistemrData[index]['diagnosis'] = content;
+        break;
+      case 'or5':
+        specialistemrData[index]['treatment'] = content;
+        break;
+      case 'or6':
+        specialistemrData[index]['karyotype'] = content;
+        break;
+      default:
+        console.log('type error');
+        break;
+    }
+    this.setState({currentShowData},() => this.closeModal())
+  }
 
 
   render() {
-    const { operationList, currentTreeKeys, operationNewDataList, currentShowData = {}, clear } = this.state;
+    const { operationList, currentShowData = {}, clear } = this.state;
     const { id, templateId = 0 } = currentShowData;
+    const { isShowTemplateModal, type, doctor } = this.state.templateObj;
     return (
       <Page className="fuzhen font-16">
         <div className="fuzhen-left ant-col-5">
@@ -432,6 +491,19 @@ export default class Operation extends Component{
             <Button className="blue-btn" onClick={this.handleSave}>保存</Button>
           </div>
         </div>
+        <Modal 
+          visible={isShowTemplateModal}
+          onCancel={this.closeModal}
+          footer={false}
+          width="800px"
+        >
+          <div>
+            <TemplateInput
+              data={{doctor,type}}
+              getData={this.getTemplateInput}
+            /> 
+          </div>
+        </Modal>
       </Page>
     )
   }

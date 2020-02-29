@@ -113,6 +113,7 @@ export default {
    */
   medicalrecord: Object.assign(medicalrecord, { userId: () => userId, fireWatch: (...args) => watchInfoList.forEach(fn => fn(...args)) }),
 
+
   /**
    * 手术记录所需API
    */

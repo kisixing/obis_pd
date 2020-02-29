@@ -1169,6 +1169,7 @@ export const preoperativeUltrasonographyColumns6 = [
   {title: '超声孕周', key: 'gestationalWeek', type: 'input'},
   {title: 'BPD(mm)', key: 'bpd', type: 'input'},
   {title: 'FL(mm)', key: 'fl', type: 'input'},
+  {title: 'HL(mm)', key: 'hl', type: 'input'},
   {title: 'AFV(mm)', key: 'afv', type: 'input'},
   {title: 'AC(mm)', key: 'ac', type: 'input'},
   {title: '胎重(g)', key: 'fetalWeight', type: 'input'},
@@ -1181,7 +1182,7 @@ export const preoperativeUltrasonographyColumns6 = [
 ];
 
 // 术后血流指标
-export const afterBloodFlowColumns = [
+export const bleedFlowColumns = [
   {title: '日期', key: 'checkDate', type: 'input'},
   {
     title: 'UA', key: 'UA', children: [
@@ -1203,7 +1204,7 @@ export const afterBloodFlowColumns = [
 ];
 
 // 术后血象检查
-export const afterHemogramColumns = [
+export const hemogramColumns = [
   // {title: ' ', key: 'checkDate', type: 'input'},
   {title: 'WBC(*10&sup9 /L)', key: 'wbc', type: 'input'},
   {title: 'RBC(*10&sup12 /L)', key: 'rbc', type: 'input'},
@@ -1301,18 +1302,21 @@ export const sjTreeOption = [
 				{value: 'hemolytic_anemia2', label: '血常规五类',},
 				{value: 'hemolytic_anemia3', label: '血型',},
 				{value: 'hemolytic_anemia4', label: '新生儿血清学组合',},
-				{value: 'hemolytic_anemia5', label: '弓形虫DNA',},
-				{value: 'hemolytic_anemia6', label: '直接抗人球蛋白试验',},
-				{value: 'hemolytic_anemia7', label: '肝代谢组合',}
+				// {value: 'hemolytic_anemia5', label: '弓形虫DNA',},
+				{value: 'hemolytic_anemia6', label: '直接抗人球蛋白试验（coombs实验）',},
+				// {value: 'hemolytic_anemia7', label: '肝代谢组合',}
     	],
   }, {
 			value: 'thalassemia',
 			label: '地中海贫血检测',
     	children: [
-    		{value: 'thalassemia1', label: '地贫筛查组合',},
-				{value: 'thalassemia2', label: '地中海贫血基因全套',},
-				{value: 'thalassemia3', label: 'α地贫基因检测',},
-				{value: 'thalassemia4', label: 'β地贫基因检测',}
+    		{value: 'thalassemia1', label: '地贫筛查组合（Hb电泳）'},
+				{value: 'thalassemia2', label: '地中海贫血基因全套'},
+				{value: 'thalassemia3', label: 'α地贫基因检测'},
+				{value: 'thalassemia4', label: 'β地贫基因检测'},
+				{value: 'thalassemia5', label: '血常规全套'},
+				{value: 'thalassemia6', label: '血常规五分类'},
+				{value: 'thalassemia7', label: '血型'},
     	],
   }, {
 			value: 'hydrothorax_ascites',

@@ -28,7 +28,8 @@ class MyTreeSelect extends Component{
     super(props);
     this.state = {
       currentValue: [],
-      nOptions: []
+      nOptions: [],
+      currentSelections: []
     }
   }
 
