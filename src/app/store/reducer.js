@@ -27,7 +27,6 @@ export default (state = defaultState, action) => {
   }
   if(action.type === SET_OPENCASE_DATA) {
     const newState = JSON.parse(JSON.stringify(state));
-    console.log(action);
     newState.openCaseData = action.data;
     return newState;
   }

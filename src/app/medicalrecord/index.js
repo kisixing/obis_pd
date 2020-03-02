@@ -243,7 +243,7 @@ export default class MedicalRecord extends Component {
           { span: 1 },
           { name: 'hbA2[HbA2]', type: 'input', span: 6, showSearch: true},
           { name: 'blood_group[血型]', type: 'select', span: 6, showSearch: true, options: baseData.xuexingOptions},
-          { name: 'rh[血型]', type: 'select', span: '6', options: baseData.xuexing2Options}
+          { name: 'rh[RH(D)血型]', type: 'select', span: '6', options: baseData.xuexing2Options}
         ]
       },
       {
@@ -394,7 +394,7 @@ export default class MedicalRecord extends Component {
 
           { name: 'current_weight(kg)[现 体 重 ]', type: 'input', span: 6, valid: 'required|number|rang(0,100)' },
 
-          { name: 'weight_gain(kg)[体重增长]', type: 'input', span: 6, valid: 'required|number|rang(0,100)' },
+          { name: 'weight_gain(kg)[体重增长]', type: 'input', span: 6, valid: 'required' },
         ]
       }
     ]
@@ -537,7 +537,7 @@ export default class MedicalRecord extends Component {
           { name: 'excdesc[异常结果描述]', type: 'input', span: 8 },
         ]
       },
-      { columns: [{ label: '术前超声检查', span: 12 }] },
+      
 
     ]
   });
@@ -545,9 +545,10 @@ export default class MedicalRecord extends Component {
   middle_config = () => ({
     step: 1,
     rows: [
+      { columns: [{ label: '中孕超声:', span: 12 }] },
       {
         columns: [
-          { name: 'middle[中孕超声]', type: 'table', pagination: false, editable: true, options: baseData.BvColumns },
+          { name: 'middle', type: 'table', pagination: false, editable: true, options: baseData.BvColumns },
         ]
       },
     ]
@@ -719,7 +720,7 @@ export default class MedicalRecord extends Component {
     console.log(specialistemrData);
     const index = specialistemrData.findIndex(item => item.id.toString() === currentTreeKeys[0]);
     if (action === 'remove') {
-      const uIndex = specialistemrData[index].ultrasound.fetus.findIndex(v => v.id === targetKey);
+      const uIndex = specialistemrData[index].ultrasound.fetus.findIndex(v => v.id.toString() === targetKey);
       specialistemrData[index].ultrasound.fetus.splice(uIndex, 1);
     } else if (action === 'add') {
       if(specialistemrData[index].hasOwnProperty('ultrasound')){
@@ -732,8 +733,8 @@ export default class MedicalRecord extends Component {
         specialistemrData[index]['ultrasound'] = {};
         specialistemrData[index]['ultrasound']['fetus'] = [];
       }
+      specialistemrData[index].ultrasound.fetus.push({ id: Math.random(), userId: specialistemrData.userid });
     }
-    specialistemrData[index].ultrasound.fetus.push({ id: Math.random(), userId: specialistemrData.userid });
     this.setState({ specialistemrData });
   };
 
@@ -747,9 +748,7 @@ export default class MedicalRecord extends Component {
    * @param value       值
    */
   handleFormChange = (path, name, value) => {
-    const { specialistemrData, currentTreeKeys } = this.state;
-    console.log(specialistemrData);
-    console.log(currentTreeKeys);
+    let { specialistemrData, currentTreeKeys } = this.state;
     const index = specialistemrData.findIndex(item => item.id.toString() === currentTreeKeys[0]);
     if (path === "") {
       // 为第一层值
@@ -773,6 +772,7 @@ export default class MedicalRecord extends Component {
           mapValueToKey(specialistemrData[index], `physical_check_up.weight_gain`, (Number(specialistemrData[index]['physical_check_up']['current_weight']) - Number(value)).toString());
         }
         mapValueToKey(specialistemrData[index], `${path}.${name}`, value);
+        console.log(this.state);
       }else {
         mapValueToKey(specialistemrData[index], `${path}.${name}`, value);
       }

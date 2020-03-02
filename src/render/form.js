@@ -147,9 +147,15 @@ class FormItem extends Component {
   componentWillReceiveProps(newProps) {
     const { name } = this.state;
     const { entity, width } = this.props;
-    // console.log(this.props);
-    // console.log(newProps);
+    // TODO newprops 和 this.props 是一样的
+    if(name === 'weight_gain' || name === "pre_weight") {
+      console.log(newProps);
+      console.log(this.props);
+      console.log(entity);
+    }
+    
     if (!entity || (JSON.stringify(entity && entity[name]) !== JSON.stringify(newProps.entity[name]))) {
+      console.log('in');
       this.setState({
         ...this.getSplitState(newProps.name, newProps.entity),
         value: newProps.entity[name],
@@ -161,7 +167,16 @@ class FormItem extends Component {
     }
   }
 
+  // componentDidUpdate(prevProps, prevState) {
+  //   if(this.state.name === 'weight_gain' || name === "pre_weight") {
+  //     console.log(prevProps);
+  //     console.log(this.props);
+  //     console.log(this.state);
+  //   }
+  // }
+
   onChange = (e, value) => {
+    console.log(value);
     return new Promise(resolve => {
       this.setState({
         value: value

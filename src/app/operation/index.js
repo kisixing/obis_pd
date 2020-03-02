@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
-import {Button, Collapse, Tabs, Tree} from "antd";
+import {Button, Collapse, Tabs, Tree, Modal} from "antd";
 import Page from '../../render/page';
 
 import service from '../../service/index.js';
 import { formateDate, convertString2Json } from './util.js';
 
-import templateInput from '../../components/templateInput/index';
+import TemplateInput from '../../components/templateInput/index';
 
 import '../index.less';
 import './index.less';
@@ -157,7 +157,7 @@ export default class Operation extends Component{
             </Tabs>
           </Panel>
           <Panel header="术后情况" key="surgery">
-            {formRender(renderData['surgery'],formRenderConfig[`config${templateId}`]['surgery_config'](), (_,{name, value}) => this.handleFormChange("surgery",name,value))}
+            {formRender(renderData['surgery'],formRenderConfig[`config${templateId}`]['surgery_config'](this.openModal), (_,{name, value}) => this.handleFormChange("surgery",name,value))}
           </Panel>
         </Collapse>
       </div>
@@ -169,7 +169,7 @@ export default class Operation extends Component{
     if(templateId !== 8) return null;
     return (
       <div>
-        {formRender(renderData['ward'], formRenderConfig['ward_config'](), (_,{value, name}) => this.handleFormChange('ward',name,value))}
+        {formRender(renderData['ward'], formRenderConfig['ward_config'](this.openModal), (_,{value, name}) => this.handleFormChange('ward',name,value))}
       </div>
     )
   };
@@ -177,7 +177,7 @@ export default class Operation extends Component{
   renderFetusTabPane = (fetusData, templateId) => {
     if(fetusData.length === 0) return null;
     return fetusData.map((v, index) => (
-      <TabPane tab={`胎儿${index+1}`} key={v.id}>{formRender(v, formRenderConfig[`config${templateId}`][`operative_procedure_config`](), (_,{name, value}) => this.handleFormChange(`operative_procedure.fetus-${index}`,name,value))}</TabPane>
+      <TabPane tab={`胎儿${index+1}`} key={v.id}>{formRender(v, formRenderConfig[`config${templateId}`][`operative_procedure_config`](this.openModal), (_,{name, value}) => this.handleFormChange(`operative_procedure.fetus-${index}`,name,value))}</TabPane>
     ));
   };
 
@@ -235,7 +235,7 @@ export default class Operation extends Component{
       if(selectedKeys[0].length > 3) {
         // 非新建病例
         service.operation.getOperationdetail({recordid: selectedKeys[0]}).then(res => {
-          if(res.code === 200 || "200"){
+          if(res.code === 200 || res.code === "200"){
             this.setState({});
             // 整合请求下来的数据
             let formatData = this.convertOperationDetail(res.object);
@@ -426,24 +426,18 @@ export default class Operation extends Component{
 
   getTemplateInput = ({content}) => {
     const { currentShowData } = this.state;
+    const { type } = this.state.templateObj;
+    console.log(content)
+    console.log(currentShowData)
     switch(type) {
-      case 'or1':
-        specialistemrData[index]['chief_complaint'] = content;
-        break;
       case 'or2':
-        specialistemrData[index]['medical_history'] = content;
+        currentShowData['operative_procedure']['special_case'] = content;
         break;
       case 'or3':
-        specialistemrData[index]['other_exam'] = content;
-        break;
-      case 'or4':
-        specialistemrData[index]['diagnosis'] = content;
-        break;
-      case 'or5':
-        specialistemrData[index]['treatment'] = content;
+        currentShowData['surgery']['doctors_advice'] = content;
         break;
       case 'or6':
-        specialistemrData[index]['karyotype'] = content;
+        currentShowData['ward']['operationProcedure'] = content;
         break;
       default:
         console.log('type error');

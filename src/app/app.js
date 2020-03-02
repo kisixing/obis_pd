@@ -59,10 +59,9 @@ export default class App extends Component {
     service.getuserDoc().then(res => {
       store.dispatch(setUserData(res.object));
       this.setState({...res.object, loading: false},() => {
-        console.log(this.state);
         service.getIvisitMain({userid: this.state.userData.userid}).then(Response => {
           // 在这个地方就整理好，后面去使用
-          if(Response.data.code === 200 || "200") {
+          if(Response.data.code === 200 || Response.data.code === "200") {
             const allPreghiss = Response.data.object.gestation.preghiss;
             const { gesexpect,gesmoc } = Response.data.object.pregnantInfo;
             if(allPreghiss.length > 0) {
@@ -304,7 +303,7 @@ export default class App extends Component {
     if(userData.userid !== this.state.userData.userid) {
       service.getIvisitMain({userid: userData.userid}).then(Response => {
         // 在这个地方就整理好，后面去使用
-        if(Response.data.code === 200 || "200") {
+        if(Response.data.code === 200 || Response.data.code === "200") {
           const allPreghiss = Response.data.gestation.preghiss;
           const { gesexpect,gsmoc } = Response.data.pregnantInfo;
           if(allPreghiss.length > 0) {

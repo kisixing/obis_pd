@@ -121,12 +121,12 @@ export default class OpenCase extends Component {
       {
         columns: [
           // TODO 这里缺少 地级市 级联选择器
-          {name: 'useraddress[户口地址]', type: 'input', addonBefore: citySelection, placeholder: '请输入详细地址', span: 12, options: hyOptions},
+          {name: 'useraddress[户口地址]', type: 'input', addonBefore: citySelection, placeholder: '请输入详细地址', span: 12,  options: hyOptions},
         ]
       },
       {
         columns: [
-          {name: 'userconstant[居住地址]', type: 'input', addonBefore: citySelection,placeholder: '请输入详细地址',span: 12, options: hyOptions},
+          {name: 'userconstant[居住地址]', type: 'input', addonBefore: citySelection,placeholder: '请输入详细地址',span: 12,valid: 'required', options: hyOptions},
         ]
       }
     ]
