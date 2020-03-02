@@ -97,6 +97,8 @@ export default class Operation extends Component{
       currentShowData: {}, // 当前展示的数据
 
       clear: false, // 用于清空表单的渲染，不然会造成前一表单遗留
+      
+      currentFetusKey: -1,
 
       // 模板功能
       templateObj: {
@@ -152,6 +154,7 @@ export default class Operation extends Component{
             <Tabs
               type="editable-card"
               onEdit={this.handleTabsEdit}
+              onTabClick={this.handleTabClick}
             >
               {this.renderFetusTabPane(renderData['operative_procedure']['fetus'],templateId)}
             </Tabs>
@@ -177,7 +180,9 @@ export default class Operation extends Component{
   renderFetusTabPane = (fetusData, templateId) => {
     if(fetusData.length === 0) return null;
     return fetusData.map((v, index) => (
-      <TabPane tab={`胎儿${index+1}`} key={v.id}>{formRender(v, formRenderConfig[`config${templateId}`][`operative_procedure_config`](this.openModal), (_,{name, value}) => this.handleFormChange(`operative_procedure.fetus-${index}`,name,value))}</TabPane>
+      <TabPane tab={`胎儿${index+1}`} key={v.id}>
+        {formRender(v, formRenderConfig[`config${templateId}`][`operative_procedure_config`](this.openModal), (_,{name, value}) => this.handleFormChange(`operative_procedure.fetus-${index}`,name,value))}
+      </TabPane>
     ));
   };
 
@@ -204,12 +209,16 @@ export default class Operation extends Component{
       preoperative_record: {
         operation_date: todayStr
       },
-      operative_procedure: {fetus:[{id: ''}]}, 
+      operative_procedure: {fetus:[{id: newId+1}]}, 
       surgery: {},
       ward: {}
     };
     operationNewDataList.push(currentData);
-    this.setState({operationList,currentExpandedKeys, currentTreeKeys: [newId.toString()], currentShowData: currentData});
+    this.setState({operationList,currentExpandedKeys,
+        currentTreeKeys: [newId.toString()], 
+        currentShowData: currentData,
+        currentFetusKey: newId+1
+      },() => console.log(this.state));
   };
   //
   handleTreeSelect = (selectedKeys, {selected, node}) => {
@@ -339,12 +348,23 @@ export default class Operation extends Component{
   // TODO
   // 婴儿数量变化 需要特殊处理
   handleTabsEdit = (targetKey, action) => {
+    let { currentShowData } = this.state;
+    console.log(targetKey);
     if( action === 'remove') {
-
+      const i = currentShowData['operative_procedure']['fetus'].findIndex(item => item.id === targetKey);
+      currentShowData['operative_procedure']['fetus'].splice(i,1);
     }else if(action === 'add') {
-
+      currentShowData['operative_procedure']['fetus'].push({
+        id: Math.random()
+      })
     }
+    this.setState({currentShowData});
   };
+  // 处理
+  handleTabClick = (key) => {
+    this.setState({currentFetusKey: key});
+  }
+
 
   handleTemplateSelect = (templateId) => {
     const { currentShowData } = this.state;
@@ -427,11 +447,13 @@ export default class Operation extends Component{
   getTemplateInput = ({content}) => {
     const { currentShowData } = this.state;
     const { type } = this.state.templateObj;
-    console.log(content)
-    console.log(currentShowData)
     switch(type) {
       case 'or2':
-        currentShowData['operative_procedure']['special_case'] = content;
+        const { currentFetusKey } = this.state;
+        const i = currentShowData['operative_procedure']['fetus'].findIndex(item => item.id === currentFetusKey);
+        console.log(currentShowData['operative_procedure']['fetus']);
+        currentShowData['operative_procedure']['fetus'][i]['special_case'] = "";
+        currentShowData['operative_procedure']['fetus'][i]['special_case'] = content;
         break;
       case 'or3':
         currentShowData['surgery']['doctors_advice'] = content;

@@ -557,7 +557,7 @@ export const gjtpOptions = toOptions('正常,异常,未有检查,不清楚');
  * 血制品
  */
 export const xzpOptions = toOptions([{ k: '红细胞{#FF3300}(shouzhenyy-时间,医院,原因)', addspan: 2 }, { k: '血小板{#FF3300}(shouzhenyy-时间,医院,原因)', addspan: 2 }, { k: '血浆{#FF3300}(shouzhenyy-时间,医院,原因)', addspan: 2 }, { k: '全血{#FF3300}(shouzhenyy2-时间,医院,原因)', addspan: 2 }, { k: '白蛋白{#FF3300}(shouzhenyy2-时间,医院,原因)', addspan: 2 }, { k: '免疫球蛋白{#FF3300}(shouzhenyy2-时间,医院,原因)', addspan: 2 }, '其他{#FF3300}', '不清楚']);
-export const sxsOptions = toOptions([{ k: '有{#FF3300}(shouzhenyy-时间,原因)', addspan: 2 }]);
+export const sxsOptions = toOptions([{ k: '有{#FF3300}(bloodinput)', addspan: 2 }]);
 
 /**
  * 数量
