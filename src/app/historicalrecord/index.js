@@ -106,6 +106,7 @@ export default class HistoricalRecord extends Component{
     if(node.props.children) {
       // 父节点，展开或收起
       const nodeKey = node.props['eventKey'];
+      console.log(nodeKey);
       const { currentExpandedKeys } = this.state;
       const i = currentExpandedKeys.findIndex(key => key === nodeKey);
       if(i !== -1) {
@@ -294,17 +295,17 @@ export default class HistoricalRecord extends Component{
           {currentHistoricalRecords !== null && currentHistoricalRecords.hasOwnProperty('historicalRecordsDates') ? (
             currentHistoricalRecords['historicalRecordsDates'].map(item => (
               <TreeNode title={item.date} key={item.date}>
-                <TreeNode title="专科病历" key="medicalRecord">
-                  {item['medicalRecord'].length !== 0 ? item['medicalRecord'][0]['children'].map(v => (
+                <TreeNode title="专科病历" key={`medicalRecord${item.date}`}>
+                  {item['medicalRecord'].map(v => (
                     <TreeNode title={v.title} key={v.key}/>
-                  )): null}
+                  ))}
                 </TreeNode>
-                <TreeNode title="手术记录" key="operationRecords">
-                  {item['operationRecords'].length !== 0 ? item['operationRecords'][0]['children'].map(v => (
+                <TreeNode title="手术记录" key={`operationRecords${item.date}`}>
+                  {item['operationRecords'].map(v => (
                     <TreeNode title={v.title} key={v.key}/>
-                  )) : null}
+                  ))}
                 </TreeNode>
-                <TreeNode title="产检病历" key="rvisit">
+                <TreeNode title="产检病历" key={`rvisit"${item.date}`}>
                   {item['rvisit'].map(v => (<TreeNode title={v.title} key={v.key}/>))}
                 </TreeNode>
               </TreeNode>

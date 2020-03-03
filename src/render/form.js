@@ -147,9 +147,8 @@ class FormItem extends Component {
   componentWillReceiveProps(newProps) {
     const { name } = this.state;
     const { entity, width } = this.props;
-    // console.log(this.props);
-    // console.log(newProps);
     if (!entity || (JSON.stringify(entity && entity[name]) !== JSON.stringify(newProps.entity[name]))) {
+      console.log('in');
       this.setState({
         ...this.getSplitState(newProps.name, newProps.entity),
         value: newProps.entity[name],
@@ -268,7 +267,7 @@ class FormItem extends Component {
  *        type：***为没有编辑器，其他为具体编辑器名称，可以是数组，方法或者字符串
  * }
  */
-export default function (entity, config, onChange, { children, ...props } = {}) {
+export default function formRender(entity, config, onChange, { children, ...props } = {}) {
   if (!entity) {
     console.warn('entity最好不为空,否则可能导致保存不上');
   }

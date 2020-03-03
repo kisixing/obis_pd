@@ -17,6 +17,7 @@ import Pacs from 'bundle-loader?lazy&name=pacs!./pacs';
 import HistoricalRecord from 'bundle-loader?lazy&name=historicalrecord!./historicalrecord';
 import Outcome from 'bundle-loader?lazy&name=outcome!./outcome';
 import OpenCase from 'bundle-loader?lazy&name=opencase!./opencase';
+import Test from 'bundle-loader?lazy&name=test!./Test';
 
 import "./app.less";
 
@@ -30,7 +31,8 @@ const routers = [
   { name: '影像报告', path: '/pacs', component: bundle(Pacs) },
   { name: '历史病历', path: '/historicalrecord', component: bundle(HistoricalRecord) },
   { name: '分娩结局', path: '/outcome', component: bundle(Outcome) },
-  { name: '孕妇建册', path: '/opencase', component: bundle(OpenCase) }
+  { name: '孕妇建册', path: '/opencase', component: bundle(OpenCase) },
+  { name: '测试页面', path: '/Test', component: bundle(Test) }
 ];
 
 export default class App extends Component {
@@ -59,33 +61,33 @@ export default class App extends Component {
     service.getuserDoc().then(res => {
       store.dispatch(setUserData(res.object));
       this.setState({...res.object, loading: false},() => {
-        console.log(this.state);
         service.getIvisitMain({userid: this.state.userData.userid}).then(Response => {
+          // 由后台提供
           // 在这个地方就整理好，后面去使用
-          if(Response.data.code === 200 || "200") {
-            const allPreghiss = Response.data.object.gestation.preghiss;
-            const { gesexpect,gesmoc } = Response.data.object.pregnantInfo;
-            if(allPreghiss.length > 0) {
-              // P && G
-              let yunc = parseInt(allPreghiss[allPreghiss.length-1].pregnum) + 1;
-              let chanc = 0;
-              allPreghiss.forEach(item => {
-                if(item.zuych === true) {
-                  chanc++;
-                }else if(item.zaoch !== ""){
-                  chanc++;
-                }
-              });
-              let d = {
-                gravidity: yunc,
-                parity: chanc,
-                lmd: gesmoc,
-                edd: gesexpect
-              }
-              // 设置建档信息
-              store.dispatch(setOpenCaseData(d));
-            }
-          }
+          // if(Response.data.code === 200 || Response.data.code === "200") {
+          //   const allPreghiss = Response.data.object.gestation.preghiss;
+          //   const { gesexpect,gesmoc } = Response.data.object.pregnantInfo;
+          //   if(allPreghiss.length > 0) {
+          //     // P && G
+          //     let yunc = parseInt(allPreghiss[allPreghiss.length-1].pregnum) + 1;
+          //     let chanc = 0;
+          //     allPreghiss.forEach(item => {
+          //       if(item.zuych === true) {
+          //         chanc++;
+          //       }else if(item.zaoch !== ""){
+          //         chanc++;
+          //       }
+          //     });
+          //     let d = {
+          //       gravidity: yunc,
+          //       parity: chanc,
+          //       lmd: gesmoc,
+          //       edd: gesexpect
+          //     }
+          //     // 设置建档信息
+          //     store.dispatch(setOpenCaseData(d));
+          //   }
+          // }
         });
       })
     });
@@ -164,7 +166,7 @@ export default class App extends Component {
           <div><strong>孕周:</strong>{tuserweek}</div>
           <div><strong>孕产:</strong>{tuseryunchan}</div>
           <div><strong>预产期:</strong>{gesexpect}</div>
-          <div><strong>就诊卡:</strong>{usermcno}</div>
+          <div><strong>门诊号:</strong>{usermcno}</div>
           <div><strong>产检编号:</strong>{chanjno}</div>
         </div>
         {/* 这里做个搜索栏 */}
@@ -304,7 +306,7 @@ export default class App extends Component {
     if(userData.userid !== this.state.userData.userid) {
       service.getIvisitMain({userid: userData.userid}).then(Response => {
         // 在这个地方就整理好，后面去使用
-        if(Response.data.code === 200 || "200") {
+        if(Response.data.code === 200 || Response.data.code === "200") {
           const allPreghiss = Response.data.gestation.preghiss;
           const { gesexpect,gsmoc } = Response.data.pregnantInfo;
           if(allPreghiss.length > 0) {

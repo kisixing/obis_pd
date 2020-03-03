@@ -203,7 +203,7 @@ export default class Operation extends Component{
     }
     if(selectedKeys.length !== 0) {
       service.operation.getOperationdetail({recordid: selectedKeys[0]}).then(res => {
-        if(res.code === 200 || "200"){
+        if(res.code === 200 || res.code === "200"){
 
           this.setState({currentTreeKeys: selectedKeys});
           // 整合请求下来的数据

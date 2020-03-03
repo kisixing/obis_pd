@@ -1304,7 +1304,7 @@ export const sjTreeOption = [
 				{value: 'hemolytic_anemia4', label: '新生儿血清学组合',},
 				// {value: 'hemolytic_anemia5', label: '弓形虫DNA',},
 				{value: 'hemolytic_anemia6', label: '直接抗人球蛋白试验（coombs实验）',},
-				// {value: 'hemolytic_anemia7', label: '肝代谢组合',}
+				{value: 'hemolytic_anemia7', label: '肝代谢组合',}
     	],
   }, {
 			value: 'thalassemia',

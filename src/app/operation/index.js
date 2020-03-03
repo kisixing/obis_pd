@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
-import {Button, Collapse, Tabs, Tree} from "antd";
+import {Button, Collapse, Tabs, Tree, Modal} from "antd";
 import Page from '../../render/page';
 
 import service from '../../service/index.js';
 import { formateDate, convertString2Json } from './util.js';
 
-import templateInput from '../../components/templateInput/index';
+import TemplateInput from '../../components/templateInput/index';
 
 import '../index.less';
 import './index.less';
@@ -97,6 +97,8 @@ export default class Operation extends Component{
       currentShowData: {}, // 当前展示的数据
 
       clear: false, // 用于清空表单的渲染，不然会造成前一表单遗留
+      
+      currentFetusKey: -1,
 
       // 模板功能
       templateObj: {
@@ -123,7 +125,9 @@ export default class Operation extends Component{
     // key-用于请求
     data.forEach(item => tnDOM.push(
       <TreeNode title={item['title'].slice(0,10)} key={item['key']}>
-        {item['children'].map(v => <TreeNode title={v['title']} key={v['key']}/>)}
+        {item['children'].map(v => 
+          (<TreeNode title={v['title']} key={v['key']}/>)
+        )}
       </TreeNode>)
     );
     return <Tree
@@ -152,12 +156,13 @@ export default class Operation extends Component{
             <Tabs
               type="editable-card"
               onEdit={this.handleTabsEdit}
+              onTabClick={this.handleTabClick}
             >
               {this.renderFetusTabPane(renderData['operative_procedure']['fetus'],templateId)}
             </Tabs>
           </Panel>
           <Panel header="术后情况" key="surgery">
-            {formRender(renderData['surgery'],formRenderConfig[`config${templateId}`]['surgery_config'](), (_,{name, value}) => this.handleFormChange("surgery",name,value))}
+            {formRender(renderData['surgery'],formRenderConfig[`config${templateId}`]['surgery_config'](this.openModal), (_,{name, value}) => this.handleFormChange("surgery",name,value))}
           </Panel>
         </Collapse>
       </div>
@@ -169,7 +174,7 @@ export default class Operation extends Component{
     if(templateId !== 8) return null;
     return (
       <div>
-        {formRender(renderData['ward'], formRenderConfig['ward_config'](), (_,{value, name}) => this.handleFormChange('ward',name,value))}
+        {formRender(renderData['ward'], formRenderConfig['ward_config'](this.openModal), (_,{value, name}) => this.handleFormChange('ward',name,value))}
       </div>
     )
   };
@@ -177,7 +182,9 @@ export default class Operation extends Component{
   renderFetusTabPane = (fetusData, templateId) => {
     if(fetusData.length === 0) return null;
     return fetusData.map((v, index) => (
-      <TabPane tab={`胎儿${index+1}`} key={v.id}>{formRender(v, formRenderConfig[`config${templateId}`][`operative_procedure_config`](), (_,{name, value}) => this.handleFormChange(`operative_procedure.fetus-${index}`,name,value))}</TabPane>
+      <TabPane tab={`胎儿${index+1}`} key={v.id}>
+        {formRender(v, formRenderConfig[`config${templateId}`][`operative_procedure_config`](this.openModal), (_,{name, value}) => this.handleFormChange(`operative_procedure.fetus-${index}`,name,value))}
+      </TabPane>
     ));
   };
 
@@ -190,12 +197,12 @@ export default class Operation extends Component{
     const newId = 0 - Math.random()*100|0;
     const todayIndex = operationList.findIndex(item => item.title === todayStr);
     if(todayIndex !== -1){
-      operationList[todayIndex].children.splice(0,0,{title: '待完善病例', key: newId});
+      operationList[todayIndex].children.splice(0,0,{title: '待完善手术记录', key: newId});
       if(currentExpandedKeys.findIndex(key => key === operationList[index].key) === -1) {
         currentExpandedKeys.push(operationList[todayIndex].key); 
       }
      }else {
-      operationList.splice(0,0,{title:  todayStr, key: todayStr, children: [{title: "待完善病历", key: newId}]});
+      operationList.splice(0,0,{title:  todayStr, key: todayStr, children: [{title: "待完善手术记录", key: newId}]});
       currentExpandedKeys.push(todayStr);
     }
     const currentData = {
@@ -204,12 +211,16 @@ export default class Operation extends Component{
       preoperative_record: {
         operation_date: todayStr
       },
-      operative_procedure: {fetus:[{id: ''}]}, 
+      operative_procedure: {fetus:[{id: newId+1}]}, 
       surgery: {},
       ward: {}
     };
     operationNewDataList.push(currentData);
-    this.setState({operationList,currentExpandedKeys, currentTreeKeys: [newId.toString()], currentShowData: currentData});
+    this.setState({operationList,currentExpandedKeys,
+        currentTreeKeys: [newId.toString()], 
+        currentShowData: currentData,
+        currentFetusKey: newId+1
+      },() => console.log(this.state));
   };
   //
   handleTreeSelect = (selectedKeys, {selected, node}) => {
@@ -235,7 +246,7 @@ export default class Operation extends Component{
       if(selectedKeys[0].length > 3) {
         // 非新建病例
         service.operation.getOperationdetail({recordid: selectedKeys[0]}).then(res => {
-          if(res.code === 200 || "200"){
+          if(res.code === 200 || res.code === "200"){
             this.setState({});
             // 整合请求下来的数据
             let formatData = this.convertOperationDetail(res.object);
@@ -339,12 +350,23 @@ export default class Operation extends Component{
   // TODO
   // 婴儿数量变化 需要特殊处理
   handleTabsEdit = (targetKey, action) => {
+    let { currentShowData } = this.state;
+    console.log(targetKey);
     if( action === 'remove') {
-
+      const i = currentShowData['operative_procedure']['fetus'].findIndex(item => item.id === targetKey);
+      currentShowData['operative_procedure']['fetus'].splice(i,1);
     }else if(action === 'add') {
-
+      currentShowData['operative_procedure']['fetus'].push({
+        id: Math.random()
+      })
     }
+    this.setState({currentShowData});
   };
+  // 处理
+  handleTabClick = (key) => {
+    this.setState({currentFetusKey: key});
+  }
+
 
   handleTemplateSelect = (templateId) => {
     const { currentShowData } = this.state;
@@ -426,24 +448,20 @@ export default class Operation extends Component{
 
   getTemplateInput = ({content}) => {
     const { currentShowData } = this.state;
+    const { type } = this.state.templateObj;
     switch(type) {
-      case 'or1':
-        specialistemrData[index]['chief_complaint'] = content;
-        break;
       case 'or2':
-        specialistemrData[index]['medical_history'] = content;
+        const { currentFetusKey } = this.state;
+        const i = currentShowData['operative_procedure']['fetus'].findIndex(item => item.id === currentFetusKey);
+        console.log(currentShowData['operative_procedure']['fetus']);
+        currentShowData['operative_procedure']['fetus'][i]['special_case'] = "";
+        currentShowData['operative_procedure']['fetus'][i]['special_case'] = content;
         break;
       case 'or3':
-        specialistemrData[index]['other_exam'] = content;
-        break;
-      case 'or4':
-        specialistemrData[index]['diagnosis'] = content;
-        break;
-      case 'or5':
-        specialistemrData[index]['treatment'] = content;
+        currentShowData['surgery']['doctors_advice'] = content;
         break;
       case 'or6':
-        specialistemrData[index]['karyotype'] = content;
+        currentShowData['ward']['operationProcedure'] = content;
         break;
       default:
         console.log('type error');

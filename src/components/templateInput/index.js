@@ -22,15 +22,19 @@ class TemplateInput extends Component {
       currentSelection: [],
       currentInput: '',
       isNewTemplate: false,
-      currentTemplateData: {} // 包含doctor和type字段
+      currentTemplateData: {
+        doctor: "",
+        type: ""
+      } // 包含doctor和type字段
     };
   }
 
   componentDidMount() {
-    const { doctor, type } = this.props.data;
+    const { doctor = "", type } = this.props.data;
     this.setState({ currentTemplateData: { doctor, type } }, () => this.getTemplateList());
   }
 
+  // 输入会触发这个方法，可以考虑优化
   componentDidUpdate(prevProps, prevState, snapshot) {
     const { doctor, type } = this.props.data;
     if (prevProps.data.doctor !== doctor || prevProps.data.type !== type) {
@@ -39,7 +43,6 @@ class TemplateInput extends Component {
       });
     }
   }
-
 
   /* ===================  =================== */
   getTemplateList = () => {

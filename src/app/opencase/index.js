@@ -3,7 +3,7 @@ import { Select, Button, message } from 'antd';
 
 import service from '../../service/index.js';
 
-import formRender from '../../render/form';
+import formRender,{ fireForm } from '../../render/form';
 import Page from '../../render/page';
 
 import "../index.less";
@@ -53,7 +53,12 @@ export default class OpenCase extends Component {
         columns: [
           {name: 'username[姓名]', type: 'input', span: 6, valid: 'required'},
           {name: 'userage[年龄]', type: 'input', span: 6, valid: 'required'},
-          {name: 'useridno[身份证]', type: 'input', span: 6, valid: 'required'}
+          {
+            name: 'useridno[身份证]', type: 'input', span: 6, valid: (value) => {
+              let IDReg = new RegExp(/^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/);
+              return IDReg.test(value);
+            }
+          }
         ]
       },
       {
@@ -121,12 +126,12 @@ export default class OpenCase extends Component {
       {
         columns: [
           // TODO 这里缺少 地级市 级联选择器
-          {name: 'useraddress[户口地址]', type: 'input', addonBefore: citySelection, placeholder: '请输入详细地址', span: 12, options: hyOptions},
+          {name: 'useraddress[户口地址]', type: 'input', addonBefore: citySelection, placeholder: '请输入详细地址', span: 12,  options: hyOptions},
         ]
       },
       {
         columns: [
-          {name: 'userconstant[居住地址]', type: 'input', addonBefore: citySelection,placeholder: '请输入详细地址',span: 12, options: hyOptions},
+          {name: 'userconstant[居住地址]', type: 'input', addonBefore: citySelection,placeholder: '请输入详细地址',span: 12,valid: 'required', options: hyOptions},
         ]
       }
     ]
@@ -170,27 +175,49 @@ export default class OpenCase extends Component {
 
   /* ======================= handler =============================== */
   handlePregnancyChange = (_,{name,value}) => {
-    const { pregnancyData } = this.state;
-    pregnancyData[name] = value;
-    this.setState({pregnancyData});
+    let { pregnancyData } = this.state;
+    let obj = {}; obj[name] = value;
+    let newData = Object.assign(pregnancyData, obj);
+    this.setState({pregnancyData, newData});
   };
   handleBenYunChange = (_,{name,value}) => {
     const { benYunData } = this.state;
-    benYunData[name] = value;
-    this.setState({benYunData});
+    let obj = Object.assign({}, benYunData); 
+    obj[name] = value;
+    this.setState({benYunData: obj});
   };
   //
   handleSave = () => {
     const { pregnancyData, benYunData } = this.state;
-    service.opencase.addyc({...pregnancyData, ...benYunData}).then(res => {
-      message.success(`成功建册，userid为${res.id}，输入门诊号切换孕妇`);
-      // 新建了一个id，设置到
-      // const userid = res.id;
+    console.log(pregnancyData);
+    fireForm(document.getElementById('form-block'),'valid').then(valid => {
+      console.log(valid);
+      if(valid){
+        // 判断身份证
+        if(Number(pregnancyData.useridno.slice(16,17)) % 2 === 1) {
+          message.error('请输入女性身份证信息');
+          return ;
+        }
 
-    });
-    service.opencase.useryc({...pregnancyData, ...benYunData}).then(res => {
-      console.log(res);
-    });
+        // service.opencase.addyc({...pregnancyData, ...benYunData}).then(res => {
+        //   console.log(res);
+        //   const { data } = res;
+        //   if(data.code === "200" || data.code === "1") {
+        //     message.success(data.message);
+        //   }else {
+        //     message.error(data.message)
+        //   }; 
+        // });
+        // service.opencase.useryc({...pregnancyData, ...benYunData}).then(res => {
+        //   if(data.code === "200") {
+        //   }else {
+        //     message.error(data.message)
+        //   }
+        // });
+      }
+    })
+    
+    
   };
 
 
@@ -198,7 +225,7 @@ export default class OpenCase extends Component {
     console.log(this.state);
     const { pregnancyData, benYunData } = this.state;
     return (
-      <Page>
+      <Page id="form-block">
         <div className="bgWhite pad-mid">
           <div>
             {formRender(pregnancyData,this.pregnancy_data_config(), this.handlePregnancyChange)}

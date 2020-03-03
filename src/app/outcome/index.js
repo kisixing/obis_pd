@@ -89,7 +89,7 @@ export default class OutCome extends Component{
 
   componentDidMount() {
     service.outcome.getDeliveryOutcome().then(res => {
-      if(res.code === 200 || "200"){
+      if(res.code === 200 || res.code === "200"){
         res.object['deliveryList'].forEach(fetus => {
           Object.keys(fetus).forEach(key => {
             if(fetus[key].indexOf('{') !== -1 && fetus[key].indexOf('}') !== -1) {

@@ -39,6 +39,44 @@ export function pharacyinput(props) {
   )
 }
 
+
+export function bloodinput(props) {
+  const { name, entity, onChange, value, onBlur } = props;
+  let targetData = value.split('|') || "";
+  const handleChangeName = (e) => {
+    if (targetData[0] !== e.target.value) {
+      if (onChange) {
+        targetData[0] = e.target.value;
+        onChange(e, `${targetData[0]}|${targetData[1]}`).then(() => onBlur({checkedChange: true}));
+      } else {
+        console.log('miss onChange: ' + props.name);
+      }
+    }
+  };
+  const handleChangeVolume = (e) => {
+    if (targetData[1] !== e.target.value) {
+      if (onChange) {
+        targetData[1] = e.target.value;
+        onChange(e, `${targetData[0]}|${targetData[1]}`).then(() => onBlur({checkedChange: true}));
+      } else {
+        console.log('miss onChange: ' + props.name);
+      }
+    }
+  };
+
+  return (
+    <div style={{display: 'flex'}}>
+      <span>（时间：</span>
+      <Input  defaultValue={targetData[0] || ""} onChange={handleChangeName}/>
+      <span>，</span>
+      <span>原因：</span>
+      <Input  defaultValue={targetData[1] || ""} onChange={handleChangeVolume}/>
+      <span>）</span>
+    </div>
+  )
+}
+
+
 // TODO 可能有一点问题，下午排查
 export function hemorrhageselect(props) {
   const { name, entity, onChange, onBlur } = props;
