@@ -30,7 +30,7 @@ export default {
    * 获取个人信息
    */
   getuserDoc: function () {
-    userId = myAxios.get('/outpatientRestful/getuserDoc' + location.search);
+    userId = myAxios.get('outpatientRestful/getuserDoc' + location.search);
     return userId;
   },
   /**
@@ -43,25 +43,25 @@ export default {
    * 高危数据
    */
   highrisk: function () {
-    return myAxios.get('/outpatientRestful/findHighriskTree')
+    return myAxios.get('outpatientRestful/findHighriskTree')
   },
   /**
    * 高危弹出提醒判断
    */
   checkHighriskAlert: function (id) {
-    return myAxios.post('/outpatientWriteRestful/checkHighriskAlert', { userid: id, inputType: '2', data: '' });
+    return myAxios.post('outpatientWriteRestful/checkHighriskAlert', { userid: id, inputType: '2', data: '' });
   },
   /**
    * 高危弹出提醒不再提示
    */
   closeHighriskAlert: function (id, params) {
-    return myAxios.post('/outpatientWriteRestful/closeHighriskAlert', { userid: id, mark: params });
+    return myAxios.post('outpatientWriteRestful/closeHighriskAlert', { userid: id, mark: params });
   },
   /**
    * 添加高危标记
    */
   addHighrisk: function (userid, highrisk, level) {
-    return myAxios.post('/outpatientWriteRestful/addHighrisk', { userid, highrisk, level });
+    return myAxios.post('outpatientWriteRestful/addHighrisk', { userid, highrisk, level });
   },
   /**
    * 根据 身份证号/就诊卡号/手机/建档号 搜索
@@ -70,7 +70,7 @@ export default {
     // 这里的userid字段名称不是userid 而是 id
     // 修改字段后再return Promise
     // 由于接口是使用本页面的userId，所以要在这里设置
-    return myAxios.get(`/prenatalQuery/findUser?useridno=${useridno}&usermcno=${usermcno}&usermobile=${usermobile}&chanjno=&id=`).then(res => {
+    return myAxios.get(`prenatalQuery/findUser?useridno=${useridno}&usermcno=${usermcno}&usermobile=${usermobile}&chanjno=&id=`).then(res => {
       res['object']['userid'] = res['object']['id'];
       res['object']['tuserweek'] = res['object']['gesweek'];
       // 有几个字段还没有

@@ -91,17 +91,17 @@ const duration = {name: 'duration[持续时间](min)', type: 'input', span: SPAN
 const timesOfNeedleInsertion = {name: 'timesOfNeedleInsertion[进针次术]', type: 'input', span: SPAN_6};
 const placenta = {name: 'placenta[经否胎盘]', type: 'select',options: [{label: '经',value: '经'},{label: '否',value: '否'}], span: SPAN_6};
 const placentaHemorrhage = {name: 'placentaHemorrhage[胎盘出血]', type: 'hemorrhageselect', span: SPAN_6};
-const uterineWallHemorrhage = {name: 'uterineWallHemorrhage[宫壁出血]', type: 'select',options: yesOptions, span: SPAN_6};
+const uterineWallHemorrhage = {name: 'uterineWallHemorrhage[宫壁出血]', type: 'hemorrhageselect',options: yesOptions, span: SPAN_6};
 const inspectionItems = {name: 'inspectionItems[送检项目]', type: 'treeselect', options: sjTreeOption,span: SPAN_6};
 const amniotic_fluid = {name: 'amniotic_fluid[羊水量](ml)', type: 'input', span: SPAN_6};
 const isPharmacy = {name: 'isPharmacy[是否用药]', type: 'checkinput', radio: true, options: isPharacyOptions, span: SPAN_18}
 const process_evaluation = {name: 'process_evaluation[过程评估]', type: 'checkinput', radio:true, options:statusOptions, span: SPAN_20};
 const diagnosis = {name: 'diagnosis[诊断]', type: 'textarea', span: SPAN_18};
 const special_case = {name: 'special_case[特殊记录]', type: 'textarea', span: SPAN_18};
-const negativePressure = {name: 'negativePressure[负压](mpa)', type: 'input', span: SPAN_6};
+const negativePressure = {name: 'negativePressure[负压](ml)', type: 'input', span: SPAN_6};
 const villusVolume = {name: 'villusVolume[绒毛量](mg)', type: 'input', span:SPAN_6};
 const numberOfHits = {name: 'numberOfHits[刺中次数]', type: 'input', span: SPAN_6};
-const omphalorrhagia = {name: 'omphalorrhagia[脐带出血]', type: 'select', options: yesOptions, span: SPAN_6};
+const omphalorrhagia = {name: 'omphalorrhagia[脐带出血]', type: 'hemorrhageselect', options: yesOptions, span: SPAN_6};
 const cordBloodVolume = {name: 'cordBloodVolume[脐血量](ml)', type: 'input', span: SPAN_6};
 const punctureCount = {name: 'punctureCount[穿刺次数]', type: 'input', span: SPAN_6};
 // 术后情况
@@ -133,7 +133,6 @@ const config0 = {
       {columns: [{name: 'puncturePosition[穿刺部位]', type: 'select', options: puncturePositionOptions0, span: SPAN_6},timesOfNeedleInsertion]},
       {columns: [placenta,placentaHemorrhage,uterineWallHemorrhage]},
       {columns: [inspectionItems,amniotic_fluid,{name: 'character[性状]', type: 'select',options: characterOptions0, span: SPAN_6}]},
-      {columns: [{label: '之后完善药物/用量输入框'}]},
       {columns: [isPharmacy]},
       {columns: [process_evaluation]},
       {columns: [diagnosis]},
@@ -543,7 +542,7 @@ const ward_config = (templateFn) => ({
     {
       columns: [
         {name: 'operationLevelWard[手术级别]', type: 'select', valid: 'required',options:operationLevelOptions , span: SPAN_6},
-        {name: 'incisionTypeWard[切开类型]', type: 'select', valid: 'required', options: incisionTypeOptions ,span: SPAN_6},
+        {name: 'incisionTypeWard[切口类型]', type: 'select', valid: 'required', options: incisionTypeOptions ,span: SPAN_6},
       ]
     },
     {
@@ -558,7 +557,7 @@ const ward_config = (templateFn) => ({
     },
     {
       columns:[
-        {name: 'operationDate[手术日期]', type: 'date', valid: 'required', span: SPAN_6},
+        {name: 'operationDate[新增记录日期]', type: 'date', valid: 'required', span: SPAN_6},
         {name: 'startTime[开始时间]', type: 'time', valid: 'required', format: "HH:mm" ,span: SPAN_6},
         {name: 'endTime[结束时间]', type: 'time', valid: 'required', format: "HH:mm", span: SPAN_6}
       ]

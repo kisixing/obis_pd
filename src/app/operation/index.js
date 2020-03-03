@@ -125,7 +125,9 @@ export default class Operation extends Component{
     // key-用于请求
     data.forEach(item => tnDOM.push(
       <TreeNode title={item['title'].slice(0,10)} key={item['key']}>
-        {item['children'].map(v => <TreeNode title={v['title']} key={v['key']}/>)}
+        {item['children'].map(v => 
+          (<TreeNode title={v['title']} key={v['key']}/>)
+        )}
       </TreeNode>)
     );
     return <Tree
@@ -195,12 +197,12 @@ export default class Operation extends Component{
     const newId = 0 - Math.random()*100|0;
     const todayIndex = operationList.findIndex(item => item.title === todayStr);
     if(todayIndex !== -1){
-      operationList[todayIndex].children.splice(0,0,{title: '待完善病例', key: newId});
+      operationList[todayIndex].children.splice(0,0,{title: '待完善手术记录', key: newId});
       if(currentExpandedKeys.findIndex(key => key === operationList[index].key) === -1) {
         currentExpandedKeys.push(operationList[todayIndex].key); 
       }
      }else {
-      operationList.splice(0,0,{title:  todayStr, key: todayStr, children: [{title: "待完善病历", key: newId}]});
+      operationList.splice(0,0,{title:  todayStr, key: todayStr, children: [{title: "待完善手术记录", key: newId}]});
       currentExpandedKeys.push(todayStr);
     }
     const currentData = {

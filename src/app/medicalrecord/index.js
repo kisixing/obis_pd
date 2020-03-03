@@ -88,7 +88,6 @@ const mapValueToKey = (obj, keyStr = "", val) => {
   } else {
     // 检查到 - ，是数组，try-catch
     const nextKey = keyStr.slice(0, arrayIndex);
-    // 这个位置可能会BUG
     if (Object.prototype.toString.call(obj[nextKey]) !== "[object Array]") {
       obj[nextKey] = [];
     }
@@ -243,7 +242,7 @@ export default class MedicalRecord extends Component {
           { span: 1 },
           { name: 'hbA2[HbA2]', type: 'input', span: 6, showSearch: true},
           { name: 'blood_group[血型]', type: 'select', span: 6, showSearch: true, options: baseData.xuexingOptions},
-          { name: 'rh[RH(D)血型]', type: 'select', span: '6', options: baseData.xuexing2Options}
+          { name: 'rh[RH(D)血型]', type: 'select', span: 6, options: baseData.xuexing2Options}
         ]
       },
       {
@@ -274,7 +273,7 @@ export default class MedicalRecord extends Component {
           { span: 1 },
           { name: 'hbA2[HbA2]', type: 'input', span: 6, showSearch: true},
           { name: 'blood_group[血型]', type: 'select', span: 6, showSearch: true, options: baseData.xuexingOptions},
-          { name: 'rh[血型]', type: 'select', span: '6', options: baseData.xuexing2Options}
+          { name: 'rh[RH(D)血型]', type: 'select', span: 6, options: baseData.xuexing2Options}
         ]
       },
       {
@@ -748,7 +747,7 @@ export default class MedicalRecord extends Component {
    * @param value       值
    */
   handleFormChange = (path, name, value) => {
-    let { specialistemrData, currentTreeKeys } = this.state;
+    const { specialistemrData, currentTreeKeys } = this.state;
     const index = specialistemrData.findIndex(item => item.id.toString() === currentTreeKeys[0]);
     if (path === "") {
       // 为第一层值
@@ -797,6 +796,7 @@ export default class MedicalRecord extends Component {
             message.success('成功保存');
             service.medicalrecord.getspecialistemr().then(res => {
               if (res.code === "200" || 200) {
+                message.success('200 保存成功');
                 this.setState({ specialistemrList: res.object.list }, () => { })
               }
             });
