@@ -126,7 +126,7 @@ export default class Operation extends Component{
     data.forEach(item => tnDOM.push(
       <TreeNode title={item['title'].slice(0,10)} key={item['key']}>
         {item['children'].map(v => 
-          (<TreeNode title={v['title']} key={v['key']}/>)
+          (<TreeNode title={<span style={{color: v.key > 0 ? 'black' : 'red'}}>{v['title']}</span>} key={v['key']}/>)
         )}
       </TreeNode>)
     );
@@ -479,7 +479,7 @@ export default class Operation extends Component{
       <Page className="fuzhen font-16">
         <div className="fuzhen-left ant-col-5">
           <div style={{textAlign: 'center'}}>
-            <Button size="small" onClick={this.newOperation}>新增病历</Button>
+            <Button size="small" onClick={this.newOperation}>新增手术记录</Button>
           </div>
           <div>
             {this.renderTree(operationList)}

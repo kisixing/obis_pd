@@ -3,6 +3,8 @@ import { Select, Button, message } from 'antd';
 
 import service from '../../service/index.js';
 
+import { GetExpected } from '../../utils/index';
+
 import formRender,{ fireForm } from '../../render/form';
 import Page from '../../render/page';
 
@@ -175,14 +177,18 @@ export default class OpenCase extends Component {
 
   /* ======================= handler =============================== */
   handlePregnancyChange = (_,{name,value}) => {
-    let { pregnancyData } = this.state;
-    let obj = {}; obj[name] = value;
-    let newData = Object.assign(pregnancyData, obj);
-    this.setState({pregnancyData, newData});
+    const { pregnancyData } = this.state;
+    let obj = Object.assign({}, pregnancyData);
+    obj[name] = value;
+    this.setState({pregnancyData, obj});
   };
   handleBenYunChange = (_,{name,value}) => {
     const { benYunData } = this.state;
     let obj = Object.assign({}, benYunData); 
+    if(name === 'gesmoc'){
+      const gesexpect = GetExpected(value);
+      obj['gesexpect'] = gesexpect;
+    }
     obj[name] = value;
     this.setState({benYunData: obj});
   };
@@ -198,22 +204,23 @@ export default class OpenCase extends Component {
           message.error('请输入女性身份证信息');
           return ;
         }
-
-        // service.opencase.addyc({...pregnancyData, ...benYunData}).then(res => {
-        //   console.log(res);
-        //   const { data } = res;
-        //   if(data.code === "200" || data.code === "1") {
-        //     message.success(data.message);
-        //   }else {
-        //     message.error(data.message)
-        //   }; 
-        // });
-        // service.opencase.useryc({...pregnancyData, ...benYunData}).then(res => {
-        //   if(data.code === "200") {
-        //   }else {
-        //     message.error(data.message)
-        //   }
-        // });
+        // 转换数据格式
+        benYunData['chanc'] = Number(benYunData['chanc']);
+        benYunData['yunc'] = Number(benYunData['yunc']);
+        service.opencase.addyc({...pregnancyData, ...benYunData}).then(res => {
+          const { data } = res;
+          if(data.code === "200" || data.code === "1") {
+            message.success(data.message);
+          }else {
+            message.error(data.message)
+          }; 
+        });
+        service.opencase.useryc({...pregnancyData, ...benYunData}).then(res => {
+          if(data.code === "200") {
+          }else {
+            message.error(data.message)
+          }
+        });
       }
     })
     

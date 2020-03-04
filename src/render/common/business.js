@@ -77,11 +77,11 @@ export function bloodinput(props) {
 }
 
 
-// TODO 可能有一点问题，下午排查
+
 export function hemorrhageselect(props) {
   const { name, entity, onChange, onBlur } = props;
 
-  let data = {label:'有', value:''};
+  let data = {label:'', value:''};
   // 设置初始值
   if(entity[name]){
     // console.log(entity);
@@ -118,3 +118,27 @@ export function hemorrhageselect(props) {
     </Select>
   )
 }
+
+export function whetherbleedingselect(props) {
+  const { name, entity, onChange, onBlur } = props;
+
+  var uValue = '';
+  
+  // 设置初始值
+  if(entity[name]){
+    uValue = entity[name].value;
+  }
+
+  // 回调
+  const handleSelect = (value,event) => {
+    uValue = value;
+    onChange(event, uValue).then(() => onBlur({checkedChange:true}));
+  };
+
+  return (
+    <Select onSelect={(value,event) => handleSelect(value, event)}>
+      <Option value="+">+</Option>
+      <Option value="++">++</Option>
+    </Select>
+  )
+} 

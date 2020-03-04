@@ -17,15 +17,15 @@ import * as util from './util';
 function toOptions(data, vfn = () => ({})) {
   if (data instanceof Array) {
     return data.map((v, i) => {
-      const {k, ...rest} = v;
-      return {...rest, label: k || v, value: k || v, ...vfn(k || v, i)}
+      const { k, ...rest } = v;
+      return { ...rest, label: k || v, value: k || v, ...vfn(k || v, i) }
     })
   }
   if (data && typeof data === 'object') {
-    return Object.keys(data).map((v, i) => ({label: data[v], value: v, ...vfn(data[v], v, i)}))
+    return Object.keys(data).map((v, i) => ({ label: data[v], value: v, ...vfn(data[v], v, i) }))
   }
   if (typeof data === 'string') {
-    return data.split(/[,;]/).map((v, i) => ({label: v, value: v, ...vfn(v, i)}))
+    return data.split(/[,;]/).map((v, i) => ({ label: v, value: v, ...vfn(v, i) }))
   }
   return [];
 }
@@ -311,7 +311,7 @@ export const planKey = () => [
   {
     title: 'No',
     key: 'index',
-    format: (v, {row}) => row + 1
+    format: (v, { row }) => row + 1
   },
   {
     title: '时间',
@@ -329,7 +329,7 @@ export const planKey = () => [
     title: '提醒事项',
     key: 'event',
   }
-].map(i => ({type: 'input', ...i}));
+].map(i => ({ type: 'input', ...i }));
 
 /**
  * 管理诊疗组表头
@@ -347,7 +347,7 @@ export const managePlanKey = () => [
     title: '内容',
     key: 'content',
   }
-].map(i => ({type: 'input', ...i}));
+].map(i => ({ type: 'input', ...i }));
 
 /**
  * 新建诊疗组表头
@@ -365,56 +365,56 @@ export const newPlanKey = () => [
     title: '提醒事件',
     key: 'event',
   }
-].map(i => ({type: 'input', ...i}));
+].map(i => ({ type: 'input', ...i }));
 
 /**
  * 诊断输入框的联想数据，当没有输入的时候显示top为true的数据
  */
-export const diagnosis = toOptions('瘢痕子宫,妊娠期糖尿病,妊娠高血压,双胎妊娠,子宫平滑肌瘤'.split(','), v => ({top: true})).concat(toOptions(['高血压', '冠心病', '多胎妊娠', '梅毒']));
+export const diagnosis = toOptions('瘢痕子宫,妊娠期糖尿病,妊娠高血压,双胎妊娠,子宫平滑肌瘤'.split(','), v => ({ top: true })).concat(toOptions(['高血压', '冠心病', '多胎妊娠', '梅毒']));
 
 /**
  * 先露
  */
 export const xlOptions = [
-  {label: '头', value: '1'},
-  {label: '臀', value: '2'},
-  {label: '肩', value: '3'},
-  {label: '/', value: '4'},
+  { label: '头', value: '1' },
+  { label: '臀', value: '2' },
+  { label: '肩', value: '3' },
+  { label: '/', value: '4' },
 ];
 
 /**
  * 位置
  */
 export const wzOptions = [
-  {label: '左', value: '1'},
-  {label: '上', value: '2'},
-  {label: '右下', value: '3'},
-  {label: '左下', value: '4'},
+  { label: '左', value: '1' },
+  { label: '上', value: '2' },
+  { label: '右下', value: '3' },
+  { label: '左下', value: '4' },
 ];
 
 /**
  * 浮肿
  */
 export const ckfuzhOptions = [
-  {label: '-', value: '1'},
-  {label: '+', value: '2'},
-  {label: '++', value: '3'},
-  {label: '+++', value: '4'},
-  {label: '++++', value: '5'},
+  { label: '-', value: '1' },
+  { label: '+', value: '2' },
+  { label: '++', value: '3' },
+  { label: '+++', value: '4' },
+  { label: '++++', value: '5' },
 ];
 
 /**
  * 浮肿
  */
 export const yyfaOptions = [
-  {label: '一天一次', value: '1'},
-  {label: '一天两次', value: '2'},
-  {label: '一天三次', value: '3'},
-  {label: '一天四次', value: '4'},
-  {label: '每四小时一次', value: '5'},
-  {label: '每六小时一次', value: '6'},
-  {label: '每八小时一次', value: '7'},
-  {label: '每晚一次', value: '8'},
+  { label: '一天一次', value: '1' },
+  { label: '一天两次', value: '2' },
+  { label: '一天三次', value: '3' },
+  { label: '一天四次', value: '4' },
+  { label: '每四小时一次', value: '5' },
+  { label: '每六小时一次', value: '6' },
+  { label: '每八小时一次', value: '7' },
+  { label: '每晚一次', value: '8' },
 ];
 
 /**
@@ -426,10 +426,10 @@ export const ckzijzhzOptions = toOptions(['胎动好', '无腹痛', '无阴道�
  * 下次复诊 几周后
  */
 export const nextRvisitWeekOptions = [
-  {label: '', value: ''},
-  {label: '1周后', value: '1,周'},
-  {label: '2周后', value: '2,周'},
-  {label: '4周后', value: '4,周'},
+  { label: '', value: '' },
+  { label: '1周后', value: '1,周' },
+  { label: '2周后', value: '2,周' },
+  { label: '4周后', value: '4,周' },
 ];
 
 /**
@@ -444,23 +444,23 @@ export const rvisitOsTypeOptions = toOptions(['', '普通门诊', '高危门诊'
  * 上午/下午
  */
 export const ckappointmentAreaOptions = [
-  {label: '上午', describe: '上', value: '1'},
-  {label: '下午', describe: '下', value: '2'},
+  { label: '上午', describe: '上', value: '1' },
+  { label: '下午', describe: '下', value: '2' },
 ];
 /**
  * 产检项目
  */
 export const cjOptions = [
-  {label: '胎监', value: '1'},
-  {label: '尿蛋白', value: '2'},
+  { label: '胎监', value: '1' },
+  { label: '尿蛋白', value: '2' },
 ];
 /**
  * 胎监选项
  */
 export const tjOptions = [
-  {label: '有反应', value: '1'},
-  {label: '可疑，复查', value: '2'},
-  {label: '异常，入院治疗', value: '3'},
+  { label: '有反应', value: '1' },
+  { label: '可疑，复查', value: '2' },
+  { label: '异常，入院治疗', value: '3' },
 ];
 
 // 住院登记表
@@ -471,7 +471,7 @@ export const zyksOptions = toOptions(['孕妇区', '产区', '爱婴区', '产�
 /**
  * 是否在我院住院
  */
-export const sfzyOptions = toOptions([{k: '是(shouzhenyy-原住院号)', addspan: 2}, '否']);
+export const sfzyOptions = toOptions([{ k: '是(shouzhenyy-原住院号)', addspan: 2 }, '否']);
 /**
  * 出生地
  */
@@ -511,10 +511,10 @@ export const operation_itemsOptions = toOptions('羊膜腔穿刺术,绒毛活检
 /**
  * 身份证：证件类型
  */
-export const sfzOptions = [{label: '身份证', value: '身份证'},
-  {label: '护照', value: '护照'},
-  {label: '回乡证', value: '回乡证'},
-  {label: '台胞证', value: '台胞证'}];
+export const sfzOptions = [{ label: '身份证', value: '身份证' },
+{ label: '护照', value: '护照' },
+{ label: '回乡证', value: '回乡证' },
+{ label: '台胞证', value: '台胞证' }];
 
 /**
  * 证件类型
@@ -534,17 +534,17 @@ export const syfsOptions = toOptions('IVF{#FF3300}');
 /**
  * 血型O,A,B,AB
  */
-export const xuexingOptions = [{label: 'O', value: 'O'},
-  {label: 'A', value: 'A'},
-  {label: 'B', value: 'B'},
-  {label: 'AB', value: 'AB'}];
+export const xuexingOptions = [{ label: 'O', value: 'O' },
+{ label: 'A', value: 'A' },
+{ label: 'B', value: 'B' },
+{ label: 'AB', value: 'AB' }];
 //toOptions('O,A,B,AB');
 
 /**
  * 血型RH(+),RH(-)
  */
-export const xuexing2Options = [{label: 'RH(+)', value: 'RH(+)'},
-  {label: 'RH(-)', value: 'RH(-)'}];
+export const xuexing2Options = [{ label: 'RH(+)', value: 'RH(+)' },
+{ label: 'RH(-)', value: 'RH(-)' }];
 //toOptions('RH(+),RH(-)');
 
 /**
@@ -568,14 +568,14 @@ export const gjtpOptions = toOptions('正常,异常,未有检查,不清楚');
 export const xzpOptions = toOptions([{
   k: '红细胞{#FF3300}(shouzhenyy-时间,医院,原因)',
   addspan: 2
-}, {k: '血小板{#FF3300}(shouzhenyy-时间,医院,原因)', addspan: 2}, {
+}, { k: '血小板{#FF3300}(shouzhenyy-时间,医院,原因)', addspan: 2 }, {
   k: '血浆{#FF3300}(shouzhenyy-时间,医院,原因)',
   addspan: 2
-}, {k: '全血{#FF3300}(shouzhenyy2-时间,医院,原因)', addspan: 2}, {
+}, { k: '全血{#FF3300}(shouzhenyy2-时间,医院,原因)', addspan: 2 }, {
   k: '白蛋白{#FF3300}(shouzhenyy2-时间,医院,原因)',
   addspan: 2
-}, {k: '免疫球蛋白{#FF3300}(shouzhenyy2-时间,医院,原因)', addspan: 2}, '其他{#FF3300}', '不清楚']);
-export const sxsOptions = toOptions([{k: '有{#FF3300}(shouzhenyy-时间,原因)', addspan: 2}]);
+}, { k: '免疫球蛋白{#FF3300}(shouzhenyy2-时间,医院,原因)', addspan: 2 }, '其他{#FF3300}', '不清楚']);
+export const sxsOptions = toOptions([{ k: '有{#FF3300}(shouzhenyy-时间,原因)', addspan: 2 }]);
 
 /**
  * 数量
@@ -657,7 +657,7 @@ export const nhOptions = toOptions('有(input){#FF3300},无');
 
 export const isPharacyOptions = toOptions('有(pharacyinput),无');
 
-export const wssOptions = toOptions([{k: '有{#FF3300}(input)', addspan: 2}]);
+export const wssOptions = toOptions([{ k: '有{#FF3300}(input)', addspan: 2 }]);
 
 /**
  * 是否用药 （含有用药特殊输入框）
@@ -665,9 +665,9 @@ export const wssOptions = toOptions([{k: '有{#FF3300}(input)', addspan: 2}]);
 export const iumOption = toOptions('有(右)(input),无');
 
 /**
- * 是否出现 （含特殊输入框）
+ * 是否出血 （含特殊输入框）
  */
-export const wbOptions = toOptions('有,无');
+export const wbOptions = toOptions('有(whetherbleedingselect),无');
 
 /**
  *乳头
@@ -843,7 +843,7 @@ export const pregnanciesColumns = [
     title: '孕次',
     key: 'index',
     width: '50',
-    format: (v, {row}) => row + 1
+    format: (v, { row }) => row + 1
   },
   {
     title: '   年-月    ',
@@ -942,9 +942,9 @@ export const pregnanciesColumns = [
         type: 'select',
         showSearch: true,
         options: [
-          {label: '男', value: '1'},
-          {label: '女', value: '2'},
-          {label: '未知', value: '3'},
+          { label: '男', value: '1' },
+          { label: '女', value: '2' },
+          { label: '未知', value: '3' },
         ],
       },
       {
@@ -953,9 +953,9 @@ export const pregnanciesColumns = [
         type: 'select',
         showSearch: true,
         options: [
-          {label: '健在', value: '1'},
-          {label: '死亡', value: '2'},
-          {label: '未知', value: '3'},
+          { label: '健在', value: '1' },
+          { label: '死亡', value: '2' },
+          { label: '未知', value: '3' },
         ],
       },
       {
@@ -1015,12 +1015,12 @@ export const lisiColumns = [
 /**
  * 术者
  */
-export const operaterOptions = [{label: '张志', value: '张志'}, {label: '王军', value: '王军'}];
+export const operaterOptions = [{ label: '张志', value: '张志' }, { label: '王军', value: '王军' }];
 
 /**
  * 身份证：证件类型
  */
-export const assistantOptions = [{label: '李志', value: '李志'}, {label: '李君', value: '李君'}];
+export const assistantOptions = [{ label: '李志', value: '李志' }, { label: '李君', value: '李君' }];
 /**
  *叶酸
  */
@@ -1046,17 +1046,17 @@ export const incisionTypeOptions = toOptions('01,02,03,1,2,3,4');
  */
 // 超声检查
 export const preoperativeUltrasonographyColumns0 = [
-  {title: '胎儿', key: 'fetus', type: 'input'},
-  {title: 'BPD(mm)', key: 'bpd', type: 'input'},
-  {title: '超声孕周', key: 'gestationalWeek', type: 'input'},
-  {title: 'FL(mm)', key: 'fl', type: 'input'},
-  {title: 'HL(mm)', key: 'hl', type: 'input'},
-  {title: 'AFV(mm)', key: 'afv', type: 'input'},
-  {title: '胎盘厚度(mm)', key: 'fetalThickness', type: 'input'},
-  {title: '胎盘位置', key: 'fetalPosition', type: 'input'},
-  {title: '脐静脉直径(mm)', key: 'umbilicalVeins', type: 'input'},
-  {title: '胎心率(bpm)', key: 'fhr', type: 'input'},
-  {title: '备注', key: 'remark', type: 'input'},
+  { title: '胎儿', key: 'fetus', type: 'input' },
+  { title: 'BPD(mm)', key: 'bpd', type: 'input' },
+  { title: '超声孕周', key: 'gestationalWeek', type: 'input' },
+  { title: 'FL(mm)', key: 'fl', type: 'input' },
+  { title: 'HL(mm)', key: 'hl', type: 'input' },
+  { title: 'AFV(mm)', key: 'afv', type: 'input' },
+  { title: '胎盘厚度(mm)', key: 'fetalThickness', type: 'input' },
+  { title: '胎盘位置', key: 'fetalPosition', type: 'input' },
+  { title: '脐静脉直径(mm)', key: 'umbilicalVeins', type: 'input' },
+  { title: '胎心率(bpm)', key: 'fhr', type: 'input' },
+  { title: '备注', key: 'remark', type: 'input' },
 ];
 // 穿刺部位
 export const puncturePositionOptions0 = toOptions('经胎盘,经羊膜');
@@ -1068,15 +1068,15 @@ export const characterOptions0 = toOptions('淡黄色,水样,血染,新鲜血性
  */
 // 超声检查
 export const preoperativeUltrasonographyColumns1 = [
-  {title: '胎儿', key: 'fetus', type: 'input'},
-  {title: 'BPD(mm)', key: 'bpd', type: 'input'},
-  {title: '超声孕周', key: 'gestationalWeek', type: 'input'},
-  {title: 'CRL(mm)', key: 'crl', type: 'input'},
-  {title: '孕囊大小(cm&sup2)', key: 'cellNatureSize', type: 'input'},
-  {title: '胎心搏动(bpm)', key: 'fhb', type: 'input'},
-  {title: '孕囊与宫璧分离部位', key: 'gsUwSeparationPart', type: 'input'},
-  {title: '分离部分面积(cm&sup2)', key: 'gsUwSeparationSize', type: 'input'},
-  {title: '胎盘位置', key: 'fetalPosition', type: 'input'},
+  { title: '胎儿', key: 'fetus', type: 'input' },
+  { title: 'BPD(mm)', key: 'bpd', type: 'input' },
+  { title: '超声孕周', key: 'gestationalWeek', type: 'input' },
+  { title: 'CRL(mm)', key: 'crl', type: 'input' },
+  { title: '孕囊大小(cm&sup2)', key: 'cellNatureSize', type: 'input' },
+  { title: '胎心搏动(bpm)', key: 'fhb', type: 'input' },
+  { title: '孕囊与宫璧分离部位', key: 'gsUwSeparationPart', type: 'input' },
+  { title: '分离部分面积(cm&sup2)', key: 'gsUwSeparationSize', type: 'input' },
+  { title: '胎盘位置', key: 'fetalPosition', type: 'input' },
 ]
 // 穿刺部位
 export const puncturePositionOptions1 = toOptions('经宫颈,经腹部');
@@ -1090,17 +1090,17 @@ export const characterOptions1 = toOptions('典型,不典型');
 * */
 // 超声
 export const preoperativeUltrasonographyColumns2 = [
-  {title: '胎儿', key: 'fetus', type: 'input'},
-  {title: 'BPD(mm)', key: 'bpd', type: 'input'},
-  {title: '超声孕周', key: 'gestationalWeek', type: 'input'},
-  {title: 'FL(mm)', key: 'fl', type: 'input'},
-  {title: 'HL(mm)', key: 'hl', type: 'input'},
-  {title: 'AFV(mm)', key: 'afv', type: 'input'},
-  {title: '胎盘厚度(mm)', key: 'fetalThickness', type: 'input'},
-  {title: '胎盘位置', key: 'fetalPosition', type: 'input'},
-  {title: '脐静脉直径(mm)', key: 'umbilicalVeins', type: 'input'},
-  {title: '胎心率(bpm)', key: 'fhr', type: 'input'},
-  {title: '备注', key: 'remark', type: 'input'},
+  { title: '胎儿', key: 'fetus', type: 'input' },
+  { title: 'BPD(mm)', key: 'bpd', type: 'input' },
+  { title: '超声孕周', key: 'gestationalWeek', type: 'input' },
+  { title: 'FL(mm)', key: 'fl', type: 'input' },
+  { title: 'HL(mm)', key: 'hl', type: 'input' },
+  { title: 'AFV(mm)', key: 'afv', type: 'input' },
+  { title: '胎盘厚度(mm)', key: 'fetalThickness', type: 'input' },
+  { title: '胎盘位置', key: 'fetalPosition', type: 'input' },
+  { title: '脐静脉直径(mm)', key: 'umbilicalVeins', type: 'input' },
+  { title: '胎心率(bpm)', key: 'fhr', type: 'input' },
+  { title: '备注', key: 'remark', type: 'input' },
 ];
 // 穿刺
 export const puncturePositionOptions2 = toOptions('脐静脉,脐带游离段');
@@ -1111,50 +1111,50 @@ export const characterOptions2 = toOptions('鲜红,混入羊水,混入母血');
 * 羊膜腔灌注
 * */
 export const preoperativeUltrasonographyColumns3 = [
-  {title: '胎儿', key: 'fetus', type: 'input'},
-  {title: '超声孕周', key: 'gestationalWeek', type: 'input'},
-  {title: 'BPD(mm)', key: 'bpd', type: 'input'},
-  {title: 'NT(mm)', key: 'nt', type: 'input'},
-  {title: 'FL(mm)', key: 'fl', type: 'input'},
-  {title: 'HL(mm)', key: 'hl', type: 'input'},
-  {title: 'AFV(mm)', key: 'afv', type: 'input'},
-  {title: '胎心率(bpm)', key: 'fhr', type: 'input'},
-  {title: '胎盘厚度(mm)', key: 'fetalThickness', type: 'input'},
-  {title: '胎盘位置', key: 'fetalPosition', type: 'input'},
-  {title: '其他项目', key: 'otherProject', type: 'input'}
+  { title: '胎儿', key: 'fetus', type: 'input' },
+  { title: '超声孕周', key: 'gestationalWeek', type: 'input' },
+  { title: 'BPD(mm)', key: 'bpd', type: 'input' },
+  { title: 'NT(mm)', key: 'nt', type: 'input' },
+  { title: 'FL(mm)', key: 'fl', type: 'input' },
+  { title: 'HL(mm)', key: 'hl', type: 'input' },
+  { title: 'AFV(mm)', key: 'afv', type: 'input' },
+  { title: '胎心率(bpm)', key: 'fhr', type: 'input' },
+  { title: '胎盘厚度(mm)', key: 'fetalThickness', type: 'input' },
+  { title: '胎盘位置', key: 'fetalPosition', type: 'input' },
+  { title: '其他项目', key: 'otherProject', type: 'input' }
 ];
 
 /*
 * 选择性减胎术
 * */
 export const preoperativeUltrasonographyColumns4 = [
-  {title: '绒毛膜性质', key: 'chorionicity', type: 'input'},
-  {title: '胎儿位置', key: 'fetusPosition', type: 'input'},
-  {title: '超声孕周', key: 'gestationalWeek', type: 'input'},
-  {title: 'BPD(mm)', key: 'bpd', type: 'input'},
-  {title: 'NT(mm)', key: 'nt', type: 'input'},
-  {title: 'FL(mm)', key: 'fl', type: 'input'},
-  {title: 'AFV(mm)', key: 'afv', type: 'input'},
-  {title: '胎心率(bpm)', key: 'fhr', type: 'input'},
-  {title: '胎盘厚度(mm)', key: 'fetalThickness', type: 'input'},
-  {title: '胎盘位置', key: 'fetalPosition', type: 'input'},
-  {title: '备注', key: 'remark', type: 'input'}
+  { title: '绒毛膜性质', key: 'chorionicity', type: 'input' },
+  { title: '胎儿位置', key: 'fetusPosition', type: 'input' },
+  { title: '超声孕周', key: 'gestationalWeek', type: 'input' },
+  { title: 'BPD(mm)', key: 'bpd', type: 'input' },
+  { title: 'NT(mm)', key: 'nt', type: 'input' },
+  { title: 'FL(mm)', key: 'fl', type: 'input' },
+  { title: 'AFV(mm)', key: 'afv', type: 'input' },
+  { title: '胎心率(bpm)', key: 'fhr', type: 'input' },
+  { title: '胎盘厚度(mm)', key: 'fetalThickness', type: 'input' },
+  { title: '胎盘位置', key: 'fetalPosition', type: 'input' },
+  { title: '备注', key: 'remark', type: 'input' }
 ];
 
 /*
 * 羊水减量
 * */
 export const preoperativeUltrasonographyColumns5 = [
-  {title: '胎儿', key: 'fetus', type: 'input'},
-  {title: '超声孕周', key: 'gestationalWeek', type: 'input'},
-  {title: 'BPD(mm)', key: 'bpd', type: 'input'},
-  {title: 'NT(mm)', key: 'nt', type: 'input'},
-  {title: 'FL(mm)', key: 'fl', type: 'input'},
-  {title: 'AFV(mm)', key: 'afv', type: 'input'},
-  {title: '胎心率(bpm)', key: 'fhr', type: 'input'},
-  {title: '胎盘厚度(mm)', key: 'fetalThickness', type: 'input'},
-  {title: '胎盘位置', key: 'fetalPosition', type: 'input'},
-  {title: '其他项目', key: 'otherProject', type: 'input'}
+  { title: '胎儿', key: 'fetus', type: 'input' },
+  { title: '超声孕周', key: 'gestationalWeek', type: 'input' },
+  { title: 'BPD(mm)', key: 'bpd', type: 'input' },
+  { title: 'NT(mm)', key: 'nt', type: 'input' },
+  { title: 'FL(mm)', key: 'fl', type: 'input' },
+  { title: 'AFV(mm)', key: 'afv', type: 'input' },
+  { title: '胎心率(bpm)', key: 'fhr', type: 'input' },
+  { title: '胎盘厚度(mm)', key: 'fetalThickness', type: 'input' },
+  { title: '胎盘位置', key: 'fetalPosition', type: 'input' },
+  { title: '其他项目', key: 'otherProject', type: 'input' }
 ];
 // 穿刺针
 // TODO 不知道键名是不是器械
@@ -1165,71 +1165,71 @@ export const instrumentOptions5 = toOptions('16/18G,17/19G,20G,21G');
 * */
 // 术前超声检查
 export const preoperativeUltrasonographyColumns6 = [
-  {title: '胎儿', key: 'fetus', type: 'input'},
-  {title: '超声孕周', key: 'gestationalWeek', type: 'input'},
-  {title: 'BPD(mm)', key: 'bpd', type: 'input'},
-  {title: 'FL(mm)', key: 'fl', type: 'input'},
-  {title: 'HL(mm)', key: 'hl', type: 'input'},
-  {title: 'AFV(mm)', key: 'afv', type: 'input'},
-  {title: 'AC(mm)', key: 'ac', type: 'input'},
-  {title: '胎重(g)', key: 'fetalWeight', type: 'input'},
-  {title: 'H/C', key: 'hc', type: 'input'},
-  {title: '胎盘厚度(mm)', key: 'fetalThickness', type: 'input'},
-  {title: '胎盘位置', key: 'fetalPosition', type: 'input'},
-  {title: '脐静脉直径(mm)', key: 'umbilicalVeins', type: 'input'},
-  {title: '胎心率(bpm)', key: 'fhr', type: 'input'},
-  {title: '备注', key: 'remark', type: 'input'},
+  { title: '胎儿', key: 'fetus', type: 'input' },
+  { title: '超声孕周', key: 'gestationalWeek', type: 'input' },
+  { title: 'BPD(mm)', key: 'bpd', type: 'input' },
+  { title: 'FL(mm)', key: 'fl', type: 'input' },
+  { title: 'HL(mm)', key: 'hl', type: 'input' },
+  { title: 'AFV(mm)', key: 'afv', type: 'input' },
+  { title: 'AC(mm)', key: 'ac', type: 'input' },
+  { title: '胎重(g)', key: 'fetalWeight', type: 'input' },
+  { title: 'H/C', key: 'hc', type: 'input' },
+  { title: '胎盘厚度(mm)', key: 'fetalThickness', type: 'input' },
+  { title: '胎盘位置', key: 'fetalPosition', type: 'input' },
+  { title: '脐静脉直径(mm)', key: 'umbilicalVeins', type: 'input' },
+  { title: '胎心率(bpm)', key: 'fhr', type: 'input' },
+  { title: '备注', key: 'remark', type: 'input' },
 ];
 
 // 术后血流指标
 export const bleedFlowColumns = [
-  {title: '日期', key: 'checkDate', type: 'input'},
+  { title: '日期', key: 'checkDate', type: 'input' },
   {
     title: 'UA', key: 'UA', children: [
-      {title: 'EDF', key: 'edf', type: 'input'},
-      {title: 'PI', key: 'piUa', type: 'input'},
-      {title: 'RI', key: 'riUa', type: 'input'},
-      {title: 'S/D', key: 'sdua', type: 'input'},
+      { title: 'EDF', key: 'edf', type: 'input' },
+      { title: 'PI', key: 'piUa', type: 'input' },
+      { title: 'RI', key: 'riUa', type: 'input' },
+      { title: 'S/D', key: 'sdua', type: 'input' },
     ]
   },
-  {title: 'DV', key: 'dv', type: 'input'},
+  { title: 'DV', key: 'dv', type: 'input' },
   {
     title: 'MCA', key: 'MCA', children: [
-      {title: 'PSV', key: 'psv', type: 'input'},
-      {title: 'PI', key: 'piMca', type: 'input'},
-      {title: 'RI', key: 'riMca', type: 'input'},
-      {title: 'S/D', key: 'sdmca', type: 'input'},
+      { title: 'PSV', key: 'psv', type: 'input' },
+      { title: 'PI', key: 'piMca', type: 'input' },
+      { title: 'RI', key: 'riMca', type: 'input' },
+      { title: 'S/D', key: 'sdmca', type: 'input' },
     ]
   }
 ];
 
-// 术后血象检查
+// 血象检查
 export const hemogramColumns = [
   // {title: ' ', key: 'checkDate', type: 'input'},
-  {title: 'WBC(*10&sup9 /L)', key: 'wbc', type: 'input'},
-  {title: 'RBC(*10&sup12 /L)', key: 'rbc', type: 'input'},
-  {title: 'HGB(g/L)', key: 'hgb', type: 'input'},
-  {title: 'HCT', key: 'hct', type: 'input'},
-  {title: 'PLT(*10&sup9 /L)', key: 'reticulocyte', type: 'input'},
-  {title: '红织网(%)', key: 'nucleatedrbc', type: 'input'},
-  {title: '有核红(*10&sup9 /L)', key: 'bilirubin', type: 'input'},
-  {title: 'coomb\'s', key: 'coomb', type: 'input'},
+  { title: 'WBC(x10⁹/L)', key: 'wbc', type: 'input' },
+  { title: `RBC(x10&sup1&sup2/L)`, key: 'rbc', type: 'input' },
+  { title: 'HGB(g/L)', key: 'hgb', type: 'input' },
+  { title: 'HCT', key: 'hct', type: 'input' },
+  { title: 'PLT(x10⁹ /L)', key: 'reticulocyte', type: 'input' },
+  { title: '红织网(%)', key: 'nucleatedrbc', type: 'input' },
+  { title: '有核红(x10⁹ /L)', key: 'bilirubin', type: 'input' },
+  { title: 'coomb\'s', key: 'coomb', type: 'input' },
 ];
 
 /*
 * 胸腔积液、腹水、囊液抽吸
 * */
 export const preoperativeUltrasonographyColumns7 = [
-  {title: '胎儿', key: 'fetus', type: 'input'},
-  {title: 'BPD(mm)', key: 'bpd', type: 'input'},
-  {title: '超声孕周', key: 'gestationalWeek', type: 'input'},
-  {title: 'FL(mm)', key: 'fl', type: 'input'},
-  {title: 'HL(mm)', key: 'hl', type: 'input'},
-  {title: 'AFV(mm)', key: 'afv', type: 'input'},
-  {title: '胎盘厚度(mm)', key: 'fetalThickness', type: 'input'},
-  {title: '胎盘位置', key: 'fetalPosition', type: 'input'},
-  {title: '胎心率(bpm)', key: 'fhr', type: 'input'},
-  {title: '备注', key: 'remark', type: 'input'},
+  { title: '胎儿', key: 'fetus', type: 'input' },
+  { title: 'BPD(mm)', key: 'bpd', type: 'input' },
+  { title: '超声孕周', key: 'gestationalWeek', type: 'input' },
+  { title: 'FL(mm)', key: 'fl', type: 'input' },
+  { title: 'HL(mm)', key: 'hl', type: 'input' },
+  { title: 'AFV(mm)', key: 'afv', type: 'input' },
+  { title: '胎盘厚度(mm)', key: 'fetalThickness', type: 'input' },
+  { title: '胎盘位置', key: 'fetalPosition', type: 'input' },
+  { title: '胎心率(bpm)', key: 'fhr', type: 'input' },
+  { title: '备注', key: 'remark', type: 'input' },
 ];
 // 穿刺部位
 export const puncturePositionOptions7 = toOptions('胸腔,腹腔膜');
@@ -1238,12 +1238,12 @@ export const characterOptions7 = toOptions('清亮，金黄色,血型，浅黄�
 
 // 术后测量值
 export const measurementColumns = [
-  {title: '左胸腔积液(mm)', key: 'lefteffusion', type: 'input'},
-  {title: '右胸腔积液(mm)', key: 'righteffusion', type: 'input'},
-  {title: '腹水(mm)', key: 'ascites', type: 'input'},
-  {title: '囊肿(mm)', key: 'cyst', type: 'input'},
-  {title: '肺压缩', key: 'pneumoniacompression', type: 'input'},
-  {title: '心和纵隔', key: 'heartmediastinum', type: 'input'}
+  { title: '左胸腔积液(mm)', key: 'lefteffusion', type: 'input' },
+  { title: '右胸腔积液(mm)', key: 'righteffusion', type: 'input' },
+  { title: '腹水(mm)', key: 'ascites', type: 'input' },
+  { title: '囊肿(mm)', key: 'cyst', type: 'input' },
+  { title: '肺压缩', key: 'pneumoniacompression', type: 'input' },
+  { title: '心和纵隔', key: 'heartmediastinum', type: 'input' }
 ];
 
 /**
@@ -1251,17 +1251,17 @@ export const measurementColumns = [
  */
 
 export const preoperativeUltrasonographyColumns = [
-  {title: '胎儿', key: 'fetus', type: 'input'},
-  {title: 'BPD(mm)', key: 'bpd', type: 'input'},
-  {title: '超声孕周', key: 'gestationalWeek', type: 'input'},
-  {title: 'FL(mm)', key: 'fl', type: 'input'},
-  {title: 'HL(mm)', key: 'hl', type: 'input'},
-  {title: 'AFV(mm)', key: 'afv', type: 'input'},
-  {title: '胎盘厚度(mm)', key: 'fetalThickness', type: 'input'},
-  {title: '胎盘位置', key: 'fetalPosition', type: 'input'},
-  {title: '脐静脉直径(mm)', key: 'umbilicalVeins', type: 'input'},
-  {title: '胎心率(bpm)', key: 'fhr', type: 'input'},
-  {title: '备注', key: 'remark', type: 'input'},
+  { title: '胎儿', key: 'fetus', type: 'input' },
+  { title: 'BPD(mm)', key: 'bpd', type: 'input' },
+  { title: '超声孕周', key: 'gestationalWeek', type: 'input' },
+  { title: 'FL(mm)', key: 'fl', type: 'input' },
+  { title: 'HL(mm)', key: 'hl', type: 'input' },
+  { title: 'AFV(mm)', key: 'afv', type: 'input' },
+  { title: '胎盘厚度(mm)', key: 'fetalThickness', type: 'input' },
+  { title: '胎盘位置', key: 'fetalPosition', type: 'input' },
+  { title: '脐静脉直径(mm)', key: 'umbilicalVeins', type: 'input' },
+  { title: '胎心率(bpm)', key: 'fhr', type: 'input' },
+  { title: '备注', key: 'remark', type: 'input' },
 ];
 /**
  *  麻醉方法
@@ -1272,75 +1272,116 @@ export const anesthesiaMethodOptions = toOptions('全部麻醉,局部麻醉,复�
 /**
  * 送检项目 树形选择器数据
  */
-export const sjTreeOption = [
+export const sjTreeOptions = [
   {
     value: 'genic',
     label: '遗传学检查',
     children: [
-      {value: 'chromosome_karyotype', label: '染色体核型',},
-      {value: 'chromosomal_microarray', label: '染色体微阵列',},
-      {value: 'FISH', label: 'FISH',}
+      { value: 'chromosome_karyotype', label: '染色体核型', },
+      { value: 'chromosomal_microarray', label: '染色体微阵列', },
+      { value: 'FISH', label: 'FISH', }
     ],
   },
   {
     value: 'infection',
     label: '感染',
     children: [
-    	{value: 'infection3', label: '感染三项DNA/RNA',},
-			{value: 'infectionlgm', label: '感染三项lgm',},
-			{value: 'infectiongaint', label: '巨细胞DNA',},
-			{value: 'infectionRubella', label: '风疹病毒RNA',},
-			{value: 'infectiontox', label: '弓形虫DNA',},
-			{value: 'infectioncoxsackie', label: '柯萨奇病毒RNA',},
-			{value: 'infectionb19', label: 'B19病毒核酸检测',}
-    	],
+      { value: 'infection3', label: '感染三项DNA/RNA', },
+      { value: 'infectionlgm', label: '感染三项lgM', },
+      { value: 'infectiongaint', label: '巨细胞DNA', },
+      { value: 'infectionRubella', label: '风疹病毒RNA', },
+      { value: 'infectiontox', label: '弓形虫DNA', },
+      { value: 'infectioncoxsackie', label: '柯萨奇病毒RNA', },
+      { value: 'infectionb19', label: 'B19病毒核酸检测', }
+    ],
   }, {
-			value: 'hemolytic_anemia',
-			label: '溶血性贫血',
-			children: [
-				{value: 'hemolytic_anemia1', label: '血常规全套',},
-				{value: 'hemolytic_anemia2', label: '血常规五类',},
-				{value: 'hemolytic_anemia3', label: '血型',},
-				{value: 'hemolytic_anemia4', label: '新生儿血清学组合',},
-				// {value: 'hemolytic_anemia5', label: '弓形虫DNA',},
-				{value: 'hemolytic_anemia6', label: '直接抗人球蛋白试验（coombs实验）',},
-				{value: 'hemolytic_anemia7', label: '肝代谢组合',}
-    	],
+    value: 'hemolytic_anemia',
+    label: '溶血性贫血',
+    children: [
+      { value: 'hemolytic_anemia1', label: '血常规全套', },
+      { value: 'hemolytic_anemia2', label: '血常规五类', },
+      { value: 'hemolytic_anemia3', label: '血型', },
+      { value: 'hemolytic_anemia4', label: '新生儿血清学组合', },
+      // {value: 'hemolytic_anemia5', label: '弓形虫DNA',},
+      { value: 'hemolytic_anemia6', label: '直接抗人球蛋白试验（coombs实验）', },
+      { value: 'hemolytic_anemia7', label: '肝代谢组合', }
+    ],
   }, {
-			value: 'thalassemia',
-			label: '地中海贫血检测',
-    	children: [
-    		{value: 'thalassemia1', label: '地贫筛查组合（Hb电泳）'},
-				{value: 'thalassemia2', label: '地中海贫血基因全套'},
-				{value: 'thalassemia3', label: 'α地贫基因检测'},
-				{value: 'thalassemia4', label: 'β地贫基因检测'},
-				{value: 'thalassemia5', label: '血常规全套'},
-				{value: 'thalassemia6', label: '血常规五分类'},
-				{value: 'thalassemia7', label: '血型'},
-    	],
+    value: 'thalassemia',
+    label: '地中海贫血检测',
+    children: [
+      { value: 'thalassemia1', label: '地贫筛查组合（Hb电泳）' },
+      { value: 'thalassemia2', label: '地中海贫血基因全套' },
+      { value: 'thalassemia3', label: 'α地贫基因检测' },
+      { value: 'thalassemia4', label: 'β地贫基因检测' },
+      { value: 'thalassemia5', label: '血常规全套' },
+      { value: 'thalassemia6', label: '血常规五分类' },
+      { value: 'thalassemia7', label: '血型' },
+    ],
   }, {
-			value: 'hydrothorax_ascites',
-			label: '胸腹水检查',
-			children: [
-				{value: 'hydrothorax_ascites1', label: '胸腹水全套',},
-				{value: 'hydrothorax_ascites2', label: '胸腹水生化组合',},
-				{value: 'hydrothorax_ascites3', label: '肝代谢组合',}
-			]
+    value: 'hydrothorax_ascites',
+    label: '胸腹水检查',
+    children: [
+      { value: 'hydrothorax_ascites1', label: '胸腹水全套', },
+      { value: 'hydrothorax_ascites2', label: '胸腹水生化组合', },
+      { value: 'hydrothorax_ascites3', label: '肝代谢组合', }
+    ]
   }, {
-			value: 'HF',
-			label: '心衰检查',
-			children: [
-				{value: 'HF1', label: '心质组合',},
-				{value: 'HF2', label: '心酶组合',},
-				{value: 'HF3', label: '脑钠素BNP',}
-			]
+    value: 'HF',
+    label: '心衰检查',
+    children: [
+      { value: 'HF1', label: '心质组合', },
+      { value: 'HF2', label: '心酶组合', },
+      { value: 'HF3', label: '脑钠素BNP', }
+    ]
   }, {
-    	value: 'other',
-    	label: '其他检查',
-    	children: [
-    		{value: 'other1', label: 'AFP',},
-				{value: 'other2', label: '其他',}
-    	]
+    value: 'other',
+    label: '其他检查',
+    children: [
+      { value: 'other1', label: 'AFP', },
+      { value: 'other2', label: '其他', }
+    ]
   }];
+
+/**
+ * 绒毛活检的 送检
+ */
+export const rmSjTreeOptions = [
+  {
+    value: 'genic',
+    label: '遗传学检查',
+    children: [
+      { value: 'chromosome_karyotype', label: '染色体核型', },
+      { value: 'chromosomal_microarray', label: '染色体微阵列', },
+      { value: 'FISH', label: 'FISH', }
+    ]
+  },{
+    value: 'infection',
+    label: '感染',
+    children: [
+      { value: 'infection3', label: '感染三项DNA/RNA', },
+      { value: 'infectionlgm', label: '感染三项lgM', },
+      { value: 'infectiongaint', label: '巨细胞DNA', },
+      { value: 'infectionRubella', label: '风疹病毒RNA', },
+      { value: 'infectiontox', label: '弓形虫DNA', },
+      { value: 'infectioncoxsackie', label: '柯萨奇病毒RNA', },
+      { value: 'infectionb19', label: 'B19病毒核酸检测', }
+    ],
+  },{
+    value: 'thalassemia',
+    label: '地中海贫血检测',
+    children: [
+      { value: 'thalassemia1', label: '地贫筛查组合（Hb电泳）' },
+      { value: 'thalassemia2', label: '地中海贫血基因全套' },
+      { value: 'thalassemia3', label: 'α地贫基因检测' },
+      { value: 'thalassemia4', label: 'β地贫基因检测' }
+    ]
+  }
+]
+
+/**
+ * 血库情况
+ */
+export const bloodBankOptions = toOptions('全血,洗涤,悬浮,浓缩');
 
 
