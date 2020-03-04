@@ -6,7 +6,7 @@ export default {
     let formData = new FormData();
     Object.keys(entity).forEach(key => {
       formData.append(key, entity[key]);
-    })
+    });
     return axios.post("http://120.77.46.176/api/doc/useryc",formData);
   },
   addyc: function (entity) {

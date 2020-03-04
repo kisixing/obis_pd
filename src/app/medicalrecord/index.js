@@ -915,7 +915,9 @@ export default class MedicalRecord extends Component {
         object['family_history'][item] = convertString2Json(object['family_history'][item]) || [];
       });
     }
-
+    if(object.hasOwnProperty('physical_check_up')){
+      object['physical_check_up']['edema'] = convertString2Json(object['physical_check_up']['edema']) || "";
+    }
     return object;
   };
   // 检测data中是否存在这个key值

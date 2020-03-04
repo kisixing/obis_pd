@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Select, Button, message } from 'antd';
-
+import store from '../store/index';
 import service from '../../service/index.js';
 
 import { GetExpected } from '../../utils/index';
@@ -58,7 +58,16 @@ export default class OpenCase extends Component {
           {
             name: 'useridno[身份证]', type: 'input', span: 6, valid: (value) => {
               let IDReg = new RegExp(/^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/);
-              return IDReg.test(value);
+              if(IDReg.test(value)){
+                if(Number(value.slice(16,17)) % 2 === 1){
+                  message.error('请输入女性身份证');
+                  return "*请输入女性身份证";
+                }else{
+                  return "";
+                }
+              }else{
+                return "*身份证格式错误"
+              }
             }
           }
         ]
@@ -75,7 +84,7 @@ export default class OpenCase extends Component {
           // new
           // {name: 'danw[工作单位]', type: 'input', span: 6, valid: 'required'},
           {name: 'useroccupation[职业]', type: 'input', span: 6},
-          {name: 'usermobile[手机]', type: 'input', span: 6, valid: 'required'}
+          {name: 'usermobile[手机]', type: 'input', span: 6, valid: (value) => (/^1[3456789]\d{9}$/.test(value) ? "" : "*请输入正确的手机号码")}
         ]
       },
       {
@@ -180,7 +189,7 @@ export default class OpenCase extends Component {
     const { pregnancyData } = this.state;
     let obj = Object.assign({}, pregnancyData);
     obj[name] = value;
-    this.setState({pregnancyData, obj});
+    this.setState({pregnancyData: obj});
   };
   handleBenYunChange = (_,{name,value}) => {
     const { benYunData } = this.state;
@@ -199,27 +208,23 @@ export default class OpenCase extends Component {
     fireForm(document.getElementById('form-block'),'valid').then(valid => {
       console.log(valid);
       if(valid){
-        // 判断身份证
-        if(Number(pregnancyData.useridno.slice(16,17)) % 2 === 1) {
-          message.error('请输入女性身份证信息');
-          return ;
-        }
         // 转换数据格式
-        benYunData['chanc'] = Number(benYunData['chanc']);
-        benYunData['yunc'] = Number(benYunData['yunc']);
+        benYunData['chanc'] = Number(benYunData['chanc'].value);
+        benYunData['yunc'] = Number(benYunData['yunc'].value);
         service.opencase.addyc({...pregnancyData, ...benYunData}).then(res => {
-          const { data } = res;
-          if(data.code === "200" || data.code === "1") {
-            message.success(data.message);
+          if(res.data.code === "200" || res.data.code === "1") {
+            message.success('新建孕妇信息成功');
+            const id = res.data.object.id; 
+            service.opencase.useryc({id,...pregnancyData, ...benYunData}).then(uRes => {
+              if(uRes.data.code === "200" || uRes.data.code === "1") {
+                message.success('保存信息成功');
+              }else {
+                message.error(data.message)
+              }
+            });
           }else {
             message.error(data.message)
           }; 
-        });
-        service.opencase.useryc({...pregnancyData, ...benYunData}).then(res => {
-          if(data.code === "200") {
-          }else {
-            message.error(data.message)
-          }
         });
       }
     })

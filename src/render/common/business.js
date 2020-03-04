@@ -136,9 +136,13 @@ export function whetherbleedingselect(props) {
   };
 
   return (
-    <Select onSelect={(value,event) => handleSelect(value, event)}>
-      <Option value="+">+</Option>
-      <Option value="++">++</Option>
-    </Select>
+    <div>
+      <span>出血量:</span>
+      <Select onSelect={(value,event) => handleSelect(value, event)}>
+        <Option value="+">+</Option>
+        <Option value="++">++</Option>
+      </Select>
+    </div>
+    
   )
 } 

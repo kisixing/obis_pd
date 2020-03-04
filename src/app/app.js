@@ -50,10 +50,10 @@ export default class App extends Component {
       }
     };
     store.subscribe(this.handleStoreChange);
-    store.subscribe(this.getIvisitMain)
   }
 
   handleStoreChange = () => {
+    this,this.getIvisitMain();
     this.setState(store.getState());
   };
 
@@ -284,31 +284,19 @@ export default class App extends Component {
     if(userData.userid !== this.state.userData.userid) {
       service.getIvisitMain({userid: userData.userid}).then(Response => {
         // 在这个地方就整理好，后面去使用
-        if(Response.data.code === 200 || Response.data.code === "200") {
-          const allPreghiss = Response.data.gestation.preghiss;
-          const { gesexpect,gsmoc } = Response.data.pregnantInfo;
-          if(allPreghiss.length > 0) {
-            // P && G
-            let yunc = parseInt(allPreghiss[allPreghiss.length-1].pregnum + 1);
-            let chanc = 0;
-            allPreghiss.forEach(item => {
-              if(item.zuych === true) {
-                chanc++;
-              }else if(item.zaoch !== ""){
-                chanc++;
-              }
-            });
-            let d = {
-              gravidity: yunc,
-              parity: chanc,
-              lmd: gsmoc,
-              edd: gesexpect
-            }
-            // 设置建档信息
-            store.dispatch(setOpenCaseData({yunc, chanc}))
-          }
+        console.log(Response);
+        const { yunc, chanc } = Response.data.object.diagnosis;
+        const { gesmoc, gesexpect } = Response.data.object.pregnantInfo;
+        let d = {
+          gravidity: yunc,
+          parity: chanc,
+          lmd: gesmoc,
+          edd: gesexpect
         }
-      });
+        // 设置建档信息
+        store.dispatch(setOpenCaseData(d))
+        }
+      );
     }
   }
 

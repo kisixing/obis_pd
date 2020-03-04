@@ -126,7 +126,7 @@ export default class Operation extends Component{
     data.forEach(item => tnDOM.push(
       <TreeNode title={item['title'].slice(0,10)} key={item['key']}>
         {item['children'].map(v => 
-          (<TreeNode title={<span style={{color: v.key > 0 ? 'black' : 'red'}}>{v['title']}</span>} key={v['key']}/>)
+          (<TreeNode title={<span style={{color: v.id > 0 ? '' : 'red'}}>{v['title']}</span>} key={v['key']}/>)
         )}
       </TreeNode>)
     );
@@ -213,7 +213,9 @@ export default class Operation extends Component{
       },
       operative_procedure: {fetus:[{id: newId+1}]}, 
       surgery: {},
-      ward: {}
+      ward: {
+        operationDate: todayStr
+      }
     };
     operationNewDataList.push(currentData);
     this.setState({operationList,currentExpandedKeys,
@@ -247,9 +249,9 @@ export default class Operation extends Component{
         // 非新建病例
         service.operation.getOperationdetail({recordid: selectedKeys[0]}).then(res => {
           if(res.code === 200 || res.code === "200"){
-            this.setState({});
             // 整合请求下来的数据
             let formatData = this.convertOperationDetail(res.object);
+            console.log(formatData);
             this.setState({clear: true},() => {
               this.setState({currentShowData: formatData, currentTreeKeys: selectedKeys, clear: false},() => console.log(this.state));
             });
@@ -393,7 +395,7 @@ export default class Operation extends Component{
     service.operation.saveOperation(currentShowData).then(res => {
       // console.log(res);
       service.operation.getOperation().then(res => {
-        if(res.code === '200' || 200)  this.setState({operationList: res.object.list, currentShowData: {}});
+        if(res.code === '200' || 200)  this.setState({operationList: res.object.list, currentShowData: {}, currentTreeKeys: []});
       })
     })
   };

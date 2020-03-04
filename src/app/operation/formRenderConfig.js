@@ -402,7 +402,7 @@ const config6 = {
           {name: 'bleedIndex[术前血流指标]', type: 'table', valid: 'required', pagination: false, editable: false, options: bleedFlowColumns, span: SPAN_20},
       ]},
       {columns:[
-          {name: 'bloodBank[血库情况]', type: 'select', valid: 'required', options: bloodBankOptions, span: SPAN_6 },
+          {name: 'bloodBank[库血情况]', type: 'select', valid: 'required', options: bloodBankOptions, span: SPAN_6 },
           {name: 'collectBloodDate[采血日期]', type: 'date', valid: 'required', span: SPAN_6}
       ]},
       {columns:[
@@ -545,7 +545,7 @@ const ward_config = (templateFn) => ({
     {
       columns: [
         {name: 'operationLevelWard[手术级别]', type: 'select', valid: 'required',options:operationLevelOptions , span: SPAN_6},
-        {name: 'incisionTypeWard[切口类型]', type: 'select', valid: 'required', options: incisionTypeOptions ,span: SPAN_6},
+        {name: 'incisionTypeWard[切口类别]', type: 'select', valid: 'required', options: incisionTypeOptions ,span: SPAN_6},
       ]
     },
     {
@@ -560,7 +560,7 @@ const ward_config = (templateFn) => ({
     },
     {
       columns:[
-        {name: 'operationDate[新增记录日期]', type: 'date', valid: 'required', span: SPAN_6},
+        {name: 'operationDate[手术日期]', type: 'date', valid: 'required', span: SPAN_6},
         {name: 'startTime[开始时间]', type: 'time', valid: 'required', format: "HH:mm" ,span: SPAN_6},
         {name: 'endTime[结束时间]', type: 'time', valid: 'required', format: "HH:mm", span: SPAN_6}
       ]
