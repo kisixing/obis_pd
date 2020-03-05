@@ -57,14 +57,18 @@ export default class App extends Component {
   }
 
   handleStoreChange = () => {
-    this.getIvisitMain();
-    this.setState(...store.getState(), () => {
-      let newSearchObj = Object.assign({}, this.state.searchObj);
-      newSearchObj.menzhenNumber = this.state.usermcno;
-      newSearchObj.IDCard = this.state.useridno;
-      newSearchObj.phoneNumber = this.state.usermobile;
-      this.setState({searchObj: newSearchObj})
-    });
+    const { userData } = store.getState();
+    // 当app.js的userData.userid与store中的userData.userid 不相同时，才走findUser
+    if( this.state.userData.userid !== userData.userid) {
+      this.findUser("","","","",userData.userid);
+      // this.setState(...store.getState(), () => {
+      //   let newSearchObj = Object.assign({}, this.state.searchObj);
+      //   newSearchObj.menzhenNumber = this.state.usermcno;
+      //   newSearchObj.IDCard = this.state.useridno;
+      //   newSearchObj.phoneNumber = this.state.usermobile;
+      //   this.setState({searchObj: newSearchObj})
+      // });
+    }
   };
 
   componentDidMount() {
@@ -263,45 +267,69 @@ export default class App extends Component {
     const { menzhenNumber, IDCard, phoneNumber } = this.state.searchObj;
     this.setState({ muneIndex: 0 }, () => {
       this.onClick(routers[0]);
-      service.findUser({ usermcno: menzhenNumber, useridno: IDCard, usermobile: phoneNumber }).then(res => {
-        // 处理孕产
-        res.object['tuseryunchan'] = `${res.object['yunc']}/${res.object['chanc']}`;
-        res.object['userid'] = res.object.id;
-        store.dispatch(setUserData(res.object))
-        this.setState({ ...res.object });
-      })
+      this.findUser(menzhenNumber, IDCard, phoneNumber, "", "");
     });
-
   };
+  // id - userid
+  findUser = (menzhenNumber, IDCard, phoneNumber, chanjno, id) => {
+    service.findUser({ usermcno: menzhenNumber, useridno: IDCard, usermobile: phoneNumber, chanjno, id }).then(res => {
+      const { yunc, chanc , gesmoc, gesexpect, usermcno, useridno, usermobile } = res.object;
+      // 处理孕产
+      res.object['tuseryunchan'] = `${yunc}/${chanc}`;
+      res.object['userid'] = res.object.id;
+      // store孕产信息
+      let d = {
+        gravidity: yunc,
+        parity: chanc,
+        lmd: gesmoc,
+        edd: gesexpect
+      }
+      // 填充本地输入框
+      let newSearchObj = Object.assign({}, this.state.searchObj);
+      newSearchObj.menzhenNumber = usermcno;
+      newSearchObj.IDCard = useridno;
+      newSearchObj.phoneNumber = usermobile;
+      store.dispatch(setUserData(res.object));
+      store.dispatch(setOpenCaseData(d));
+      this.setState({ 
+        userData: res.object,
+        searchObj: newSearchObj
+      });
+    })
+  }
+
+  // 暂时不使用 - 此方法数据最全
 
   // 获取孕妇建档信息，用于之后所有页面的同步
-  getIvisitMain = () => {
-    const storeData = store.getState();
-    const { userData } = storeData;
-    if(userData.userid !== this.state.userData.userid) {
-      service.getIvisitMain({userid: userData.userid}).then(Response => {
-        // 在这个地方就整理好，后面去使用
-        const { yunc, chanc } = Response.data.object.diagnosis;
-        const { gesmoc, gesexpect } = Response.data.object.pregnantInfo;
-        let d = {
-          gravidity: yunc,
-          parity: chanc,
-          lmd: gesmoc,
-          edd: gesexpect
-        }
-        // 设置
-        this.setState({userData: storeData['userData'] },() => {
-          let newSearchObj = Object.assign({}, this.state.searchObj);
-          newSearchObj.menzhenNumber = this.state.userData.usermcno;
-          newSearchObj.IDCard = this.state.userData.useridno;
-          newSearchObj.phoneNumber = this.state.userData.usermobile;
-          this.setState({searchObj: newSearchObj})
-        }); 
-        // 设置建档信息
-        store.dispatch(setOpenCaseData(d));
-      });
-    }
-  }
+  // getIvisitMain = () => {
+  //   const storeData = store.getState();
+  //   const { userData } = storeData;
+  //   if(userData.userid !== this.state.userData.userid) {
+  //     service.getIvisitMain({userid: userData.userid}).then(res => {
+  //       // 在这个地方就整理好，后面去使用
+  //       const { yunc, chanc } = res.object.diagnosis;
+  //       const { gesmoc, gesexpect } = res.object.pregnantInfo;
+  //       let d = {
+  //         gravidity: yunc,
+  //         parity: chanc,
+  //         lmd: gesmoc,
+  //         edd: gesexpect
+  //       }
+  //       // 设置store
+  //       store.dispatch(setUserData(res.object.gravidaInfo));
+  //       // 设置app.js的userData
+  //       this.setState({userData: res.object.gravidaInfo },() => {
+  //         let newSearchObj = Object.assign({}, this.state.searchObj);
+  //         newSearchObj.menzhenNumber = this.state.userData.usermcno;
+  //         newSearchObj.IDCard = this.state.userData.useridno;
+  //         newSearchObj.phoneNumber = this.state.userData.usermobile;
+  //         this.setState({searchObj: newSearchObj})
+  //       }); 
+  //       // 设置建档信息
+  //       store.dispatch(setOpenCaseData(d));
+  //     });
+  //   }
+  // }
 
   render() {
     return (

@@ -36,9 +36,12 @@ export default {
   /**
    * 获取孕妇建档信息
    */
-  getIvisitMain: function ({userid}) {
-    return axios.get(`http://120.77.46.176:8899/rapi/outpatientRestful/ivisitMain?style=gravidaInfo&userid=${userid}`)
-  },
+  // getIvisitMain: function ({userid}) {
+  //   return axios.get(`http://120.77.46.176:8899/rapi/outpatientRestful/ivisitMain?style=gravidaInfo&userid=${userid}`).then(res => {
+  //     userId = new Promise(resolve => resolve(res.data));
+  //     return userId;
+  //   })
+  // },
   /**
    * 高危数据
    */
@@ -66,11 +69,11 @@ export default {
   /**
    * 根据 身份证号/就诊卡号/手机/建档号 搜索
    */
-  findUser: function ({ usermcno = "", useridno = "", usermobile = "", id ="" }) {
+  findUser: function ({ usermcno = "", useridno = "", usermobile = "", chanjno = "", id ="" }) {
     // 这里的userid字段名称不是userid 而是 id
     // 修改字段后再return Promise
     // 由于接口是使用本页面的userId，所以要在这里设置
-    return myAxios.get(`prenatalQuery/findUser?useridno=${useridno}&usermcno=${usermcno}&usermobile=${usermobile}&chanjno=&id=${id}`).then(res => {
+    return myAxios.get(`prenatalQuery/findUser?useridno=${useridno}&usermcno=${usermcno}&usermobile=${usermobile}&chanjno${chanjno}=&id=${id}`).then(res => {
       res['object']['userid'] = res['object']['id'];
       res['object']['tuserweek'] = res['object']['gesweek'];
       // 有几个字段还没有

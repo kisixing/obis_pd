@@ -46,3 +46,24 @@ export function GetExpected(gesmoc) {
   var newdate = new_y + "-" + new_m + "-" + new_d;
   return newdate
 };
+
+// 获取当前日期
+export function formateDate() {
+  let date = new Date();
+  const m = date.getMonth() + 1, d = date.getDate();
+  return `${date.getFullYear()}-${m < 10 ? `0${m}` : m}-${d < 10 ? `0${d}` : d}`
+}
+
+/**
+ * 求两个时间差值
+ * @param {hh:mm} t1 
+ * @param {hh:mm} t2 
+ * 使用 t2 - t1
+ */
+export const getTimeDifference = (t1,t2) => {
+  const arr1 = t1.split(':');
+  const arr2 = t2.split(':');
+  let hourDifference = Number(arr2[0]) - Number(arr1[0]);
+  let minDifference = Number(arr2[1]) + 60 - Number(arr1[1]);
+  return (hourDifference-1)*60+minDifference;
+}

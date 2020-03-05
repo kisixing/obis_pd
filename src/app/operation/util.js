@@ -56,3 +56,17 @@ export const convertString2Json = function(str) {
   resArr.push(JSON.parse(str));
   return resArr;
 };
+ 
+/**
+ * 求两个时间差值
+ * @param {hh:mm} t1 
+ * @param {hh:mm} t2 
+ * 使用 t2 - t1
+ */
+export const getTimeDifference = (t1,t2) => {
+  const arr1 = t1.split(':');
+  const arr2 = t2.split(':');
+  let hourDifference = Number(arr2[0]) - Number(arr1[0]);
+  let minDifference = Number(arr2[1]) + 60 - Number(arr1[1]);
+  return (hourDifference-1)*60+minDifference;
+}

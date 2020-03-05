@@ -84,7 +84,16 @@ export default class OpenCase extends Component {
           // new
           // {name: 'danw[工作单位]', type: 'input', span: 6, valid: 'required'},
           {name: 'useroccupation[职业]', type: 'input', span: 6},
-          {name: 'usermobile[手机]', type: 'input', span: 6, valid: (value) => (/^1[3456789]\d{9}$/.test(value) ? "" : "*请输入正确的手机号码")}
+          {
+            name: 'usermobile[手机]', type: 'input', span: 6, valid: (value) => {
+              if(value !== "") {
+                if(!/^1[3456789]\d{9}$/.test(value)){
+                  return "*请输入正确的手机号码"
+                }
+              }
+              return "";
+            }
+          }
         ]
       },
       {

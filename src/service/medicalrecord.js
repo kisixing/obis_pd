@@ -8,7 +8,10 @@ export default {
    */
   getspecialistemr: function () {
     let uri = 'getspecialistemr';
-    return this.userId().then(r => myAxios.get(`${FRONT_URL}${uri}?userid=${r.object.userid}`,));
+    return this.userId().then(r => {
+      console.log(r);
+      return myAxios.get(`${FRONT_URL}${uri}?userid=${r.object.userid}`
+    )});
   },
 
   /**

@@ -35,7 +35,7 @@ export default class Patient extends Component {
     // 防止已进入页面没有userid
     if(userid) {
       service.getgeneralinformation({userId: userid}).then((res) => {
-        if(res['code'] === "200" || 200 && res['object'] ) {
+        if(res.code === "200" || res.code === 200 && res.object ) {
           // TODO idtype 改成字符串
           let { object } = res;
           

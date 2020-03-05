@@ -8,61 +8,61 @@ const config = {
   * 通用型
   * */
   // 主诉
-  chief_complaint_config:() => ({
+  chief_complaint_config:(openModal) => ({
     step: 1,
     rows: [
       {
         columns:[
           { name: 'chief_complaint[主诉]', type: 'textarea', valid: 'required',span: 16 },
-          { name:'chief_complaintBtn[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => this.openModal('zz')}
+          { name:'chief_complaintBtn[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr1')}
         ]
       },
     ]
   }),
   // 现病史
-  medical_history_config: () => ({
+  medical_history_config: (openModal) => ({
     step : 3,
     rows:[
       {
         columns:[
           { name: 'medical_history[现病史]', type: 'textarea', valid: 'required', span: 16 },
-          { name:'medical_history[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => this.openModal('xb')}
+          { name:'medical_history[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr2')}
         ]
       }
     ]
   }),
   // 其他检查
-  other_exam_config: () => ({
+  other_exam_config: (openModal) => ({
     step: 1,
     rows: [
       {
         columns:[
           { name: 'other_exam[其他]', type: 'textarea', valid: 'required', span: 16 },
-          { name:'other_exam[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => this.openModal('zd')}
+          { name:'other_exam[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr3')}
         ]
       }
     ]
   }),
   // 诊断
-  diagnosis_config: () => ({
+  diagnosis_config: (openModal) => ({
     step: 1,
     rows: [
       {
         columns:[
           { name: 'diagnosis[诊断]', type: 'textarea', valid: 'required', span: 16 },
-          { name:'diagnosisBtn[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => this.openModal('zd'), valid: 'required'}
+          { name:'diagnosisBtn[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr4'), valid: 'required'}
         ]
       }
     ]
   }),
   // 处理
-  treatment_config: () => ({
+  treatment_config: (openModal) => ({
     step: 1,
     rows: [
       {
         columns:[
           { name: 'treatment[处理措施]', type: 'textarea', valid: 'required', span: 16 },
-          { name:'treatment[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => this.openModal('cl')}
+          { name:'treatment[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr5')}
         ]
       },
     ]
@@ -432,7 +432,7 @@ const config = {
       {
         columns:[
           { name: 'karyotype[诊断]', type: 'textarea', span: 16 },
-          { name:'karyotype[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => this.openModal('zd')}
+          { name:'karyotype[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr6')}
         ]
       }
     ]
@@ -454,25 +454,25 @@ const config = {
     ]
   }),
   // 病情变化
-  stateChange_config:() => ({
+  stateChange_config:(openModal) => ({
     step: 1,
     rows: [
       {
         columns:[
           { name: 'stateChange[病情变化]', type: 'textarea', span: 16 },
-          { name:'stateChange[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => this.openModal('cl')}
+          { name:'stateChange[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr7')}
         ]
       },
     ]
   }),
   // 前次检查结果
-  lastResult_config: () => ({
+  lastResult_config: (openModal) => ({
     step: 1,
     rows: [
       {
         columns:[
           { name: 'lastResult[前次检查结果]', type: 'textarea', span: 16 },
-          { name:'lastResult[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => this.openModal('cl')}
+          { name:'lastResult[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr8')}
         ]
       },
     ]

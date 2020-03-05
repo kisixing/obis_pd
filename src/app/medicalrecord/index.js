@@ -879,7 +879,6 @@ export default class MedicalRecord extends Component {
   /* ========================= 其他 ================================== */
   // 获取数据 整合 返回
   convertSpecialistemrDetail = (object) => {
-    const { specialistemrData } = this.state;
     // 将 存在 "[{"label":"a","value":"b"},{""}]"  这样格式的转一下
     // 既往史 家族史
     if (object.formType !== "3") {
