@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import {Button, Tabs} from 'antd';
+import {Button, Tabs, Collapse} from 'antd';
 
 import { convertString2Json } from './util.js';
 import * as baseData from './data';
@@ -11,6 +11,7 @@ import Page from "../../render/page";
 import "../index.less";
 import "./index.less";
 
+const { Panel } = Collapse;
 const { TabPane } = Tabs;
 
 const diagnosis_config = () => ({
@@ -83,7 +84,11 @@ export default class OutCome extends Component{
   constructor(props) {
     super(props);
     this.state = {
-      outComeData: {}
+      outComeData: {
+        deliveryList: [
+          {id: '-1'}
+        ]
+      }
     }
   }
 
@@ -141,20 +146,25 @@ export default class OutCome extends Component{
 
   render() {
     const { outComeData = {} } = this.state;
-    const { deliveryList = [] } = outComeData;
-    console.log(outComeData);
+    const { deliveryList } = outComeData;
     return (
       <Page className='fuzhen font-16 ant-col'>
         <div className="bgWhite pad-mid ">
-          {formRender(outComeData,diagnosis_config(),(_,{name, value}) => this.handleFormChange(``, name, value))}
-          <div>
-            <Tabs
-              type="editable-card"
-              onEdit={this.handleFetusTabEdit}
-            >
-              {this.renderFetusTabPane(deliveryList)}
-            </Tabs>
-          </div>
+
+              <div>
+                {formRender(outComeData,diagnosis_config(),(_,{name, value}) => this.handleFormChange(``, name, value))}
+              </div>
+            <div>
+              <Tabs
+                type="editable-card"
+                onEdit={this.handleFetusTabEdit}
+              >
+                {deliveryList && deliveryList.length !== 0 ? (
+                  this.renderFetusTabPane(deliveryList)
+                ): (<div>暂无信息，点击加号添加</div>)}
+                
+              </Tabs>
+            </div>
         </div>
         <div className="btn-group pull-right bottom-btn">
           <Button className="blue-btn">打印</Button>

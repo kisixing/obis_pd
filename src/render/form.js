@@ -147,9 +147,6 @@ class FormItem extends Component {
   componentWillReceiveProps(newProps) {
     const { name } = this.state;
     const { entity, width } = this.props;
-    // console.log(this.props);
-    // console.log('=================');
-    // console.log(newProps);
     if (!entity || (JSON.stringify(entity && entity[name]) !== JSON.stringify(newProps.entity[name]))) {
       // console.log('in');
       this.setState({

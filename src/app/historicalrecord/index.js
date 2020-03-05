@@ -282,7 +282,8 @@ export default class HistoricalRecord extends Component{
   /*================================ 渲染类 ======================================*/
   // 渲染树形菜单
   renderTree = (treeData) => {
-    const { currentHistoricalRecords = {} , oldHistoricalRecords = {} } = treeData;
+    const { currentHistoricalRecords = {
+} , oldHistoricalRecords = {} } = treeData;
     const { currentExpandedKeys } = this.state;
     // TODO 可复用 之后完成功能后再修改
     return (
@@ -295,11 +296,11 @@ export default class HistoricalRecord extends Component{
           {currentHistoricalRecords !== null && currentHistoricalRecords.hasOwnProperty('historicalRecordsDates') ? (
             currentHistoricalRecords['historicalRecordsDates'].map(item => (
               <TreeNode title={item.date} key={item.date}>
-                <TreeNode title="专科病历" key={`medicalRecord${item.date}`}>
-                  {item['medicalRecord'].map(v => (
-                    <TreeNode title={v.title} key={v.key}/>
-                  ))}
+                {item.hasOwnProperty('medicalRecord') ? (
+                  <TreeNode title="专科病历" key={`medicalRecord${item.date}`}>
+                  {item['medicalRecord'].map(v => (<TreeNode title={v.title} key={v.key}/>))}
                 </TreeNode>
+                ) : null}
                 <TreeNode title="手术记录" key={`operationRecords${item.date}`}>
                   {item['operationRecords'].map(v => (
                     <TreeNode title={v.title} key={v.key}/>

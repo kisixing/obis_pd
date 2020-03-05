@@ -756,71 +756,50 @@ export default class MedicalRecord extends Component {
    */
   handleFormChange = (path, name, value) => {
     const { specialistemrData, currentTreeKeys } = this.state;
-    let obj = [];
-    specialistemrData.forEach(v => {
-      obj.push(Object.assign({}, v));
-    });
+    const index = specialistemrData.findIndex(item => item.id.toString() === currentTreeKeys[0]);
+    
+    let obj = JSON.parse(JSON.stringify(specialistemrData[index]));
 
-    const index = obj.findIndex(item => item.id.toString() === currentTreeKeys[0]);
-    console.log(obj);
     if (path === "") {
       // 为第一层值
       mapValueToKey(obj[index], name, value);
     } else {
       switch (name) {
         case 'bp':
-          if (value["0"]) { name = 'systolic_pressure'; mapValueToKey(obj[index], `${path}.${name}`, value["0"]); }
-          if (value["1"]) { name = 'diastolic_pressure'; mapValueToKey(obj[index], `${path}.${name}`, value["1"]); }
+          if (value["0"]) { name = 'systolic_pressure'; mapValueToKey(obj, `${path}.${name}`, value["0"]); }
+          if (value["1"]) { name = 'diastolic_pressure'; mapValueToKey(obj, `${path}.${name}`, value["1"]); }
           break;
         case 'operation_history':
           break;
         case 'current_weight':
           // 判断是否有此值
-          if(!obj[index]['physical_check_up'].hasOwnProperty('pre_weight')){obj[index]['pre_weight']['pre_weight'] = ''};
-          if(obj[index]['physical_check_up']['pre_weight'] !== '' ) {
-            const weight_gain = Number(value) - Number(obj[index]['physical_check_up']['pre_weight']);
+          if(!obj['physical_check_up'].hasOwnProperty('pre_weight')){obj['pre_weight']['pre_weight'] = ''};
+          if(obj['physical_check_up']['pre_weight'] !== '' ) {
+            const weight_gain = Number(value) - Number(obj['physical_check_up']['pre_weight']);
             console.log(weight_gain);  
-            obj[index]['physical_check_up']['weight_gain'] = weight_gain.toString();
+            obj['physical_check_up']['weight_gain'] = weight_gain.toString();
           }
-          obj[index]['physical_check_up'][name] = value;
+          obj['physical_check_up'][name] = value;
           break;
         case 'pre_weight':
           // 判断是否有此值
-          if(!obj[index]['physical_check_up'].hasOwnProperty('current_weight')){obj[index]['physical_check_up']['current_weight'] = ''};
-          if(obj[index]['physical_check_up']['current_weight'] !== '' ) {
-            console.log(obj[index]['physical_check_up']['current_weight']);
+          if(!obj['physical_check_up'].hasOwnProperty('current_weight')){obj['physical_check_up']['current_weight'] = ''};
+          if(obj['physical_check_up']['current_weight'] !== '' ) {
+            console.log(obj['physical_check_up']['current_weight']);
             console.log(value);
-            const weight_gain = Number(obj[index]['physical_check_up']['current_weight']) - Number(value);
+            const weight_gain = Number(obj['physical_check_up']['current_weight']) - Number(value);
             console.log(weight_gain);  
-            obj[index]['physical_check_up']['weight_gain'] = weight_gain.toString();
+            obj['physical_check_up']['weight_gain'] = weight_gain.toString();
           }
-          obj[index]['physical_check_up'][name] = value;
+          obj['physical_check_up'][name] = value;
           break;
         default:
-          mapValueToKey(obj[index], `${path}.${name}`, value);
+          mapValueToKey(obj, `${path}.${name}`, value);
       }
-      // // 手动 特殊处理bp
-      // if (name === 'bp') {
-        
-      //   // 特殊处理手术史，中孕超声
-      // } else if(path === 'physical_check_up'){
-      //   // 自动填充体重
-      //   if(obj[index]['physical_check_up']['pre_weight'] !== '' && name === 'current_weight'){
-      //     console.log('1');  
-      //     mapValueToKey(obj[index], `physical_check_up.weight_gain`, (Number(value)-Number(obj[index]['physical_check_up']['pre_weight'])).toString());
-      //   }
-      //   if(obj[index]['physical_check_up']['current_weight'] !== '' && name === 'pre_weight'){
-      //     console.log('2');
-      //     mapValueToKey(obj[index], `physical_check_up.weight_gain`, (Number(obj[index]['physical_check_up']['current_weight']) - Number(value)).toString());
-      //   }
-      //   mapValueToKey(obj[index], `${path}.${name}`, value);
-      //   console.log(this.state);
-      // }else {
-      //   mapValueToKey(obj[index], `${path}.${name}`, value);
-      // }
     }
     console.log(obj);
-    this.setState({ specialistemrData: obj }, () => console.log(this.state));
+    specialistemrData.splice(index,1,obj);
+    this.setState({ specialistemrData: specialistemrData }, () => console.log(this.state));
   };
 
   // 表单保存

@@ -37,6 +37,7 @@ const routers = [
 
 export default class App extends Component {
   constructor(props) {
+    const storeData = store.getState();
     super(props);
     this.state = {
       loading: true,
@@ -44,33 +45,27 @@ export default class App extends Component {
       highriskEntity: null,
       highriskShow: false,
       muneIndex: 0, // 从0开始
-      ...store.getState(),
+      userData: {},
+      ...storeData,
       searchObj: {
         menzhenNumber: "", IDCard: "", phoneNumber: ""
       }
     };
-    store.subscribe(this.handleStoreChange);
+    store.subscribe(() => {
+      this.handleStoreChange();
+    });
   }
 
   handleStoreChange = () => {
-    this,this.getIvisitMain();
-    this.setState(store.getState());
+    this.getIvisitMain();
+    this.setState(...store.getState(), () => {
+      let newSearchObj = Object.assign({}, this.state.searchObj);
+      newSearchObj.menzhenNumber = this.state.usermcno;
+      newSearchObj.IDCard = this.state.useridno;
+      newSearchObj.phoneNumber = this.state.usermobile;
+      this.setState({searchObj: newSearchObj})
+    });
   };
-
-  componentWillMount() {
-    // service.getuserDoc().then(res => {
-    //   store.dispatch(setUserData(res.object));
-    //   console.log(res.object)
-    //   this.setState({...res.object, loading: false},() => {
-    //     service.getIvisitMain({userid: this.state.userData.userid}).then(Response => {
-    //       console.log(Response);
-    //     });
-    //   })
-    // });
-    // service.highrisk().then(res => this.setState({
-    //   highriskList: res.object
-    // }))
-  }
 
   componentDidMount() {
     const { location = {} } = this.props;
@@ -132,7 +127,7 @@ export default class App extends Component {
   }
 
   renderHeader() {
-    const { username, userage, tuserweek, tuseryunchan, gesexpect, usermcno, chanjno, risklevel, infectious } = this.state;
+    const { username, userage, tuserweek, tuseryunchan, gesexpect, usermcno, chanjno, risklevel, infectious } = this.state.userData;
     const { searchObj } = this.state;
     return (
       <div className="main-header">
@@ -168,7 +163,7 @@ export default class App extends Component {
           <div className="search-btn">
             {/* 功能还没有写 */}
             <Button onClick={this.handleSearch}>搜索</Button>
-            <Button >重置</Button>
+            <Button>重置</Button>
             <Button onClick={() => { this.props.history.push('/opencase'); this.setState({ muneIndex: -1 }); }}>建册</Button>
           </div>
         </div>
@@ -271,7 +266,8 @@ export default class App extends Component {
       service.findUser({ usermcno: menzhenNumber, useridno: IDCard, usermobile: phoneNumber }).then(res => {
         // 处理孕产
         res.object['tuseryunchan'] = `${res.object['yunc']}/${res.object['chanc']}`;
-        store.dispatch(store.dispatch(setUserData(res.object)));
+        res.object['userid'] = res.object.id;
+        store.dispatch(setUserData(res.object))
         this.setState({ ...res.object });
       })
     });
@@ -280,11 +276,11 @@ export default class App extends Component {
 
   // 获取孕妇建档信息，用于之后所有页面的同步
   getIvisitMain = () => {
-    const { userData } = store.getState();
+    const storeData = store.getState();
+    const { userData } = storeData;
     if(userData.userid !== this.state.userData.userid) {
       service.getIvisitMain({userid: userData.userid}).then(Response => {
         // 在这个地方就整理好，后面去使用
-        console.log(Response);
         const { yunc, chanc } = Response.data.object.diagnosis;
         const { gesmoc, gesexpect } = Response.data.object.pregnantInfo;
         let d = {
@@ -293,10 +289,17 @@ export default class App extends Component {
           lmd: gesmoc,
           edd: gesexpect
         }
+        // 设置
+        this.setState({userData: storeData['userData'] },() => {
+          let newSearchObj = Object.assign({}, this.state.searchObj);
+          newSearchObj.menzhenNumber = this.state.userData.usermcno;
+          newSearchObj.IDCard = this.state.userData.useridno;
+          newSearchObj.phoneNumber = this.state.userData.usermobile;
+          this.setState({searchObj: newSearchObj})
+        }); 
         // 设置建档信息
-        store.dispatch(setOpenCaseData(d))
-        }
-      );
+        store.dispatch(setOpenCaseData(d));
+      });
     }
   }
 

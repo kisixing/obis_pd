@@ -140,6 +140,7 @@ export default class Operation extends Component{
   };
   // 渲染 胎儿中心类模板 - templateId 0~7
   renderFetusTemplateForm = (renderData) => {
+    const { currentFetusKey } = this.state;
     if(Object.keys(renderData).length === 0) return <div>无数据展示</div> ;
     const { templateId } = renderData;
     if(templateId < 0 || templateId > 7) return null;
@@ -157,6 +158,7 @@ export default class Operation extends Component{
               type="editable-card"
               onEdit={this.handleTabsEdit}
               onTabClick={this.handleTabClick}
+              activeKey={currentFetusKey}
             >
               {this.renderFetusTabPane(renderData['operative_procedure']['fetus'],templateId)}
             </Tabs>
@@ -198,7 +200,7 @@ export default class Operation extends Component{
     const todayIndex = operationList.findIndex(item => item.title === todayStr);
     if(todayIndex !== -1){
       operationList[todayIndex].children.splice(0,0,{title: '待完善手术记录', key: newId});
-      if(currentExpandedKeys.findIndex(key => key === operationList[index].key) === -1) {
+      if(currentExpandedKeys.findIndex(key => key === operationList[todayIndex].key) === -1) {
         currentExpandedKeys.push(operationList[todayIndex].key); 
       }
      }else {
@@ -327,27 +329,25 @@ export default class Operation extends Component{
         // console.log(currentShowData['preoperative_record'][name]);
         this.setState({currentShowData},() => console.log(currentShowData));
       }
-
       return;
     }
     // 通用
+    let obj = JSON.parse(JSON.stringify(currentShowData));
     if(path === "") {
-      mapValueToKey(currentShowData, value);
+      mapValueToKey(obj, value);
     }else {
-      mapValueToKey(currentShowData, `${path}.${name}`,value);
+      mapValueToKey(obj, `${path}.${name}`,value);
     }
-    if(currentShowData.templateId === 8) {
+    if(obj.templateId === 8) {
       console.log(value);
     }
     // 如何时新建病例 ，需要存储本地
-    if(currentShowData.id < 0) {
-      const index = operationNewDataList.findIndex(item => item.id === currentShowData.id);
-      operationNewDataList[index] = currentShowData;
+    if(obj.id < 0) {
+      const index = operationNewDataList.findIndex(item => item.id === obj.id);
+      operationNewDataList[index] = obj;
       this.setState({operationNewDataList});
     }
-    console.log(name);
-    console.log(value);
-    this.setState({currentShowData},() => console.log(this.state));
+    this.setState({currentShowData: obj},() => console.log(this.state));
   };
   // TODO
   // 婴儿数量变化 需要特殊处理
@@ -390,7 +390,9 @@ export default class Operation extends Component{
     // }catch (e) {
     //   console.log('非');
     // }
-    currentShowData['id'] = currentShowData['id'] || "";
+    if(currentShowData['id'] < 0){
+      currentShowData['id'] = "";
+    }
 
     service.operation.saveOperation(currentShowData).then(res => {
       // console.log(res);
@@ -437,7 +439,8 @@ export default class Operation extends Component{
 
   openModal = (type) => {
     if (type) {
-      const { doctor } = this.state.currentShowData;
+      let { doctor = ""} = this.state.currentShowData;
+      if(doctor === null) doctor = "";
       this.setState({templateObj: {isShowTemplateModal: true,type: type,doctor: doctor}});
     }
   }
@@ -451,6 +454,7 @@ export default class Operation extends Component{
   getTemplateInput = ({content}) => {
     const { currentShowData } = this.state;
     const { type } = this.state.templateObj;
+    // 需要新对象
     switch(type) {
       case 'or2':
         const { currentFetusKey } = this.state;
@@ -476,7 +480,7 @@ export default class Operation extends Component{
   render() {
     const { operationList, currentShowData = {}, clear } = this.state;
     const { id, templateId = 0 } = currentShowData;
-    const { isShowTemplateModal, type, doctor } = this.state.templateObj;
+    const { isShowTemplateModal, type, doctor = "" } = this.state.templateObj;
     return (
       <Page className="fuzhen font-16">
         <div className="fuzhen-left ant-col-5">

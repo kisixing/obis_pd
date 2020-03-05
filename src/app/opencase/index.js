@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Select, Button, message } from 'antd';
 import store from '../store/index';
 import service from '../../service/index.js';
-
+import { setUserData } from '../store/actionCreators'
 import { GetExpected } from '../../utils/index';
 
 import formRender,{ fireForm } from '../../render/form';
@@ -206,20 +206,25 @@ export default class OpenCase extends Component {
     const { pregnancyData, benYunData } = this.state;
     console.log(pregnancyData);
     fireForm(document.getElementById('form-block'),'valid').then(valid => {
-      console.log(valid);
       if(valid){
         // 转换数据格式
         benYunData['chanc'] = Number(benYunData['chanc'].value);
         benYunData['yunc'] = Number(benYunData['yunc'].value);
+        // 孕妇建档
         service.opencase.addyc({...pregnancyData, ...benYunData}).then(res => {
           if(res.data.code === "200" || res.data.code === "1") {
-            message.success('新建孕妇信息成功');
+            message.success('孕妇建档成功');
             const id = res.data.object.id; 
+            res.data.object['tuseryunchan'] = `${res.data.object['yunc']}/${res.data.object['chanc']}`;
+            res.data.object['userid'] = id;
+            store.dispatch(setUserData(res.data.object))
+            // 保存孕妇信息
             service.opencase.useryc({id,...pregnancyData, ...benYunData}).then(uRes => {
               if(uRes.data.code === "200" || uRes.data.code === "1") {
                 message.success('保存信息成功');
+                this.props.history.push('/pregnancy');
               }else {
-                message.error(data.message)
+                message.error(uRes.data.message)
               }
             });
           }else {
