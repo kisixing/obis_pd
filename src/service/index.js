@@ -66,11 +66,11 @@ export default {
   /**
    * 根据 身份证号/就诊卡号/手机/建档号 搜索
    */
-  findUser: function ({ usermcno = "", useridno = "", usermobile = "" }) {
+  findUser: function ({ usermcno = "", useridno = "", usermobile = "", id ="" }) {
     // 这里的userid字段名称不是userid 而是 id
     // 修改字段后再return Promise
     // 由于接口是使用本页面的userId，所以要在这里设置
-    return myAxios.get(`prenatalQuery/findUser?useridno=${useridno}&usermcno=${usermcno}&usermobile=${usermobile}&chanjno=&id=`).then(res => {
+    return myAxios.get(`prenatalQuery/findUser?useridno=${useridno}&usermcno=${usermcno}&usermobile=${usermobile}&chanjno=&id=${id}`).then(res => {
       res['object']['userid'] = res['object']['id'];
       res['object']['tuserweek'] = res['object']['gesweek'];
       // 有几个字段还没有

@@ -12,7 +12,8 @@ import {
   puncturePositionOptions1,
   puncturePositionOptions2,
   puncturePositionOptions7,
-  sjTreeOption,
+  sjTreeOptions,
+  rmSjTreeOptions,
   statusOptions,
   yesOptions,
   hnOptions,
@@ -29,7 +30,8 @@ import {
   bleedFlowColumns,
   hemogramColumns, measurementColumns,
   anesthesiaMethodOptions,
-  isPharacyOptions
+  isPharacyOptions,
+  bloodBankOptions
 } from "./data";
 import valid from "../../render/common/valid";
 
@@ -92,7 +94,7 @@ const timesOfNeedleInsertion = {name: 'timesOfNeedleInsertion[进针次术]', ty
 const placenta = {name: 'placenta[经否胎盘]', type: 'select',options: [{label: '经',value: '经'},{label: '否',value: '否'}], span: SPAN_6};
 const placentaHemorrhage = {name: 'placentaHemorrhage[胎盘出血]', type: 'hemorrhageselect', span: SPAN_6};
 const uterineWallHemorrhage = {name: 'uterineWallHemorrhage[宫壁出血]', type: 'hemorrhageselect',options: yesOptions, span: SPAN_6};
-const inspectionItems = {name: 'inspectionItems[送检项目]', type: 'treeselect', options: sjTreeOption,span: SPAN_6};
+const inspectionItems = {name: 'inspectionItems[送检项目]', type: 'treeselect', options: sjTreeOptions,span: SPAN_6};
 const amniotic_fluid = {name: 'amniotic_fluid[羊水量](ml)', type: 'input', span: SPAN_6};
 const isPharmacy = {name: 'isPharmacy[是否用药]', type: 'checkinput', radio: true, options: isPharacyOptions, span: SPAN_18}
 const process_evaluation = {name: 'process_evaluation[过程评估]', type: 'checkinput', radio:true, options:statusOptions, span: SPAN_20};
@@ -176,7 +178,8 @@ const config1 = {
         ]
       },
       {columns: [
-        inspectionItems, villusVolume,
+        {name: 'inspectionItems[送检项目]', type: 'treeselect', options: rmSjTreeOptions, span: SPAN_6},
+        villusVolume,
         {name: 'character[性状]', type: 'select',options: characterOptions1, span: SPAN_6}
       ]},
       {columns: [isPharmacy]},
@@ -252,7 +255,7 @@ const config3 = {
       {columns: [operation_no, operator, assistant]},
       {columns: [start_time, end_time, duration]},
       {columns: [
-        // 此处的 穿刺部位/羊水形状 与config0 - 羊膜腔穿刺 相同
+        // 此处的 穿刺部位/羊水性状 与config0 - 羊膜腔穿刺 相同
         {name: 'puncturePosition[穿刺部位]', type: 'select', options: puncturePositionOptions0,span: SPAN_6},
         punctureCount,
         {name: 'perfusionVolume[灌注液量](ml)', type: 'input', span: SPAN_6}
@@ -361,7 +364,7 @@ const config5 = {
       {
         columns: [
           {name: 'drawSheepWater[抽吸羊水量](ml)', type: 'input', span: SPAN_6},
-          {name: 'character[羊水形状]', type: 'select',options: characterOptions0 , span: SPAN_6},
+          {name: 'character[羊水性状]', type: 'select',options: characterOptions0 , span: SPAN_6},
           negativePressure
         ]
       },
@@ -399,7 +402,7 @@ const config6 = {
           {name: 'bleedIndex[术前血流指标]', type: 'table', valid: 'required', pagination: false, editable: false, options: bleedFlowColumns, span: SPAN_20},
       ]},
       {columns:[
-          {name: 'bloodBank[血库情况]', type: 'input', valid: 'required', span: SPAN_6 },
+          {name: 'bloodBank[库血情况]', type: 'select', valid: 'required', options: bloodBankOptions, span: SPAN_6 },
           {name: 'collectBloodDate[采血日期]', type: 'date', valid: 'required', span: SPAN_6}
       ]},
       {columns:[
@@ -421,7 +424,7 @@ const config6 = {
         columns: [
           {name: 'targetHct[目标HCT]', type: 'input', span: SPAN_6},
           {name: 'calculationOfBloodTransfusionVolume[计算输血量](ml)', type: 'input', span: SPAN_6},
-          {name: 'actualTransfusionVolume[实际输血量]', type: 'input', span: SPAN_6},
+          {name: 'actualTransfusionVolume[实际输血量](ml)', type: 'input', span: SPAN_6},
         ]
       },
       {
@@ -439,7 +442,7 @@ const config6 = {
       {columns: [placenta, placentaHemorrhage, omphalorrhagia]},
       {columns: [uterineWallHemorrhage]},
       {columns: [inspectionItems, cordBloodVolume,
-          {name: 'character[形状]', type: 'select', options: characterOptions2, span: SPAN_6}
+          {name: 'character[性状]', type: 'select', options: characterOptions2, span: SPAN_6}
       ]},
       {columns: [isPharmacy]},
       {columns: [process_evaluation]},
@@ -542,7 +545,7 @@ const ward_config = (templateFn) => ({
     {
       columns: [
         {name: 'operationLevelWard[手术级别]', type: 'select', valid: 'required',options:operationLevelOptions , span: SPAN_6},
-        {name: 'incisionTypeWard[切口类型]', type: 'select', valid: 'required', options: incisionTypeOptions ,span: SPAN_6},
+        {name: 'incisionTypeWard[切口类别]', type: 'select', valid: 'required', options: incisionTypeOptions ,span: SPAN_6},
       ]
     },
     {
@@ -557,7 +560,7 @@ const ward_config = (templateFn) => ({
     },
     {
       columns:[
-        {name: 'operationDate[新增记录日期]', type: 'date', valid: 'required', span: SPAN_6},
+        {name: 'operationDate[手术日期]', type: 'date', valid: 'required', span: SPAN_6},
         {name: 'startTime[开始时间]', type: 'time', valid: 'required', format: "HH:mm" ,span: SPAN_6},
         {name: 'endTime[结束时间]', type: 'time', valid: 'required', format: "HH:mm", span: SPAN_6}
       ]

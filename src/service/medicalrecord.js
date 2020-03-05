@@ -31,7 +31,7 @@ export default {
     return this.userId().then(r => {
         console.log(r);
         entity['userid'] = r.object.userid;
-        myAxios.post(`${FRONT_URL}${uri}`, entity)
+        return myAxios.post(`${FRONT_URL}${uri}`, entity)
       }
     )
   },

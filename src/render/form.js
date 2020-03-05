@@ -148,7 +148,7 @@ class FormItem extends Component {
     const { name } = this.state;
     const { entity, width } = this.props;
     if (!entity || (JSON.stringify(entity && entity[name]) !== JSON.stringify(newProps.entity[name]))) {
-      console.log('in');
+      // console.log('in');
       this.setState({
         ...this.getSplitState(newProps.name, newProps.entity),
         value: newProps.entity[name],

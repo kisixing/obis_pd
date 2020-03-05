@@ -22,3 +22,4 @@ export function getWeek(param1, param2) {
   let days = day1 - day2;
   return `${Math.floor(days / 7)}+${days % 7}`;
 }
+

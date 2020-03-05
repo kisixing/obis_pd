@@ -29,6 +29,7 @@ export function getWeek(param1, param2) {
 
 // 将后台返回的string转为object
 export const convertString2Json = function(str) {
+  if(str === null || str === undefined) return ;
   const splitKey = "},{";
   let index = str.indexOf(splitKey);
   if(index === -1) {

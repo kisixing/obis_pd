@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { Select, Button, message } from 'antd';
-
+import store from '../store/index';
 import service from '../../service/index.js';
+import { setUserData } from '../store/actionCreators'
+import { GetExpected } from '../../utils/index';
 
 import formRender,{ fireForm } from '../../render/form';
 import Page from '../../render/page';
@@ -56,7 +58,16 @@ export default class OpenCase extends Component {
           {
             name: 'useridno[身份证]', type: 'input', span: 6, valid: (value) => {
               let IDReg = new RegExp(/^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/);
-              return IDReg.test(value);
+              if(IDReg.test(value)){
+                if(Number(value.slice(16,17)) % 2 === 1){
+                  message.error('请输入女性身份证');
+                  return "*请输入女性身份证";
+                }else{
+                  return "";
+                }
+              }else{
+                return "*身份证格式错误"
+              }
             }
           }
         ]
@@ -73,7 +84,7 @@ export default class OpenCase extends Component {
           // new
           // {name: 'danw[工作单位]', type: 'input', span: 6, valid: 'required'},
           {name: 'useroccupation[职业]', type: 'input', span: 6},
-          {name: 'usermobile[手机]', type: 'input', span: 6, valid: 'required'}
+          {name: 'usermobile[手机]', type: 'input', span: 6, valid: (value) => (/^1[3456789]\d{9}$/.test(value) ? "" : "*请输入正确的手机号码")}
         ]
       },
       {
@@ -175,14 +186,18 @@ export default class OpenCase extends Component {
 
   /* ======================= handler =============================== */
   handlePregnancyChange = (_,{name,value}) => {
-    let { pregnancyData } = this.state;
-    let obj = {}; obj[name] = value;
-    let newData = Object.assign(pregnancyData, obj);
-    this.setState({pregnancyData, newData});
+    const { pregnancyData } = this.state;
+    let obj = Object.assign({}, pregnancyData);
+    obj[name] = value;
+    this.setState({pregnancyData: obj});
   };
   handleBenYunChange = (_,{name,value}) => {
     const { benYunData } = this.state;
     let obj = Object.assign({}, benYunData); 
+    if(name === 'gesmoc'){
+      const gesexpect = GetExpected(value);
+      obj['gesexpect'] = gesexpect;
+    }
     obj[name] = value;
     this.setState({benYunData: obj});
   };
@@ -191,29 +206,31 @@ export default class OpenCase extends Component {
     const { pregnancyData, benYunData } = this.state;
     console.log(pregnancyData);
     fireForm(document.getElementById('form-block'),'valid').then(valid => {
-      console.log(valid);
       if(valid){
-        // 判断身份证
-        if(Number(pregnancyData.useridno.slice(16,17)) % 2 === 1) {
-          message.error('请输入女性身份证信息');
-          return ;
-        }
-
-        // service.opencase.addyc({...pregnancyData, ...benYunData}).then(res => {
-        //   console.log(res);
-        //   const { data } = res;
-        //   if(data.code === "200" || data.code === "1") {
-        //     message.success(data.message);
-        //   }else {
-        //     message.error(data.message)
-        //   }; 
-        // });
-        // service.opencase.useryc({...pregnancyData, ...benYunData}).then(res => {
-        //   if(data.code === "200") {
-        //   }else {
-        //     message.error(data.message)
-        //   }
-        // });
+        // 转换数据格式
+        benYunData['chanc'] = Number(benYunData['chanc'].value);
+        benYunData['yunc'] = Number(benYunData['yunc'].value);
+        // 孕妇建档
+        service.opencase.addyc({...pregnancyData, ...benYunData}).then(res => {
+          if(res.data.code === "200" || res.data.code === "1") {
+            message.success('孕妇建档成功');
+            const id = res.data.object.id; 
+            res.data.object['tuseryunchan'] = `${res.data.object['yunc']}/${res.data.object['chanc']}`;
+            res.data.object['userid'] = id;
+            store.dispatch(setUserData(res.data.object))
+            // 保存孕妇信息
+            service.opencase.useryc({id,...pregnancyData, ...benYunData}).then(uRes => {
+              if(uRes.data.code === "200" || uRes.data.code === "1") {
+                message.success('保存信息成功');
+                this.props.history.push('/pregnancy');
+              }else {
+                message.error(uRes.data.message)
+              }
+            });
+          }else {
+            message.error(data.message)
+          }; 
+        });
       }
     })
     

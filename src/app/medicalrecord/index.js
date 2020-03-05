@@ -9,9 +9,10 @@ import service from "../../service";
 import { formateDate } from './util';
 import TemplateInput from '../../components/templateInput';
 
+import { GetExpected } from '../../utils/index';
+
 import './index.less';
 import '../index.less';
-import { newDataTemplate } from './data';
 import * as baseData from './data';
 
 const { TreeNode } = Tree;
@@ -101,6 +102,10 @@ const mapValueToKey = (obj, keyStr = "", val) => {
  *
  */
 
+ // 新建数据模型
+ const newData = {
+
+ }
 export default class MedicalRecord extends Component {
   constructor(props) {
     super(props);
@@ -393,7 +398,7 @@ export default class MedicalRecord extends Component {
 
           { name: 'current_weight(kg)[现 体 重 ]', type: 'input', span: 6, valid: 'required|number|rang(0,100)' },
 
-          { name: 'weight_gain(kg)[体重增长]', type: 'input', span: 6, valid: 'required' },
+          { name: 'weight_gain(kg)[体重增长]', type: 'input', span: 6, valid: 'required|number|rang(0,100)' },
         ]
       }
     ]
@@ -682,8 +687,11 @@ export default class MedicalRecord extends Component {
     const { openCaseData, userData } = store.getState();
     console.log(openCaseData);
     // 新建数据实体 填充
+    let newDataTemplate = {};
     newDataTemplate['id'] = newId;
     newDataTemplate['formType'] = "1";
+    newDataTemplate['pregnancy_history'] = {};
+    newDataTemplate['physical_check_up'] = {};
     newDataTemplate['pregnancy_history']['gravidity'] = openCaseData['gravidity'];
     newDataTemplate['pregnancy_history']['parity'] = openCaseData['parity'];
     newDataTemplate['pregnancy_history']['lmd'] = openCaseData['lmd'];
@@ -749,34 +757,49 @@ export default class MedicalRecord extends Component {
   handleFormChange = (path, name, value) => {
     const { specialistemrData, currentTreeKeys } = this.state;
     const index = specialistemrData.findIndex(item => item.id.toString() === currentTreeKeys[0]);
+    
+    let obj = JSON.parse(JSON.stringify(specialistemrData[index]));
+
     if (path === "") {
       // 为第一层值
-      mapValueToKey(specialistemrData[index], name, value);
+      mapValueToKey(obj[index], name, value);
     } else {
-      // 手动 特殊处理bp
-      if (name === 'bp') {
-        if (value["0"]) { name = 'systolic_pressure'; mapValueToKey(specialistemrData[index], `${path}.${name}`, value["0"]); }
-        if (value["1"]) { name = 'diastolic_pressure'; mapValueToKey(specialistemrData[index], `${path}.${name}`, value["1"]); }
-        // 特殊处理手术史，中孕超声
-      } else if (name === "operation_history") {
-        console.log(value);
-      } else if(path === 'physical_check_up'){
-        // 自动填充体重
-        if(specialistemrData[index]['physical_check_up']['pre_weight'] !== '' && name === 'current_weight'){
-          console.log('1');  
-          mapValueToKey(specialistemrData[index], `physical_check_up.weight_gain`, (Number(value)-Number(specialistemrData[index]['physical_check_up']['pre_weight'])).toString());
-        }
-        if(specialistemrData[index]['physical_check_up']['current_weight'] !== '' && name === 'pre_weight'){
-          console.log('2');
-          mapValueToKey(specialistemrData[index], `physical_check_up.weight_gain`, (Number(specialistemrData[index]['physical_check_up']['current_weight']) - Number(value)).toString());
-        }
-        mapValueToKey(specialistemrData[index], `${path}.${name}`, value);
-        console.log(this.state);
-      }else {
-        mapValueToKey(specialistemrData[index], `${path}.${name}`, value);
+      switch (name) {
+        case 'bp':
+          if (value["0"]) { name = 'systolic_pressure'; mapValueToKey(obj, `${path}.${name}`, value["0"]); }
+          if (value["1"]) { name = 'diastolic_pressure'; mapValueToKey(obj, `${path}.${name}`, value["1"]); }
+          break;
+        case 'operation_history':
+          break;
+        case 'current_weight':
+          // 判断是否有此值
+          if(!obj['physical_check_up'].hasOwnProperty('pre_weight')){obj['pre_weight']['pre_weight'] = ''};
+          if(obj['physical_check_up']['pre_weight'] !== '' ) {
+            const weight_gain = Number(value) - Number(obj['physical_check_up']['pre_weight']);
+            console.log(weight_gain);  
+            obj['physical_check_up']['weight_gain'] = weight_gain.toString();
+          }
+          obj['physical_check_up'][name] = value;
+          break;
+        case 'pre_weight':
+          // 判断是否有此值
+          if(!obj['physical_check_up'].hasOwnProperty('current_weight')){obj['physical_check_up']['current_weight'] = ''};
+          if(obj['physical_check_up']['current_weight'] !== '' ) {
+            console.log(obj['physical_check_up']['current_weight']);
+            console.log(value);
+            const weight_gain = Number(obj['physical_check_up']['current_weight']) - Number(value);
+            console.log(weight_gain);  
+            obj['physical_check_up']['weight_gain'] = weight_gain.toString();
+          }
+          obj['physical_check_up'][name] = value;
+          break;
+        default:
+          mapValueToKey(obj, `${path}.${name}`, value);
       }
     }
-    this.setState({ specialistemrData }, () => console.log(this.state));
+    console.log(obj);
+    specialistemrData.splice(index,1,obj);
+    this.setState({ specialistemrData: specialistemrData }, () => console.log(this.state));
   };
 
   // 表单保存
@@ -789,14 +812,13 @@ export default class MedicalRecord extends Component {
         const index = specialistemrData.findIndex(item => item['id'].toString() === currentTreeKeys[0]);
         // 整合bp的格式
         specialistemrData[index]['physical_check_up']['bp'] = '0';
-        // TODO 未确定
         // specialistemrData[index]['id'] = "";
         service.medicalrecord.savespecialistemrdetail(specialistemrData[index]).then(res => {
-          if (res.code === "200" && res.message === "OK") {
+          console.log(res);
+          if (res.code === "200") {
             message.success('成功保存');
             service.medicalrecord.getspecialistemr().then(res => {
-              if (res.code === "200" || 200) {
-                message.success('200 保存成功');
+              if (res.code === "200" || res.code === 200) {
                 this.setState({ specialistemrList: res.object.list }, () => { })
               }
             });
@@ -872,7 +894,9 @@ export default class MedicalRecord extends Component {
         object['family_history'][item] = convertString2Json(object['family_history'][item]) || [];
       });
     }
-
+    if(object.hasOwnProperty('physical_check_up')){
+      object['physical_check_up']['edema'] = convertString2Json(object['physical_check_up']['edema']) || "";
+    }
     return object;
   };
   // 检测data中是否存在这个key值
@@ -950,20 +974,16 @@ export default class MedicalRecord extends Component {
       pregnancy_history = {},
       downs_screen = {},
       thalassemia = {},
-      ultrasound = { menopause: '', middle: [] },
+      ultrasound = { middle: [] },
       past_medical_history = {},
       family_history = {},
-      physical_check_up = {pre_weight: '', current_weight: '', weight_gain: ''},
+      physical_check_up = {},
       ckweek = '', createdate = ''
     } = renderData;
     // 手动修改 physical_check_up bp
     if (Object.keys(physical_check_up).length !== 0) {
       physical_check_up['bp'] = { "0": physical_check_up['systolic_pressure'], "1": physical_check_up['diastolic_pressure'] }
     }
-    const tableColumns = [
-      { title: '编号', key: 'index', render: (_, __, index) => (<span>{index + 1}</span>) },
-      { title: '内容', dataIndex: 'content', key: 'content' },
-    ];
     console.log(renderData);
     return (
       <Page className='fuzhen font-16 ant-col'>
