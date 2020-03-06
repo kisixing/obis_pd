@@ -399,14 +399,14 @@ const config6 = {
           {name: 'preoperativeUltrasonography[术前超声检查]', type: 'table', valid: 'required', pagination: false, editable: true, options: preoperativeUltrasonographyColumns6, span: SPAN_20 },
       ]},
       {columns:[
-          {name: 'bleedIndex[术前血流指标]', type: 'table', valid: 'required', pagination: false, editable: false, options: bleedFlowColumns, span: SPAN_20},
+          {name: 'bleedIndex[术前血流指标]', type: 'table', valid: 'required', pagination: false, editable: false, buttons: false, options: bleedFlowColumns, span: SPAN_20},
       ]},
       {columns:[
           {name: 'bloodBank[库血情况]', type: 'select', valid: 'required', options: bloodBankOptions, span: SPAN_6 },
           {name: 'collectBloodDate[采血日期]', type: 'date', valid: 'required', span: SPAN_6}
       ]},
       {columns:[
-          {name: 'hemogram[术前血象检查]', type: 'table', valid: 'required', pagination: false, editable: true, options: hemogramColumns, span: SPAN_20},
+          {name: 'hemogram[术前血象检查]', type: 'table', valid: 'required', pagination: false, editable: false, buttons: false, options: hemogramColumns, span: SPAN_20},
       ]},
     ]
   }),
@@ -478,7 +478,7 @@ const config7 = {
           {name: 'preoperativeUltrasonography[术前超声检查]', type: 'table', valid: 'required', pagination: false, editable: true, options: preoperativeUltrasonographyColumns7, span: SPAN_20 },
       ]},
       {columns :[
-          {name: 'measurement[术前测量值]', type: 'table', valid: 'required', pagination: false, editable: true, buttons: false, options: measurementColumns, span: SPAN_20 },
+          {name: 'measurement[术前测量值]', type: 'table', valid: 'required', pagination: false, editable: false, buttons: false, options: measurementColumns, span: SPAN_20 },
       ]},
     ]
   }),

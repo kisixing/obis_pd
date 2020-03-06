@@ -34,7 +34,7 @@ const _genotypeAnemia = baseData.genotypeAnemia.map(item => {
 const convertString2Json = function (str) {
   const splitKey = "},{";
   console.log(str);
-  if(str || str === null) { return ;}
+  if(str === null || str === undefined) { return ;}
   let index = str.indexOf(splitKey);
   if (index === -1) {
     try {
@@ -73,7 +73,6 @@ const convertString2Json = function (str) {
 const OBJECT_SPLIT_KEY = ".";
 const ARRAY_SPLIT_KEY = "-";
 const mapValueToKey = (obj, keyStr = "", val) => {
-  console.log(val);
   if (keyStr === "") return;
   // check "." "-"
   const objectIndex = keyStr.indexOf(OBJECT_SPLIT_KEY);
@@ -731,7 +730,8 @@ export default class MedicalRecord extends Component {
     const index = specialistemrData.findIndex(item => item.id.toString() === currentTreeKeys[0]);
     if (action === 'remove') {
       const uIndex = specialistemrData[index].ultrasound.fetus.findIndex(v => v.id.toString() === targetKey);
-      specialistemrData[index].ultrasound.fetus.splice(uIndex, 1);
+      specialistemrData[index].ultrasound.fetus[uIndex].deleteOperation = "1"; 
+      specialistemrData[index].ultrasound.fetus[uIndex].isHidden = true; 
     } else if (action === 'add') {
       if(specialistemrData[index].hasOwnProperty('ultrasound')){
         if(specialistemrData[index]['ultrasound'].hasOwnProperty('fetus')){
@@ -779,7 +779,6 @@ export default class MedicalRecord extends Component {
           if(!obj['physical_check_up'].hasOwnProperty('pre_weight')){obj['pre_weight']['pre_weight'] = ''};
           if(obj['physical_check_up']['pre_weight'] !== '' ) {
             const weight_gain = Number(value) - Number(obj['physical_check_up']['pre_weight']);
-            console.log(weight_gain);  
             obj['physical_check_up']['weight_gain'] = weight_gain.toString();
           }
           obj['physical_check_up'][name] = value;
@@ -788,10 +787,7 @@ export default class MedicalRecord extends Component {
           // 判断是否有此值
           if(!obj['physical_check_up'].hasOwnProperty('current_weight')){obj['physical_check_up']['current_weight'] = ''};
           if(obj['physical_check_up']['current_weight'] !== '' ) {
-            console.log(obj['physical_check_up']['current_weight']);
-            console.log(value);
-            const weight_gain = Number(obj['physical_check_up']['current_weight']) - Number(value);
-            console.log(weight_gain);  
+            const weight_gain = Number(obj['physical_check_up']['current_weight']) - Number(value); 
             obj['physical_check_up']['weight_gain'] = weight_gain.toString();
           }
           obj['physical_check_up'][name] = value;
@@ -825,6 +821,7 @@ export default class MedicalRecord extends Component {
         if(!specialistemrData[index].hasOwnProperty('thalassemia')) {
           specialistemrData[index]['thalassemia'] = {};
         }
+        // 专科病历主体保存
         service.medicalrecord.savespecialistemrdetail(specialistemrData[index]).then(res => {
           console.log(res);
           if (res.code === "200") {
@@ -838,7 +835,6 @@ export default class MedicalRecord extends Component {
             message.error('500 保存失败')
           }
         }).catch(err => console.log(err));
-        console.log(ultrasoundMiddleData);
         ultrasoundMiddleData.forEach(v => v.writeOperationType = "1");
         service.ultrasound.writePrenatalPacsMg({ pacsMgVOList: ultrasoundMiddleData, recordid: currentTreeKeys[0] }).then(res => console.log(res));
       } else {
@@ -878,12 +874,14 @@ export default class MedicalRecord extends Component {
     if (fetusData.length === 0) return <div key="none">暂无数据</div>;
     const fetusTabPaneDOM = [];
     fetusData.forEach((fetus, index) => {
-      fetusTabPaneDOM.push(
-        <TabPane key={fetus.id} tab={`胎儿-${index + 1}`}>
-          {/*// TODO 这里的处理需要另外做*/}
-          {formRender(fetus, this.ultrasound_fetus_config(), (_, { name, value }) => this.handleFormChange(`ultrasound.fetus-${index}`, name, value))}
-        </TabPane>
-      );
+      if(!fetus.isHidden) {
+        fetusTabPaneDOM.push(
+          <TabPane key={fetus.id} tab={`胎儿-${index + 1}`}>
+            {/*// TODO 这里的处理需要另外做*/}
+            {formRender(fetus, this.ultrasound_fetus_config(), (_, { name, value }) => this.handleFormChange(`ultrasound.fetus-${index}`, name, value))}
+          </TabPane>
+        );
+      }
     })
     return fetusTabPaneDOM;
   };
@@ -905,9 +903,15 @@ export default class MedicalRecord extends Component {
         object['family_history'][item] = convertString2Json(object['family_history'][item]) || [];
       });
     }
+    console.log(object);
     if(object.hasOwnProperty('physical_check_up')){
       object['physical_check_up']['edema'] = convertString2Json(object['physical_check_up']['edema']) || "";
     }
+    Object.keys(object['pregnancy_history']).forEach( key => {
+      if(key !== 'lmd' && key !== 'edd') {
+        object['pregnancy_history'][key] = convertString2Json(object['pregnancy_history'][key]);
+      }
+    })
     if(object.downs_screen === null) object.downs_screen = {early: {} , middle: {}, nipt: {}};
     if(object.thalassemia === null) object.thalassemia = {wife: {} , husband: {}};
     return object;
@@ -926,7 +930,7 @@ export default class MedicalRecord extends Component {
   openModal = (type) => {
     if (type) {
       const { currentTreeKeys, specialistemrData } = this.state;
-      const doctor = specialistemrData[specialistemrData.findIndex(item => item.id.toString() === currentTreeKeys[0])].doctor;
+      const doctor = specialistemrData[specialistemrData.findIndex(item => item.id.toString() === currentTreeKeys[0])].doctor || "";
       this.setState({templateObj: {isShowTemplateModal: true,type: type,doctor: doctor}});
     }
   };
@@ -1060,7 +1064,8 @@ export default class MedicalRecord extends Component {
                         </Tabs>
                       </div>
                       <div>
-                        {formRender({ middle: ultrasoundMiddleData }, this.middle_config(), (_, { value }) => { this.setState({ ultrasoundMiddleData: value }) })}
+                        {/*  中孕超声  */}
+                        {formRender({ middle: ultrasoundMiddleData }, this.middle_config(), (_, { value }) => { this.setState({ ultrasoundMiddleData: value },() => console.log(this.state)); console.log(value) })}
                       </div>
                     </div>
                   )}

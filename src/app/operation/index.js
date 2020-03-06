@@ -56,6 +56,8 @@ const mapValueToKey = (obj, keyStr = "", val) => {
  * return templateId[number] - 对应的模板编号
  */
 const operationItemTemplateId = (str) => {
+  console.log(str);
+  if(str === null || str === undefined) return -1;
   const ITEM_KEY_WORD = ['羊膜腔穿刺','绒毛活检','脐带穿刺','羊膜腔灌注','选择性减胎','羊水减量','宫内输血','胸腔积液|腹水|囊液穿刺'];
   const splitKey = '|';
   const len = ITEM_KEY_WORD.length;
@@ -78,11 +80,31 @@ const operationItemTemplateId = (str) => {
   return templateId;
 };
 
-/**
- * 对A B 数组 特定key值对比
- *  - 情况 A有 B无
- *        A无 B有
- */
+// 对Date的扩展，将 Date 转化为指定格式的String
+// 月(M)、日(d)、小时(h)、分(m)、秒(s)、季度(q) 可以用 1-2 个占位符， 
+// 年(y)可以用 1-4 个占位符，毫秒(S)只能用 1 个占位符(是 1-3 位的数字) 
+// 例子： 
+// (new Date()).Format("yyyy-MM-dd hh:mm:ss.S") ==> 2006-07-02 08:09:04.423 
+// (new Date()).Format("yyyy-M-d h:m:s.S")      ==> 2006-7-2 8:9:4.18 
+Date.prototype.Format = function (fmt) { //author: meizz 
+  var o = {
+      "M+": this.getMonth() + 1, //月份 
+      "d+": this.getDate(), //日 
+      "h+": this.getHours(), //小时 
+      "m+": this.getMinutes(), //分 
+      "s+": this.getSeconds(), //秒 
+      "q+": Math.floor((this.getMonth() + 3) / 3), //季度 
+      "S": this.getMilliseconds() //毫秒 
+  };
+  if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+  for (var k in o)
+  if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+  return fmt;
+}
+
+
+// 'bleedIndex','hemogram','measurement'
+const specialEdit = ['preoperativeUltrasonography','preoperativeUltrasonographyLast',];
 
 
 export default class Operation extends Component{
@@ -141,6 +163,7 @@ export default class Operation extends Component{
   // 渲染 胎儿中心类模板 - templateId 0~7
   renderFetusTemplateForm = (renderData) => {
     const { currentFetusKey } = this.state;
+    console.log(renderData);
     if(Object.keys(renderData).length === 0) return <div>无数据展示</div> ;
     const { templateId } = renderData;
     if(templateId < 0 || templateId > 7) return null;
@@ -213,7 +236,7 @@ export default class Operation extends Component{
       preoperative_record: {
         operation_date: todayStr
       },
-      operative_procedure: {fetus:[{id: newId+1}]}, 
+      operative_procedure: {fetus:[{id: newId-1}]}, 
       surgery: {},
       ward: {
         operationDate: todayStr
@@ -223,7 +246,7 @@ export default class Operation extends Component{
     this.setState({operationList,currentExpandedKeys,
         currentTreeKeys: [newId.toString()], 
         currentShowData: currentData,
-        currentFetusKey: newId+1
+        currentFetusKey: (newId-1).toString()
       },() => console.log(this.state));
   };
   //
@@ -296,6 +319,7 @@ export default class Operation extends Component{
       // 这里只可能存在 0~7 8种手术模板
       let templateId = operationItemTemplateId(value.value);
       // 清除当前数据
+      const newFetusId = -Math.random();
       let newCurrentShowData = Object.assign({},{
         id: currentShowData.id,
         key: currentShowData.key,
@@ -307,22 +331,25 @@ export default class Operation extends Component{
         preoperative_record: {
           operation_date: currentShowData['preoperative_record']['operation_date']
         },
-        operative_procedure: {fetus:[{id: ''}]},
+        operative_procedure: {fetus:[{id: newFetusId}]},
         surgery: {},
-        ward: {}
+        ward: {
+          operationDate:  currentShowData['preoperative_record']['operation_date']
+        }
       });
       this.setState({clear: true}, () => {
-        this.setState({currentShowData: newCurrentShowData, clear: false});
+        this.setState({currentShowData: newCurrentShowData, clear: false, currentFetusKey: newFetusId.toString()});
       })
       // 这个return一定要加
       return ;
     }
+    let obj = JSON.parse(JSON.stringify(currentShowData));
     // 修改超声|其他table类 - 这里使用operationWriteType方式
-    if(name.indexOf('preoperativeUltrasonography') !== -1) {
-      // 新增 & 修改 都不用管
-
+    if(specialEdit.findIndex(i => i === name) !== -1) {
+    // if(name.indexOf('preoperativeUltrasonography') !== -1) {
       // 删除问题 逻辑
-      let oldValue = currentShowData['preoperative_record'][name];
+      let oldValue = obj['preoperative_record'][name] || [];
+      console.log(oldValue, value);
       if(oldValue.length > value.length) {
         // 比较旧值和新值长度
         for(let i = 0; i < oldValue.length; i++) {
@@ -342,18 +369,25 @@ export default class Operation extends Component{
             }
           }
         }
-        currentShowData['preoperative_record'][name] = oldValue;
+        obj['preoperative_record'][name] = oldValue;
         // 增加
         // console.log(currentShowData['preoperative_record'][name]);
-        this.setState({currentShowData},() => console.log(currentShowData));
+        
+      }else {
+        // 新增 & 修改 都不用管
+        mapValueToKey(obj, `${path}.${name}`,value);
       }
+      this.setState({currentShowData: obj},() => console.log(this.state.currentShowData));
       return;
     }
     // 通用
-    let obj = JSON.parse(JSON.stringify(currentShowData));
+    
     // 当前胎儿的index
-    const fIndex = obj['operative_procedure']['fetus'].findIndex(item => item.id === currentFetusKey);
+    console.log(obj);
+    console.log(currentFetusKey);
+    const fIndex = obj['operative_procedure']['fetus'].findIndex(item => item.id.toString() === currentFetusKey);
     let fObj = obj['operative_procedure']['fetus'][fIndex];
+    console.log(name);
     if(path === "") {
       mapValueToKey(obj, value);
     }else {
@@ -372,6 +406,13 @@ export default class Operation extends Component{
             fObj['duration'] = getTimeDifference(fObj['start_time'],value);
             obj['operative_procedure']['fetus'].splice(fIndex,1,fObj);
           }
+          break;
+        // 日期要同步
+        case 'operationDate':
+          obj['preoperative_record']['operation_date'] = value;
+          break;
+        case 'operation_date':
+          obj['ward']['operationDate'] = value;
           break;
         default:
           break;
@@ -393,16 +434,16 @@ export default class Operation extends Component{
   // 婴儿数量变化 需要特殊处理
   handleTabsEdit = (targetKey, action) => {
     let { currentShowData } = this.state;
-    console.log(targetKey);
+    let newFetusId = -Math.random();
     if( action === 'remove') {
       const i = currentShowData['operative_procedure']['fetus'].findIndex(item => item.id === targetKey);
       currentShowData['operative_procedure']['fetus'].splice(i,1);
     }else if(action === 'add') {
       currentShowData['operative_procedure']['fetus'].push({
-        id: Math.random()
+        id:newFetusId, operationWriteType: 0
       })
     }
-    this.setState({currentShowData});
+    this.setState({currentShowData, currentFetusKey: newFetusId.toString()});
   };
   // 处理
   handleTabClick = (key) => {
@@ -413,6 +454,9 @@ export default class Operation extends Component{
   handleTemplateSelect = (templateId) => {
     const { currentShowData } = this.state;
     currentShowData['templateId'] = templateId;
+    if(templateId === 8) {
+      currentShowData.operationItem.operationName = {value: '病房病历', label: '病房病历'}
+    }
     this.setState({currentShowData});
   };
 
@@ -422,10 +466,23 @@ export default class Operation extends Component{
       currentShowData['id'] = "";
     }
     currentShowData['operative_procedure']['fetus'].forEach(v => {
-      if(Number(v) < 0){
+      if(Number(v.id) < 0){
         v.id = "";
       }
     })
+    // 转换病房中的时间
+    if(currentShowData.templateId === 8) {
+      if(currentShowData['ward']['startTime'].toString().length < 6) {
+        currentShowData['ward']['startTime'] = new Date(currentShowData['ward']['operationDate']).Format('yyyy-MM-dd') + " " +currentShowData['ward']['startTime'] + ":00";
+      }
+      if(currentShowData['ward']['endTime'].toString().length < 6) {
+        currentShowData['ward']['endTime'] =  new Date(currentShowData['ward']['operationDate']).Format('yyyy-MM-dd') + " " +currentShowData['ward']['endTime'] + ":00";
+      }
+      currentShowData['ward']['operationDate'] =   new Date(currentShowData['ward']['operationDate']).Format('yyyy-MM-dd');
+      currentShowData['preoperative_record']['operation_date'] =  currentShowData['ward']['operationDate'];
+    }
+    delete currentShowData.key;
+    delete currentShowData['templateId']; 
     console.log(currentShowData);
     service.operation.saveOperation(currentShowData).then(res => {
       // console.log(res);
@@ -441,7 +498,8 @@ export default class Operation extends Component{
     let { operative_procedure, operationItem } = object;
     /* string -> json */
     // 手术记录
-    Object.keys(operationItem).forEach(v => operationItem[v] = convertString2Json(operationItem[v]));
+    console.log(object);
+    Object.keys(operationItem).forEach(v => object.operationItem[v] = convertString2Json(operationItem[v]));
     // 术前 血压
     object['preoperative_record']['bp'] = convertString2Json(object['preoperative_record']['bp']) || {};
     //
@@ -449,14 +507,32 @@ export default class Operation extends Component{
         if(item[key].indexOf('{')!==-1 && item[key].indexOf('}')!==-1)  item[key] = convertString2Json(item[key]);
       })
     );
-
+    // 转换库血
+    object['preoperative_record']['bloodBank'] = convertString2Json(object['preoperative_record']['bloodBank']);
     // 手动添加对应的key值 - 因为这里是使用treeRecordId请求回来的
     object['key'] = currentTreeKeys[0];
     // 转换时间戳
+    console.log(object);
     object['preoperative_record']['operation_date'] = new Date(object['preoperative_record']['operation_date']);
-    object['templateId'] = operationItemTemplateId(object['operationItem']['operationName'].label);
-    if(object['templateId'] === -1 && object['ward']['userName'] !== null){
+    object['preoperative_record']['collectBloodDate'] = new Date(object['preoperative_record']['collectBloodDate']);
+    if(object['operationItem']['operationName'].hasOwnProperty('value')) {
+      object['templateId'] = operationItemTemplateId(object['operationItem']['operationName'].value);
+    }else {
+      object['templateId'] = -1;
+    }
+    
+    // 暂时这样去判断病房病历
+    if(object['templateId'] === -1){
+      // 病房病历
       object['templateId'] = 8;
+      object['ward']['startTime'] = new Date(object['ward']['startTime']).Format("hh:mm");
+      object['ward']['endTime'] = new Date(object['ward']['endTime']).Format("hh:mm");
+      object['ward']['operationDate'] = new Date(object['ward']['operationDate']);
+      object['ward']['anesthesiaMethod'] = convertString2Json(object['ward']['anesthesiaMethod']);
+      object['ward']['operationNameWard'] = convertString2Json(object['ward']['operationNameWard']);
+      object['ward']['operationLevelWard'] = convertString2Json(object['ward']['operationLevelWard']);
+      object['ward']['incisionTypeWard'] = convertString2Json(object['ward']['incisionTypeWard']);
+      object['ward']['operationDate'] = new Date(object['ward']['operationDate']);
     }
     return object;
   };
@@ -508,6 +584,7 @@ export default class Operation extends Component{
     const { operationList, currentShowData = {}, clear } = this.state;
     const { id, templateId = 0 } = currentShowData;
     const { isShowTemplateModal, type, doctor = "" } = this.state.templateObj;
+    console.log(this.state);
     return (
       <Page className="fuzhen font-16">
         <div className="fuzhen-left ant-col-5">

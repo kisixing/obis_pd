@@ -603,6 +603,20 @@ export default class HistoricalRecord extends Component{
     ));
   };
 
+  // 渲染 超声检查 胎儿Tab
+  renderUFetusTabPane = (fetusData) => {
+    if (fetusData.length === 0) return <div key="none">暂无数据</div>;
+    const fetusTabPaneDOM = [];
+    fetusData.forEach((fetus, index) => {
+      fetusTabPaneDOM.push(
+        <TabPane key={fetus.id} tab={`胎儿-${index + 1}`}>
+          {/*// TODO 这里的处理需要另外做*/}
+          {formRender(fetus, mdConfig.ultrasound_fetus_config(), (_, { name, value }) => this.handleFormChange(`ultrasound.fetus-${index}`, name, value))}
+        </TabPane>
+      );
+    })
+    return fetusTabPaneDOM;
+  };
 
   /*================================ 其他 ======================================*/
   // 数据整合
@@ -626,13 +640,15 @@ export default class HistoricalRecord extends Component{
       if(object.hasOwnProperty('physical_check_up')){
         object['physical_check_up']['edema'] = convertString2Json(object['physical_check_up']['edema']) || "";
       }
+      if(object.downs_screen === null) object.downs_screen = {early: {} , middle: {}, nipt: {}};
+      if(object.thalassemia === null) object.thalassemia = {wife: {} , husband: {}};
       console.log('专科病历');
     }else if(object.hasOwnProperty('operationItem')){
       let { currentTreeKeys } = this.state;
       let { operative_procedure, operationItem } = object;
       /* string -> json */
       // 手术记录
-      Object.keys(operationItem).forEach(v => operationItem[v] = convertString2Json(operationItem[v]));
+      Object.keys(operationItem).forEach(v => object.operationItem[v] = convertString2Json(operationItem[v]));
       // 术前 血压
       object['preoperative_record']['bp'] = convertString2Json(object['preoperative_record']['bp']) || {};
       //
@@ -640,11 +656,14 @@ export default class HistoricalRecord extends Component{
           if(item[key].indexOf('{')!==-1 && item[key].indexOf('}')!==-1)  item[key] = convertString2Json(item[key]);
         })
       );
-
+      console.log(object);
+      // 转换库血
+      object['preoperative_record']['bloodBank'] = convertString2Json(object['preoperative_record']['bloodBank']);
       // 手动添加对应的key值 - 因为这里是使用treeRecordId请求回来的
       object['key'] = currentTreeKeys[0];
       // 转换时间戳
       object['preoperative_record']['operation_date'] = new Date(object['preoperative_record']['operation_date']);
+      object['preoperative_record']['collectBloodDate'] = new Date(object['preoperative_record']['collectBloodDate']);
       object['templateId'] = operationItemTemplateId(object['operationItem']['operationName'].label);
       if(object['templateId'] === -1 && object['ward']['userName'] !== null){
         object['templateId'] = 8;

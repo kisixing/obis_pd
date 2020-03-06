@@ -20,8 +20,6 @@ export default {
    * 保存手术记录信息
    */
   saveOperation: function(entity) {
-    delete entity.key;
-    delete entity['templateId']; 
     return this.userId().then(r => myAxios.post(`prenatalWrite/saveOperation`,{userid: r.object.userid, ...entity}));
   }
 }

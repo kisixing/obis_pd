@@ -1,5 +1,6 @@
 // 将后台返回的string转为object
 export const convertString2Json = function (str = "") {
+  if(str === null || str === undefined || str === "") return "";
   const splitKey = "},{";
   let index = str.indexOf(splitKey);
   if (index === -1) {

@@ -1,6 +1,13 @@
 import * as baseData from "./data";
 import valid from "../../render/common/valid";
 
+const _genotypeAnemia = baseData.genotypeAnemia.map(item => {
+  if (item.value.indexOf('β') >= 0) {
+    const { value } = item;
+    item.value = value.replace('β', 'b');
+  }
+  return item;
+})
 
 const config = {
   /* ========================= formRender渲染UI config  ============================ */
