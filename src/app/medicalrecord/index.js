@@ -33,12 +33,15 @@ const _genotypeAnemia = baseData.genotypeAnemia.map(item => {
 // 将后台返回的string转为object
 const convertString2Json = function (str) {
   const splitKey = "},{";
+  console.log(str);
+  if(str || str === null) { return ;}
   let index = str.indexOf(splitKey);
   if (index === -1) {
     try {
       return JSON.parse(str);
     } catch (e) {
       console.log('此字符串非json格式数据');
+      return ;
     }
   }
   let len = str.length, resArr = [];
@@ -757,12 +760,12 @@ export default class MedicalRecord extends Component {
   handleFormChange = (path, name, value) => {
     const { specialistemrData, currentTreeKeys } = this.state;
     const index = specialistemrData.findIndex(item => item.id.toString() === currentTreeKeys[0]);
-    
+    console.log(obj);
     let obj = JSON.parse(JSON.stringify(specialistemrData[index]));
 
     if (path === "") {
       // 为第一层值
-      mapValueToKey(obj[index], name, value);
+      mapValueToKey(obj, name, value);
     } else {
       switch (name) {
         case 'bp':
@@ -813,6 +816,15 @@ export default class MedicalRecord extends Component {
         // 整合bp的格式
         specialistemrData[index]['physical_check_up']['bp'] = '0';
         // specialistemrData[index]['id'] = "";
+        if(specialistemrData[index].id < 0) {
+          specialistemrData[index].id = "";
+        }
+        if(!specialistemrData[index].hasOwnProperty('downs_screen')) {
+          specialistemrData[index]['downs_screen'] = {};
+        }
+        if(!specialistemrData[index].hasOwnProperty('thalassemia')) {
+          specialistemrData[index]['thalassemia'] = {};
+        }
         service.medicalrecord.savespecialistemrdetail(specialistemrData[index]).then(res => {
           console.log(res);
           if (res.code === "200") {
@@ -896,6 +908,8 @@ export default class MedicalRecord extends Component {
     if(object.hasOwnProperty('physical_check_up')){
       object['physical_check_up']['edema'] = convertString2Json(object['physical_check_up']['edema']) || "";
     }
+    if(object.downs_screen === null) object.downs_screen = {early: {} , middle: {}, nipt: {}};
+    if(object.thalassemia === null) object.thalassemia = {wife: {} , husband: {}};
     return object;
   };
   // 检测data中是否存在这个key值
