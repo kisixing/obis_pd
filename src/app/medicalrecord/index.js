@@ -294,19 +294,17 @@ export default class MedicalRecord extends Component {
         if(!specialistemrData[index].hasOwnProperty('thalassemia')) {
           specialistemrData[index]['thalassemia'] = {};
         }
+        specialistemrData[index].ultrasound.fetus.forEach(v => {
+          v.id = "";
+        })
         // 专科病历主体保存
         service.medicalrecord.savespecialistemrdetail(specialistemrData[index]).then(res => {
-          console.log(res);
-          if (res.code === "200") {
-            message.success('成功保存');
-            service.medicalrecord.getspecialistemr().then(res => {
-              if (res.code === "200" || res.code === 200) {
-                this.setState({ specialistemrList: res.object.list }, () => { })
-              }
-            });
-          } else if (res.code === "500") {
-            message.error('500 保存失败')
-          }
+          message.success('成功保存');
+          service.medicalrecord.getspecialistemr().then(res => {
+            if (res.code === "200" || res.code === 200) {
+              this.setState({ specialistemrList: res.object.list }, () => { })
+            }
+          });
         }).catch(err => console.log(err));
         // 这里要去重
         // ultrasoundMiddleData = [...new Set(ultrasoundMiddleData)];
@@ -649,7 +647,7 @@ export default class MedicalRecord extends Component {
     }
     if(object.hasOwnProperty('physical_check_up')){
       object['physical_check_up']['edema'] = convertString2Json(object['physical_check_up']['edema']);
-      renderData['physical_check_up'].bp = { "0": physical_check_up['systolic_pressure'], "1": physical_check_up['diastolic_pressure'] }
+      object['physical_check_up'].bp = { "0": object.physical_check_up['systolic_pressure'], "1": object.physical_check_up['diastolic_pressure'] }
     }
     if(object.downs_screen === null) object.downs_screen = {early: {} , middle: {}, nipt: {}};
     if(object.thalassemia === null) object.thalassemia = {wife: {} , husband: {}};

@@ -25,7 +25,7 @@ const ButtonGroup = Button.Group;
  */
 const operationItemTemplateId = (str) => {
   if(!str) return -1;
-  const ITEM_KEY_WORD = ['羊膜腔穿刺','绒毛活检','脐带穿刺','羊膜腔灌注','选择性减胎','羊水减量','宫内输血','胸腔积液|腹水|囊液穿刺','病房病例'];
+  const ITEM_KEY_WORD = ['羊膜腔穿刺','绒毛活检','脐带穿刺','羊膜腔灌注','选择性减胎','羊水减量','宫内输血','胸腔积液|腹水|囊液穿刺','病房'];
   const splitKey = '|';
   const len = ITEM_KEY_WORD.length;
   let templateId = -1;
@@ -239,23 +239,21 @@ export default class Operation extends Component{
       if(selectedKeys[0].length > 3) {
         // 非新建病例
         service.operation.getOperationdetail({recordid: selectedKeys[0]}).then(res => {
-          if(res.code === 200 || res.code === "200"){
-            // 整合请求下来的数据
-            let formatData = this.convertOperationDetail(res.object);
-            let targetFetusKey = ''
-            if(formatData['operative_procedure']['fetus'].length !== 0) {
-              targetFetusKey = formatData['operative_procedure']['fetus'][0]['id'];
-            }
-            this.setState({clear: true},() => {
-              this.setState({
-                currentShowData: formatData,
-                currentTreeKeys: selectedKeys,
-                clear: false,
-                currentFetusKey: targetFetusKey
-              });
-            });
-            // this.setTemplateIDAndOperationData(formatData);
+          // 整合请求下来的数据
+          let formatData = this.convertOperationDetail(res.object);
+          let targetFetusKey = ''
+          if(formatData['operative_procedure']['fetus'].length !== 0) {
+            targetFetusKey = formatData['operative_procedure']['fetus'][0]['id'];
           }
+          this.setState({clear: true},() => {
+            this.setState({
+              currentShowData: formatData,
+              currentTreeKeys: selectedKeys,
+              clear: false,
+              currentFetusKey: targetFetusKey
+            });
+          });
+          // this.setTemplateIDAndOperationData(formatData);
         });
       }else {
         // 为新建病例，数据存储在本地 - 这里要剪
@@ -467,6 +465,7 @@ export default class Operation extends Component{
     // 暂时这样去判断病房病历
     if(object['templateId'] === 8){
       // 病房病历
+      console.log('病房');
       object['templateId'] = 8;
       object['ward']['startTime'] = new Date(object['ward']['startTime']).Format("hh:mm");
       object['ward']['endTime'] = new Date(object['ward']['endTime']).Format("hh:mm");

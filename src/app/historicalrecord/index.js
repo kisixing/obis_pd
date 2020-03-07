@@ -25,7 +25,8 @@ const { Panel } = Collapse;
  * return templateId[number] - 对应的模板编号
  */
 const operationItemTemplateId = (str) => {
-  const ITEM_KEY_WORD = ['羊膜腔穿刺','绒毛活检','脐带穿刺','羊膜腔灌注','选择性减胎','羊水减量','宫内输血','胸腔积液|腹水|囊液穿刺'];
+  if(!str) return -1;
+  const ITEM_KEY_WORD = ['羊膜腔穿刺','绒毛活检','脐带穿刺','羊膜腔灌注','选择性减胎','羊水减量','宫内输血','胸腔积液|腹水|囊液穿刺','病房'];
   const splitKey = '|';
   const len = ITEM_KEY_WORD.length;
   let templateId = -1;
@@ -136,16 +137,21 @@ export default class HistoricalRecord extends Component{
     }
     if(selectedKeys[0].indexOf('-') !== -1){
       // 手术记录
-      console.log(targetData);
       service.operation.getOperationdetail({recordid: selectedKeys[0]}).then(res => {
         const targetData = this.convertServiceData(res.object);
-        this.setState({clear: true}, () => {
+        console.log(targetData);
+        let fetusKey = "";
+        if(targetData['operative_procedure']['fetus'].length !== 0) {
+          fetusKey = targetData['operative_procedure']['fetus'][0]['id'];
+        }
+        
+        this.setState({clear: true , currentShowData: {}}, () => {
           this.setState({
             currentShowData: targetData, 
             isOperation: true,
             clear: false,
             // 有可能没有fetuskey
-            currentFetusKey: targetData['operative_procedure']['fetus'][0]['id'].toString() || []
+            currentFetusKey: fetusKey
           });  
         })
       });
@@ -340,13 +346,14 @@ export default class HistoricalRecord extends Component{
       }
     }
   }
-
+  
+  // 公用
   handleSave = () => {
     const FORM_BLOCK = 'form-block';
     const { isOperation, currentShowData, ultrasoundMiddleData, operationHistoryData,currentTreeKeys } = this.state;
     if(isOperation) {
       service.operation.saveOperation(currentShowData).then(res => {
-
+        message.success('保存手术记录成功');
       })
     }else {
       fireForm(document.getElementById(FORM_BLOCK),'valid').then(validCode => {
@@ -354,7 +361,18 @@ export default class HistoricalRecord extends Component{
           // 保存
           // 整合bp的格式
           currentShowData['physical_check_up']['bp'] = '0';
-          // currentShowData['id'] = "";
+          if(currentShowData.id < 0) {
+            currentShowData.id = "";
+          }
+          if(!currentShowData.hasOwnProperty('downs_screen')) {
+            currentShowData['downs_screen'] = {};
+          }
+          if(!currentShowData.hasOwnProperty('thalassemia')) {
+            currentShowData['thalassemia'] = {};
+          }
+          currentShowData.ultrasound.fetus.forEach(v => {
+            v.id = "";
+          })
           service.medicalrecord.savespecialistemrdetail(currentShowData).then(res => {
               message.success('成功保存');
           }).catch(err => console.log(err));
@@ -372,6 +390,7 @@ export default class HistoricalRecord extends Component{
               break;
             }
           }
+          
           // TODO 暂时不保存 手术
           ultrasoundMiddleData.forEach((v) => {if(Number(v.docUniqueid) < 0){v.docUniqueid = "";};});
           operationHistoryData.forEach((v) => {if(Number(v.docUniqueid) < 0){v.docUniqueid = "";};});
@@ -385,6 +404,7 @@ export default class HistoricalRecord extends Component{
     }
   }
 
+  // 手术
   handleTabClick = (key) => {
     this.setState({currentFetusKey: key});
   }
@@ -646,7 +666,7 @@ export default class HistoricalRecord extends Component{
                   <div>
                     <Tabs
                       activeKey={currentFetusKey}
-                      onTabClick={this.handleTabsClick}
+                      onTabClick={this.handleTabClick}
                       type="editable-card"
                       onEdit={this.handleUFetusEdit}
                     >{this.renderUFetusTabPane(ultrasound['fetus'])}</Tabs>
@@ -808,6 +828,7 @@ export default class HistoricalRecord extends Component{
       let { operative_procedure, operationItem } = object;
       /* string -> json */
       // 手术记录
+      console.log(object);
       Object.keys(operationItem).forEach(v => object.operationItem[v] = convertString2Json(operationItem[v]));
       // 术前 血压
       object['preoperative_record']['bp'] = convertString2Json(object['preoperative_record']['bp']) || {};
@@ -838,6 +859,7 @@ export default class HistoricalRecord extends Component{
         object['ward']['incisionTypeWard'] = convertString2Json(object['ward']['incisionTypeWard']);
         object['ward']['operationDate'] = new Date(object['ward']['operationDate']);
       }
+      console.log(object);
     }
     return object;
   };
