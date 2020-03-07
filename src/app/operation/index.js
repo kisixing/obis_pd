@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
-import {Button, Collapse, Tabs, Tree, Modal} from "antd";
+import {Button, Collapse, Tabs, Tree, Modal, message} from "antd";
 import Page from '../../render/page';
 
 import service from '../../service/index.js';
-import { formateDate, convertString2Json, getTimeDifference } from '../../utils/index';
+import { formatDate, convertString2Json, getTimeDifference, mapValueToKey } from '../../utils/index';
 
 import TemplateInput from '../../components/templateInput/index';
 
@@ -16,38 +16,6 @@ const { Panel } = Collapse;
 const { TabPane } = Tabs;
 const ButtonGroup = Button.Group;
 
-// 根据字符串在一个对象中确定最下层键值
-/**
- * 在此函数内对value赋值
- * @param obj 赋值对象 NOTICE 一定是对象，不能为数组
- * @param keyStr 路径 形式为 "key1.key2-key3"  .代表对象 -代表数组   如果没有. - 代表第一层
- * @param val value
- */
-const OBJECT_SPLIT_KEY = ".";
-const ARRAY_SPLIT_KEY = "-";
-const mapValueToKey = (obj, keyStr = "", val) => {
-  if(keyStr === "") return;
-  // check "." "-"
-  const objectIndex = keyStr.indexOf(OBJECT_SPLIT_KEY);
-  const arrayIndex = keyStr.indexOf(ARRAY_SPLIT_KEY);
-  const len = keyStr.length;
-  if(objectIndex === -1 && arrayIndex === -1) {
-    obj[keyStr] = val;
-  }else if(objectIndex < arrayIndex || (objectIndex !== -1 && arrayIndex === -1)){
-    const nextKey = keyStr.slice(0,objectIndex);
-    if(!obj.hasOwnProperty(nextKey)) {
-      obj[nextKey] = {};
-    }
-    mapValueToKey(obj[nextKey], keyStr.slice(objectIndex+1, len), val);
-  }else{
-    // 检查到 - ，是数组，try-catch
-    const nextKey = keyStr.slice(0,arrayIndex);
-    if(Object.prototype.toString.call(obj[nextKey]) !== "[object Array]") {
-      obj[nextKey] = [];
-    }
-    mapValueToKey(obj[nextKey], keyStr.slice(arrayIndex+1, len), val);
-  }
-};
 
 /**
  * 手术项目对应itemTemplateId
@@ -56,9 +24,8 @@ const mapValueToKey = (obj, keyStr = "", val) => {
  * return templateId[number] - 对应的模板编号
  */
 const operationItemTemplateId = (str) => {
-  console.log(str);
-  if(str === null || str === undefined) return -1;
-  const ITEM_KEY_WORD = ['羊膜腔穿刺','绒毛活检','脐带穿刺','羊膜腔灌注','选择性减胎','羊水减量','宫内输血','胸腔积液|腹水|囊液穿刺'];
+  if(!str) return -1;
+  const ITEM_KEY_WORD = ['羊膜腔穿刺','绒毛活检','脐带穿刺','羊膜腔灌注','选择性减胎','羊水减量','宫内输血','胸腔积液|腹水|囊液穿刺','病房病例'];
   const splitKey = '|';
   const len = ITEM_KEY_WORD.length;
   let templateId = -1;
@@ -141,7 +108,7 @@ export default class Operation extends Component{
   /* ========================= 渲染类 ============================ */
   // 渲染左侧手术记录树
   renderTree = (data) => {
-    const { currentExpandedKeys } = this.state;
+    const { currentExpandedKeys, currentTreeKeys } = this.state;
     let tnDOM = [];
     if(data.length === 0) return <div>无手术记录</div>;
     // key-用于请求
@@ -156,14 +123,13 @@ export default class Operation extends Component{
       onSelect={this.handleTreeSelect}
       defaultExpandAll
       expandedKeys={currentExpandedKeys}
-      selectedKeys={this.state.currentTreeKeys || []}
+      selectedKeys={currentTreeKeys}
       multiple={false}
     >{tnDOM}</Tree>;
   };
   // 渲染 胎儿中心类模板 - templateId 0~7
   renderFetusTemplateForm = (renderData) => {
     const { currentFetusKey } = this.state;
-    console.log(renderData);
     if(Object.keys(renderData).length === 0) return <div>无数据展示</div> ;
     const { templateId } = renderData;
     if(templateId < 0 || templateId > 7) return null;
@@ -217,7 +183,7 @@ export default class Operation extends Component{
   //
   newOperation = () => {
     const { operationList, operationNewDataList, currentExpandedKeys, currentShowData } = this.state;
-    const todayStr = formateDate();
+    const todayStr = formatDate();
     // 新建元素的id
     const newId = 0 - Math.random()*100|0;
     const todayIndex = operationList.findIndex(item => item.title === todayStr);
@@ -247,7 +213,7 @@ export default class Operation extends Component{
         currentTreeKeys: [newId.toString()], 
         currentShowData: currentData,
         currentFetusKey: (newId-1).toString()
-      },() => console.log(this.state));
+      });
   };
   //
   handleTreeSelect = (selectedKeys, {selected, node}) => {
@@ -280,14 +246,13 @@ export default class Operation extends Component{
             if(formatData['operative_procedure']['fetus'].length !== 0) {
               targetFetusKey = formatData['operative_procedure']['fetus'][0]['id'];
             }
-            console.log(formatData);
             this.setState({clear: true},() => {
               this.setState({
                 currentShowData: formatData,
                 currentTreeKeys: selectedKeys,
                 clear: false,
                 currentFetusKey: targetFetusKey
-              },() => console.log(this.state));
+              });
             });
             // this.setTemplateIDAndOperationData(formatData);
           }
@@ -296,17 +261,13 @@ export default class Operation extends Component{
         // 为新建病例，数据存储在本地 - 这里要剪
         const { operationNewDataList } = this.state;
         const targetData = operationNewDataList[operationNewDataList.findIndex(item => item.key.toString() === selectedKeys[0])];
-        // let targetFetusKey = ''
-        //     if(formatData['operative_procedure']['fetus'].length !== 0) {
-        //       targetFetusKey = formatData['operative_procedure']['fetus'][0]['id'];
-        // }
         this.setState({clear: true}, () => {
           this.setState({
             currentTreeKeys: selectedKeys,
             currentShowData: targetData,
             clear: false,
             currentFetusKey: targetData['operative_procedure']['fetus'][0]['id'].toString() || ""
-          },() => console.log(this.state));
+          });
         });
 
       }
@@ -349,7 +310,6 @@ export default class Operation extends Component{
     // if(name.indexOf('preoperativeUltrasonography') !== -1) {
       // 删除问题 逻辑
       let oldValue = obj['preoperative_record'][name] || [];
-      console.log(oldValue, value);
       if(oldValue.length > value.length) {
         // 比较旧值和新值长度
         for(let i = 0; i < oldValue.length; i++) {
@@ -370,24 +330,18 @@ export default class Operation extends Component{
           }
         }
         obj['preoperative_record'][name] = oldValue;
-        // 增加
-        // console.log(currentShowData['preoperative_record'][name]);
-        
       }else {
         // 新增 & 修改 都不用管
         mapValueToKey(obj, `${path}.${name}`,value);
       }
-      this.setState({currentShowData: obj},() => console.log(this.state.currentShowData));
+      this.setState({currentShowData: obj});
       return;
     }
     // 通用
     
     // 当前胎儿的index
-    console.log(obj);
-    console.log(currentFetusKey);
     const fIndex = obj['operative_procedure']['fetus'].findIndex(item => item.id.toString() === currentFetusKey);
     let fObj = obj['operative_procedure']['fetus'][fIndex];
-    console.log(name);
     if(path === "") {
       mapValueToKey(obj, value);
     }else {
@@ -419,16 +373,14 @@ export default class Operation extends Component{
       }
       mapValueToKey(obj, `${path}.${name}`,value);
     }
-    if(obj.templateId === 8) {
-      console.log(value);
-    }
+    if(obj.templateId === 8) {console.log(value)}
     // 如何时新建病例 ，需要存储本地
     if(obj.id < 0) {
       const index = operationNewDataList.findIndex(item => item.id === obj.id);
       operationNewDataList[index] = obj;
       this.setState({operationNewDataList});
     }
-    this.setState({currentShowData: obj},() => console.log(this.state));
+    this.setState({currentShowData: obj});
   };
   // TODO
   // 婴儿数量变化 需要特殊处理
@@ -446,9 +398,7 @@ export default class Operation extends Component{
     this.setState({currentShowData, currentFetusKey: newFetusId.toString()});
   };
   // 处理
-  handleTabClick = (key) => {
-    this.setState({currentFetusKey: key});
-  }
+  handleTabClick = (key) => {this.setState({currentFetusKey: key})}
 
 
   handleTemplateSelect = (templateId) => {
@@ -483,11 +433,10 @@ export default class Operation extends Component{
     }
     delete currentShowData.key;
     delete currentShowData['templateId']; 
-    console.log(currentShowData);
     service.operation.saveOperation(currentShowData).then(res => {
-      // console.log(res);
+      message.success('保存成功');
       service.operation.getOperation().then(res => {
-        if(res.code === '200' || 200)  this.setState({operationList: res.object.list, currentShowData: {}, currentTreeKeys: []});
+        this.setState({operationList: res.object.list, currentShowData: {}, currentTreeKeys: []});
       })
     })
   };
@@ -498,7 +447,6 @@ export default class Operation extends Component{
     let { operative_procedure, operationItem } = object;
     /* string -> json */
     // 手术记录
-    console.log(object);
     Object.keys(operationItem).forEach(v => object.operationItem[v] = convertString2Json(operationItem[v]));
     // 术前 血压
     object['preoperative_record']['bp'] = convertString2Json(object['preoperative_record']['bp']) || {};
@@ -512,17 +460,12 @@ export default class Operation extends Component{
     // 手动添加对应的key值 - 因为这里是使用treeRecordId请求回来的
     object['key'] = currentTreeKeys[0];
     // 转换时间戳
-    console.log(object);
     object['preoperative_record']['operation_date'] = new Date(object['preoperative_record']['operation_date']);
     object['preoperative_record']['collectBloodDate'] = new Date(object['preoperative_record']['collectBloodDate']);
-    if(object['operationItem']['operationName'].hasOwnProperty('value')) {
-      object['templateId'] = operationItemTemplateId(object['operationItem']['operationName'].value);
-    }else {
-      object['templateId'] = -1;
-    }
+    object['templateId'] = operationItemTemplateId(object['operationItem']['operationName'].value);
     
     // 暂时这样去判断病房病历
-    if(object['templateId'] === -1){
+    if(object['templateId'] === 8){
       // 病房病历
       object['templateId'] = 8;
       object['ward']['startTime'] = new Date(object['ward']['startTime']).Format("hh:mm");
@@ -559,8 +502,7 @@ export default class Operation extends Component{
     switch(type) {
       case 'or2':
         const { currentFetusKey } = this.state;
-        const i = obj['operative_procedure']['fetus'].findIndex(item => item.id === currentFetusKey);
-        console.log(obj['operative_procedure']['fetus']);
+        const i = obj['operative_procedure']['fetus'].findIndex(item => item.id.toString() === currentFetusKey);
         let fetus = JSON.parse(JSON.stringify(obj['operative_procedure']['fetus'][i]));
         fetus['special_case'] = "";
         fetus['special_case'] = content;
@@ -584,7 +526,6 @@ export default class Operation extends Component{
     const { operationList, currentShowData = {}, clear } = this.state;
     const { id, templateId = 0 } = currentShowData;
     const { isShowTemplateModal, type, doctor = "" } = this.state.templateObj;
-    console.log(this.state);
     return (
       <Page className="fuzhen font-16">
         <div className="fuzhen-left ant-col-5">

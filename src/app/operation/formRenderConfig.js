@@ -31,7 +31,8 @@ import {
   hemogramColumns, measurementColumns,
   anesthesiaMethodOptions,
   isPharacyOptions,
-  bloodBankOptions
+  bloodBankOptions,
+  ward_operation_itemsOptions
 } from "./data";
 import valid from "../../render/common/valid";
 
@@ -416,8 +417,8 @@ const config6 = {
     rows: [
       {columns: [operation_no, operator, assistant]},
       {columns: [
-          {name: 'start_time[输血开始时间]', type: 'input', span: SPAN_6},
-          {name: 'end_time[输血结束时间]', type: 'input', span: SPAN_6},
+          {name: 'start_time[输血开始时间]', type: 'time', span: SPAN_6},
+          {name: 'end_time[输血结束时间]', type: 'time', span: SPAN_6},
           {name: 'duration[输血持续时间]', type: 'input', span: SPAN_6},
       ]},
       {
@@ -539,7 +540,7 @@ const ward_config = (templateFn) => ({
     },
     {
       columns: [
-        {name: 'operationNameWard[手术名称]', type: 'checkinput', valid: 'required', options: operation_itemsOptions,span: SPAN_24},
+        {name: 'operationNameWard[手术名称]', type: 'checkinput', valid: 'required', options: ward_operation_itemsOptions,span: SPAN_24},
       ]
     },
     {

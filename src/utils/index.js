@@ -26,7 +26,12 @@ export const convertString2Json = function (str) {
     len = str.length;
     index = str.indexOf(splitKey);
   }
-  resArr.push(JSON.parse(str));
+  try{
+    resArr.push(JSON.parse(str));
+  }catch(e) {
+    console.log(`${str}格式错误`);
+    return str;
+  }
   return resArr;
 };
 

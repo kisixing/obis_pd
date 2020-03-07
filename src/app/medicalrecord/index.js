@@ -322,10 +322,11 @@ export default class MedicalRecord extends Component {
             break;
           }
         }
+        // TODO 暂时不保存 手术
         ultrasoundMiddleData.forEach((v) => {if(Number(v.docUniqueid) < 0){v.docUniqueid = "";};});
         operationHistoryData.forEach((v) => {if(Number(v.docUniqueid) < 0){v.docUniqueid = "";};});
         service.ultrasound.writePrenatalPacsMg({ pacsMgVOList: ultrasoundMiddleData, recordid: currentTreeKeys[0] }).then(res => console.log(res));
-        service.medicalrecord.writeOperationHistory({operationHistorys: operationHistoryData}).then(res => console.log(res));
+        // service.medicalrecord.writeOperationHistory({operationHistorys: operationHistoryData}).then(res => console.log(res));
       } else {
         // 提示
         message.error('请填写所有信息后再次提交');
@@ -648,6 +649,7 @@ export default class MedicalRecord extends Component {
     }
     if(object.hasOwnProperty('physical_check_up')){
       object['physical_check_up']['edema'] = convertString2Json(object['physical_check_up']['edema']);
+      renderData['physical_check_up'].bp = { "0": physical_check_up['systolic_pressure'], "1": physical_check_up['diastolic_pressure'] }
     }
     if(object.downs_screen === null) object.downs_screen = {early: {} , middle: {}, nipt: {}};
     if(object.thalassemia === null) object.thalassemia = {wife: {} , husband: {}};
@@ -715,11 +717,7 @@ export default class MedicalRecord extends Component {
     const i = specialistemrData.findIndex(item => item.id.toString() === currentTreeKeys[0]);
     let renderData = {};
     if(i !== -1) { renderData = specialistemrData[i]; }
-    const { formType, physical_check_up = {} } = renderData;
-    // 手动修改 physical_check_up bp
-    if (Object.keys(physical_check_up).length !== 0) {
-      renderData['physical_check_up'].bp = { "0": physical_check_up['systolic_pressure'], "1": physical_check_up['diastolic_pressure'] }
-    }
+    const { formType } = renderData;
     return (
       <Page className='fuzhen font-16 ant-col'>
         <div className="fuzhen-left ant-col-5">

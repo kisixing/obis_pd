@@ -506,7 +506,8 @@ export const wjjOptions = toOptions('未检查');
  * 手术项目
  *  2020-02-06 根据新模型修改
  */
-export const operation_itemsOptions = toOptions('羊膜腔穿刺术,绒毛活检术,脐带穿刺术,羊膜腔灌注术,选择性减胎术,羊水减量,宫内输血,胎儿胸腔积液、腹水、囊液穿刺');
+export const operation_itemsOptions = toOptions('羊膜腔穿刺术,绒毛活检术,脐带穿刺术,羊膜腔灌注术,选择性减胎术,羊水减量,宫内输血,胎儿胸腔积液,腹水,囊液穿刺');
+export const ward_operation_itemsOptions = toOptions('羊膜腔穿刺术,绒毛活检术,脐带穿刺术,羊膜腔灌注术,选择性减胎术,羊水减量,宫内输血,胎儿胸腔积液、腹水、囊液穿刺');
 
 /**
  * 身份证：证件类型
