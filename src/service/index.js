@@ -12,6 +12,7 @@ import { default as outcome } from './outcome.js';
 import { default as opencase } from './opencase.js';
 import { default as template } from "./template";
 
+// TODO 这里的userId应该以后优化
 let userId = null;
 let watchInfoList = [];
 
@@ -24,6 +25,22 @@ export default {
     return () => watchInfoList = watchInfoList.filter(f => f !== fn);
   },
 
+  /**
+   * 根据 身份证号/就诊卡号/手机/建档号 搜索
+   */
+  findUser: async function ({ usermcno = "", useridno = "", usermobile = "", chanjno = "", id ="" }) {
+    // 这里的userid字段名称不是userid 而是 id
+    // 修改字段后再return Promise
+    // 由于接口是使用本页面的userId，所以要在这里设置
+    return myAxios.get(`prenatalQuery/findUser?useridno=${useridno}&usermcno=${usermcno}&usermobile=${usermobile}&chanjno${chanjno}=&id=${id}`).then(res => {
+      res['object']['userid'] = res['object']['id'];
+      res['object']['tuserweek'] = res['object']['gesweek'];
+      userId = new Promise(resolve => {
+        resolve(res);
+      });
+      return userId;
+    });
+  },
   // 查询-产前诊断-基本信息
   getgeneralinformation: ({ userId }) => myAxios.get(`/prenatalQuery/getgeneralinformation?userid=${userId}`),
   /**
@@ -65,25 +82,6 @@ export default {
    */
   addHighrisk: function (userid, highrisk, level) {
     return myAxios.post('outpatientWriteRestful/addHighrisk', { userid, highrisk, level });
-  },
-  /**
-   * 根据 身份证号/就诊卡号/手机/建档号 搜索
-   */
-  findUser: function ({ usermcno = "", useridno = "", usermobile = "", chanjno = "", id ="" }) {
-    // 这里的userid字段名称不是userid 而是 id
-    // 修改字段后再return Promise
-    // 由于接口是使用本页面的userId，所以要在这里设置
-    return myAxios.get(`prenatalQuery/findUser?useridno=${useridno}&usermcno=${usermcno}&usermobile=${usermobile}&chanjno${chanjno}=&id=${id}`).then(res => {
-      res['object']['userid'] = res['object']['id'];
-      res['object']['tuserweek'] = res['object']['gesweek'];
-      // 有几个字段还没有
-      console.log(res['object']);
-      userId = new Promise(resolve => {
-        resolve(res);
-      });
-      return userId;
-    });
-
   },
   /**
    * 孕妇建册

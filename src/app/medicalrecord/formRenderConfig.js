@@ -114,12 +114,13 @@ const config = {
           { span: 1 },
           { name: 'hbA2[HbA2]', type: 'input', span: 6, showSearch: true,},
           { name: 'blood_group[血型]',  type: 'select', span: 6, showSearch: true, options: baseData.xuexingOptions},
-          { name: 'genotype[地贫基因型]',  type: 'select', span: 11, showSearch: true, options: _genotypeAnemia }
+          { name: 'rh[RH(D)血型]', type: 'select', span: 6, options: baseData.xuexing2Options}
         ]
       },
       {
         columns:[
           { span: 1 },
+          { name: 'genotype[地贫基因型]',  type: 'select', span: 11, showSearch: true, options: _genotypeAnemia },
           { name: 'other_anomalies[其他异常]', type: 'input', span: 11 }
         ]
       }
@@ -144,11 +145,12 @@ const config = {
           { span: 1 },
           { name: 'hbA2[HbA2]', type: 'input', span: 6, showSearch: true},
           { name: 'blood_group[血型]',  type: 'select', span: 6, showSearch: true, options: baseData.xuexingOptions},
-          { name: 'genotype[地贫基因型]',  type: 'select', span: 11, showSearch: true, options: _genotypeAnemia }
+          { name: 'rh[RH(D)血型]', type: 'select', span: 6, options: baseData.xuexing2Options}
         ]
       },
       {
         columns:[
+          { name: 'genotype[地贫基因型]',  type: 'select', span: 11, showSearch: true, options: _genotypeAnemia },
           { span: 1 },
           { name: 'other_anomalies[其他异常]', type: 'input', span: 11 }
         ]
@@ -188,7 +190,12 @@ const config = {
         columns:[
           { name: 'blood_transfusion[输血史]', type: 'checkinput', valid: 'required', unselect: '无', options: baseData.sxsOptions, span: 24 },
         ]
-      },
+      }
+    ]
+  }),
+  operation_history_config: () => ({
+    step: 1,
+    rows: [
       {
         columns:[
           { name: 'operation_history[手术史]', type: 'table', pagination: false, editable: true, options: baseData.shoushushiColumns },
@@ -320,14 +327,6 @@ const config = {
           { name: 'trisomy13[13三体风险]', type: 'input', span: 5 },
         ]
       },
-      // {
-      //   columns: [
-      //     { span: 2 },
-      //     { name: 'HCG[β-HCG](mom)', type: 'input', span: 5 },
-      //     { span: 1 },
-      //     { name: 'PAPP[PAPP-A](mom)', type: 'input', span: 5 },
-      //   ]
-      // },
       {
         columns: [
           { span: 2 },
@@ -341,7 +340,7 @@ const config = {
       {
         columns: [
           { span: 2 },
-          { name: 'other_anomalies[其他异常]', type: 'input', span: 11 }
+          { name: 'e3[E3](mom)', type: 'input', span: 5 }
         ]
       },
       {
@@ -413,9 +412,7 @@ const config = {
         columns:[
           { name: 'excdesc[异常结果描述]', type: 'input', span: 8 },
         ]
-      },
-      {columns: [{label: '术前超声检查' , span: 12}]},
-
+      }
     ]
   }),
   // 中孕超声

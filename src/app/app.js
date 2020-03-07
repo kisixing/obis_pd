@@ -6,9 +6,9 @@ import bundle from "../utils/bundle";
 import service from '../service';
 
 import store from './store';
-import { getAlertAction, closeAlertAction, setOpenCaseData } from './store/actionCreators.js';
+import { closeAlertAction, setOpenCaseData } from './store/actionCreators.js';
 import { setUserData } from "./store/actionCreators";
-
+// page Component
 import Pregnancy from 'bundle-loader?lazy&name=pregnancy!./pregnancy';
 import MedicalRecord from 'bundle-loader?lazy&name=medicalrecord!./medicalrecord';
 import Operation from 'bundle-loader?lazy&name=operation!./operation';
@@ -17,7 +17,6 @@ import Pacs from 'bundle-loader?lazy&name=pacs!./pacs';
 import HistoricalRecord from 'bundle-loader?lazy&name=historicalrecord!./historicalrecord';
 import Outcome from 'bundle-loader?lazy&name=outcome!./outcome';
 import OpenCase from 'bundle-loader?lazy&name=opencase!./opencase';
-// import Test from 'bundle-loader?lazy&name=test!./Test';
 
 import "./app.less";
 
@@ -31,8 +30,7 @@ const routers = [
   { name: '影像报告', path: '/pacs', component: bundle(Pacs) },
   { name: '历史病历', path: '/historicalrecord', component: bundle(HistoricalRecord) },
   { name: '分娩结局', path: '/outcome', component: bundle(Outcome) },
-  { name: '孕妇建册', path: '/opencase', component: bundle(OpenCase) },
-  // { name: '测试页面', path: '/Test', component: bundle(Test) }
+  { name: '孕妇建册', path: '/opencase', component: bundle(OpenCase) }
 ];
 
 export default class App extends Component {
@@ -44,38 +42,27 @@ export default class App extends Component {
       highriskList: [],
       highriskEntity: null,
       highriskShow: false,
-      muneIndex: 0, // 从0开始
+      menuIndex: 0, // 默认 pregnancy
       userData: {},
       ...storeData,
       searchObj: {
         menzhenNumber: "", IDCard: "", phoneNumber: ""
       }
     };
-    store.subscribe(() => {
-      this.handleStoreChange();
-    });
+    store.subscribe(() => this.handleStoreChange());
   }
 
   handleStoreChange = () => {
     const { userData } = store.getState();
-    // 当app.js的userData.userid与store中的userData.userid 不相同时，才走findUser
-    if( this.state.userData.userid !== userData.userid) {
-      this.findUser("","","","",userData.userid);
-      // this.setState(...store.getState(), () => {
-      //   let newSearchObj = Object.assign({}, this.state.searchObj);
-      //   newSearchObj.menzhenNumber = this.state.usermcno;
-      //   newSearchObj.IDCard = this.state.useridno;
-      //   newSearchObj.phoneNumber = this.state.usermobile;
-      //   this.setState({searchObj: newSearchObj})
-      // });
-    }
+    // 当本页面userid与store不同
+    if( this.state.userData.userid !== userData.userid) this.findUser("","","","",userData.userid);
   };
 
   componentDidMount() {
     const { location = {} } = this.props;
-    const { muneIndex, userData } = this.state;
-    if (location.pathname !== routers[muneIndex].path) {
-      this.props.history.push(routers[muneIndex].path);
+    const { menuIndex } = this.state;
+    if (location.pathname !== routers[menuIndex].path) {
+      this.props.history.push(routers[menuIndex].path);
     }
     this.componentWillUnmount = service.watchInfo((info) => this.setState(info.object));
   }
@@ -124,15 +111,30 @@ export default class App extends Component {
     );
   }
 
-  onClick(item) {
+  // 路由跳转
+  handleRouteSwitch(item, i) {
     if (item.component) {
+      this.setState({ menuIndex: i });
       this.props.history.push(item.path);
     }
   }
+  // 改变搜索内容
+  handleSearchContent = (key, value) => {
+    const { searchObj } = this.state;
+    let obj = Object.assign({}, searchObj);
+    obj[key] = value;
+    this.setState({searchObj: obj});
+  }
+  // 孕妇建册
+  toOpenCase = () => {
+    this.props.history.push('/opencase');
+    this.setState({ menuIndex: -1 });
+  }
+
 
   renderHeader() {
     const { username, userage, tuserweek, tuseryunchan, gesexpect, usermcno, chanjno, risklevel, infectious } = this.state.userData;
-    const { searchObj } = this.state;
+    const { menzhenNumber, IDCard, phoneNumber } = this.state.searchObj;
     return (
       <div className="main-header">
         <div className="patient-Info_title font-16">
@@ -147,42 +149,29 @@ export default class App extends Component {
         {/* 这里做个搜索栏 */}
         <div className="search-block patient-Info_title">
           <div>
-            <strong>门诊号:</strong><Input value={searchObj['menzhenNumber']} onChange={(e) => {
-              searchObj['menzhenNumber'] = e.target.value;
-              this.setState({ searchObj });
-            }} />
+            <strong>门诊号:</strong>
+            <Input value={menzhenNumber} onChange={(e) => this.handleSearchContent('menzhenNumber' ,e.target.value)} />
           </div>
           <div>
-            <strong>身份证:</strong><Input value={searchObj['IDCard']} onChange={(e) => {
-              searchObj['IDCard'] = e.target.value;
-              this.setState({ searchObj });
-            }} />
+            <strong>身份证:</strong>
+            <Input value={IDCard} onChange={(e) => this.handleSearchContent('IDCard' ,e.target.value)} />
           </div>
           <div>
-            <strong>手机:</strong><Input value={searchObj['phoneNumber']} onChange={(e) => {
-              searchObj['phoneNumber'] = e.target.value;
-              this.setState({ searchObj });
-            }} />
+            <strong>手机:</strong>
+            <Input value={phoneNumber} onChange={(e) => this.handleSearchContent('phoneNumber' ,e.target.value)} />
           </div>
           <div className="search-btn">
-            {/* 功能还没有写 */}
             <Button onClick={this.handleSearch}>搜索</Button>
             <Button>重置</Button>
-            <Button onClick={() => { this.props.history.push('/opencase'); this.setState({ muneIndex: -1 }); }}>建册</Button>
+            <Button onClick={this.toOpenCase}>建册</Button>
           </div>
         </div>
 
         <p className="patient-Info_tab">
           {routers.map((item, i) => {
             if (item.name === '孕妇建册') return null;
-            return (<Button
-              key={"mune" + i}
-              type={this.state.muneIndex != i ? 'dashed' : 'primary'}
-              onClick={() => {
-                this.setState({ muneIndex: i });
-                this.onClick(item);
-              }}
-            >
+            return (
+            <Button key={"mune" + i} type={this.state.menuIndex != i ? 'dashed' : 'primary'} onClick={() => this.handleRouteSwitch(item,i)}>
               {item.name}
             </Button>)
           })}
@@ -265,10 +254,11 @@ export default class App extends Component {
   // 处理搜索
   handleSearch = () => {
     const { menzhenNumber, IDCard, phoneNumber } = this.state.searchObj;
-    this.setState({ muneIndex: 0 }, () => {
-      this.onClick(routers[0]);
-      this.findUser(menzhenNumber, IDCard, phoneNumber, "", "");
-    });
+    const { menuIndex } = this.state;
+    if(menuIndex !== 0){
+      this.setState({menuIndex: 0}, () => this.handleRouteSwitch(routers[0]));
+    }      
+    this.findUser(menzhenNumber, IDCard, phoneNumber, "", "");
   };
   // id - userid
   findUser = (menzhenNumber, IDCard, phoneNumber, chanjno, id) => {
@@ -277,29 +267,17 @@ export default class App extends Component {
       // 处理孕产
       res.object['tuseryunchan'] = `${yunc}/${chanc}`;
       res.object['userid'] = res.object.id;
-      // store孕产信息
-      let d = {
-        gravidity: yunc,
-        parity: chanc,
-        lmd: gesmoc,
-        edd: gesexpect
-      }
+      let d = {gravidity: yunc, parity: {value: chanc, label: chanc}, gravidity: {value: yunc, label: yunc},lmd: gesmoc,edd: gesexpect}
       // 填充本地输入框
-      let newSearchObj = Object.assign({}, this.state.searchObj);
-      newSearchObj.menzhenNumber = usermcno;
-      newSearchObj.IDCard = useridno;
-      newSearchObj.phoneNumber = usermobile;
+      let newSearchObj = {menzhenNumber: usermcno,IDCard: useridno,phoneNumber: usermobile}
+      // 设置storeuserData + 孕产信息
       store.dispatch(setUserData(res.object));
       store.dispatch(setOpenCaseData(d));
-      this.setState({ 
-        userData: res.object,
-        searchObj: newSearchObj
-      });
+      this.setState({ userData: res.object,searchObj: newSearchObj});
     })
   }
 
   // 暂时不使用 - 此方法数据最全
-
   // 获取孕妇建档信息，用于之后所有页面的同步
   // getIvisitMain = () => {
   //   const storeData = store.getState();

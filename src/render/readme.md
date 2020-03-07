@@ -85,6 +85,7 @@ options（tableColumn） 键值说明
 |title|string|表头,若为空，则默认不渲染且不占位|
 |key|string、number|唯一标识，对应传入对象键值|
 |type|'input、select等'|表单呈现内容组件载体，需使用src/render/common/下存在组件|
+|isShow|boolean|是否显示该项值|
 |children|tableColumn|子元素|
 
 行与列的合并不可使用ant-design中的rowSpan与colSpan

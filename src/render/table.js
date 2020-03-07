@@ -118,6 +118,7 @@ class MTable extends Component{
 
   render(){
     const {selected} = this.state;
+    // 新增 buttons 和 isShow
     const { buttons, dataSource, ...props } = this.props;
     const renderDataSource = dataSource.filter(item => item['isShow'] !== false);
     return (

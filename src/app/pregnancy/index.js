@@ -11,67 +11,75 @@ import { convertString2Json } from '../../utils/index';
 import "../index.less";
 import "./index.less";
 
+const PATH_NAME = "/pregnancy";
 export default class Patient extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
+      userid: "",
       gravidaInfo: {},
-      husbandInfo: {},
-      userid: ""
+      husbandInfo: {}
     };
     // 订阅store，变化时调用get拿值
     store.subscribe(() => {
-      this.getGeneralInformation();
-    })
+        if(props.location.pathname === PATH_NAME) {
+          this.getGeneralInformation()
+        }
+      }
+    )
   }
 
   componentDidMount() {
-    this.getGeneralInformation();
+    this.getGeneralInformation()
   };
 
+  /* ====================  请求处理 ============================= */
   getGeneralInformation = () => {
     const { userid } = store.getState()['userData'];
     // 防止已进入页面没有userid
     if(userid) {
       service.getgeneralinformation({userId: userid}).then((res) => {
-        if(res.code === "200" || res.code === 200 && res.object ) {
-          // TODO idtype 改成字符串
-          let { object } = res;
-          
-          // 整合职业数据
-          if(object['gravidaInfo']['useroccupation'] !== null){
-            if(object['gravidaInfo']['useroccupation'].indexOf('{') !== -1) {
-              object['gravidaInfo']['useroccupation'] = convertString2Json(object['gravidaInfo']['useroccupation']).label;
-            }
-          }else {
-            object['gravidaInfo']['useroccupation'] = "";
-          }
-          if(object['husbandInfo']['userhoccupation'] !== null){
-            if(object['husbandInfo']['userhoccupation'].indexOf('{') !== -1) {
-              object['husbandInfo']['userhoccupation'] = convertString2Json(object['husbandInfo']['userhoccupation']).label;
-            }
-          }else {
-            object['husbandInfo']['userhoccupation'] = "";
-          }
-          // 整合身份证数据
-          try {
-            object['gravidaInfo']['useridtype'] = convertString2Json(object['gravidaInfo']['useridtype']).label;
-            object['husbandInfo']['add_FIELD_husband_useridtype'] = convertString2Json(object['husbandInfo']['add_FIELD_husband_useridtype']).label;
-          } catch(e) {
-            object['gravidaInfo']['useridtype'] = "";
-            object['husbandInfo']['add_FIELD_husband_useridtype'] = "";
-          }
-          this.setState({...object})
-        }else {
-          console.log("请求失败/object undefined")
-        }
+        const obj = this.convertPregnancyData(res.object);
+        this.setState({userid: obj.userid, gravidaInfo: obj.gravidaInfo, husbandInfo: obj.husbandInfo});
       })
     }else {
       console.log('暂无孕妇id');
     }
   };
 
+  convertPregnancyData = (object) => {
+    const { useroccupation, useridtype } = object.gravidaInfo;
+    const { userhoccupation, add_FIELD_husband_useridtype } = object.husbandInfo;
+    // 修改格式
+    if(useroccupation && useroccupation.indexOf('{') !== -1) {
+      object.gravidaInfo.useroccupation = convertString2Json(useroccupation).label;
+    }
+    if(userhoccupation && userhoccupation.indexOf('{') !== -1) {
+      object.husbandInfo.userhoccupation = convertString2Json(userhoccupation).label;
+    }
+    // 整合身份证数据
+    if(useridtype && useridtype.indexOf('{') !== -1) {
+      object.gravidaInfo.useridtype = convertString2Json(useridtype);
+    }
+    if(add_FIELD_husband_useridtype && add_FIELD_husband_useridtype.indexOf('{') !== -1) {
+      object.husbandInfo.add_FIELD_husband_useridtype = convertString2Json(add_FIELD_husband_useridtype);
+    }
+    console.log(object);
+    return object;
+  }
+
+  /* ====================  表单改变处理 ============================= */
+  handleGravidaInfoChange = (_, {name, value }) => {
+    let newObj = Object.assign({}, this.state.gravidaInfo);
+    newObj[name] = value;
+    this.setState({gravidaInfo: newObj});
+  };
+  handleHusbandInfo = (_, {name, value}) => {
+    let newObj = Object.assign({}, this.state.husbandInfo);
+    newObj[name] = value;
+    this.setState({gravidaInfhusbandInfoo: newObj});
+  };
   /* ====================  UI视图渲染 ============================= */
   gravidaInfo_config = () => ({
     step: 1,
@@ -162,27 +170,13 @@ export default class Patient extends Component {
     };
   };
 
-  /* ====================  表单改变处理 ============================= */
-  handleGravidaInfoChange = (e, {name, value }) => {
-    const { gravidaInfo } = this.state;
-    gravidaInfo[name] = value;
-    this.setState({gravidaInfo});
-  };
-
-  handleHusbandInfo = (e, {name, value}) => {
-    const { husbandInfo } = this.state;
-    husbandInfo[name] = value;
-    this.setState({husbandInfo});
-  };
-
   render(){
-    const { gravidaInfo, husbandInfo } = this.state;
     return (
       <Page className='fuzhen font-16 ant-col'>
         <div className="bgWhite pad-mid ">
           <div className="">
-            {formRender(gravidaInfo || {}, this.gravidaInfo_config(), this.handleGravidaInfoChange)}
-            {formRender(husbandInfo || {}, this.husbandInfo_config(), this.handleHusbandInfo)}
+            {formRender(this.state.gravidaInfo, this.gravidaInfo_config(), this.handleGravidaInfoChange)}
+            {formRender(this.state.husbandInfo, this.husbandInfo_config(), this.handleHusbandInfo)}
           </div>
         </div>
       </Page>

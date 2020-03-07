@@ -1,11 +1,4 @@
 /**
- * NOTICE
- * 2020-02-26
- * 仅保留基本信息页面一份完整data.js
- * 其他页面全部删除不需使用的data.js - 最后再整合
- */
-
-/**
  * 如果不想在value里面使用label的数据，可以换成用index作为value
  */
 function toOptions(data, vfn =()=>({})){

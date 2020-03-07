@@ -27,12 +27,7 @@ export default {
 
   savespecialistemrdetail: function (entity) {
     let uri = 'savespecialistemrdetail';
-    console.log(entity);
-    
-    // if()
-    // entity['ultrasound']['fetus'] = [];
     return this.userId().then(r => {
-        console.log(r);
         entity['userid'] = r.object.userid;
         return myAxios.post(`${FRONT_URL}${uri}`, entity)
       }
@@ -56,5 +51,12 @@ export default {
   /**
    * 专科病历 - 胎儿疾病 - 既往史 - 手术史
    */
-  writeOperationHistory: (entity) => (this.userId().then(r => myAxios.post(`outpatientWriteRestful/writeOperationHistory`,{userid: r.object.userid, operationHistory: entity})))
+  writeOperationHistory: function (entity) {
+    return this.userId().then(r => {
+      entity.operationHistorys.forEach(v => {
+        v.userid = r.object.userid;
+      });
+      myAxios.post(`outpatientWriteRestful/writeOperationHistory`,{userid: r.object.userid, operationHistory: entity.operationHistorys})
+    })
+  }
 }
