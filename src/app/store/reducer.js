@@ -1,5 +1,9 @@
-import { CHECK_HIGHRISK_ALERT, CLOSE_HIGHRISK_ALERT, SET_USER_DATA, SET_OPENCASE_DATA } from './actionTypes.js'
+import { 
+  CHECK_HIGHRISK_ALERT, CLOSE_HIGHRISK_ALERT, SET_USER_DATA,
+  START_FETCH, FETCH_END
+ } from './actionTypes.js'
 const defaultState = {
+  isFetching: false,
   highriskAlert:[],
   userData: {},
   /** 
@@ -11,24 +15,31 @@ const defaultState = {
 
 export default (state = defaultState, action) => {
   if(action.type === CHECK_HIGHRISK_ALERT) {
-    const newState = JSON.parse(JSON.stringify(state));
+    let newState = JSON.parse(JSON.stringify(state));
     newState.highriskAlert = action.data;
     return newState;
   }
   if(action.type === CLOSE_HIGHRISK_ALERT) {
-    const newState = JSON.parse(JSON.stringify(state));
+    let newState = JSON.parse(JSON.stringify(state));
     newState.highriskAlert[action.index].visible = false;
     return newState;
   }
   if(action.type ===  SET_USER_DATA) {
-    const newState = JSON.parse(JSON.stringify(state));
+    let newState = JSON.parse(JSON.stringify(state));
     newState.userData = action.data;
+    const { yunc, chanc,  gesmoc, gesexpect} = action.data;
+    newState.openCaseData = {
+      parity: {value: chanc, label: chanc},
+      gravidity: {value: yunc, label: yunc},
+      lmd: gesmoc,
+      edd: gesexpect
+    }
     return newState;
   }
-  if(action.type === SET_OPENCASE_DATA) {
-    const newState = JSON.parse(JSON.stringify(state));
-    newState.openCaseData = action.data;
-    return newState;
-  }
+  // if(action.type ===  START_FETCH){
+  //   let newState = JSON.parse(JSON.stringify(state));
+  //   newState.isFetching = true;
+  //   return newState;
+  // }
   return state;
 }

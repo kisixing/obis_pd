@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { message } from 'antd';
 import formRender from '../../render/form';
 import Page from '../../render/page';
 import service from '../../service/index';
@@ -44,7 +45,7 @@ export default class Patient extends Component {
         this.setState({userid: obj.userid, gravidaInfo: obj.gravidaInfo, husbandInfo: obj.husbandInfo});
       })
     }else {
-      console.log('暂无孕妇id');
+      message.info('请输入孕妇门诊号/身份证/手机号码进行信息获取',5);
     }
   };
 

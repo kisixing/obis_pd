@@ -6,8 +6,8 @@ import bundle from "../utils/bundle";
 import service from '../service';
 
 import store from './store';
-import { closeAlertAction, setOpenCaseData } from './store/actionCreators.js';
-import { setUserData } from "./store/actionCreators";
+import { closeAlertAction, setUserData } from './store/actionCreators.js';
+
 // page Component
 import Pregnancy from 'bundle-loader?lazy&name=pregnancy!./pregnancy';
 import MedicalRecord from 'bundle-loader?lazy&name=medicalrecord!./medicalrecord';
@@ -35,7 +35,6 @@ const routers = [
 
 export default class App extends Component {
   constructor(props) {
-    const storeData = store.getState();
     super(props);
     this.state = {
       loading: true,
@@ -44,7 +43,8 @@ export default class App extends Component {
       highriskShow: false,
       menuIndex: 0, // 默认 pregnancy
       userData: {},
-      ...storeData,
+      userData: {},
+      highriskAlert: [],
       searchObj: {
         menzhenNumber: "", IDCard: "", phoneNumber: ""
       }
@@ -55,7 +55,9 @@ export default class App extends Component {
   handleStoreChange = () => {
     const { userData } = store.getState();
     // 当本页面userid与store不同
-    if( this.state.userData.userid !== userData.userid) this.findUser("","","","",userData.userid);
+    if( this.state.userData.userid !== userData.userid &&  this.state.userData.userid) {
+      this.findUser("","","","",userData.userid);
+    }
   };
 
   componentDidMount() {
@@ -130,7 +132,6 @@ export default class App extends Component {
     this.props.history.push('/opencase');
     this.setState({ menuIndex: -1 });
   }
-
 
   renderHeader() {
     const { username, userage, tuserweek, tuseryunchan, gesexpect, usermcno, chanjno, risklevel, infectious } = this.state.userData;
@@ -267,12 +268,10 @@ export default class App extends Component {
       // 处理孕产
       res.object['tuseryunchan'] = `${yunc}/${chanc}`;
       res.object['userid'] = res.object.id;
-      let d = {gravidity: yunc, parity: {value: chanc, label: chanc}, gravidity: {value: yunc, label: yunc},lmd: gesmoc,edd: gesexpect}
       // 填充本地输入框
       let newSearchObj = {menzhenNumber: usermcno,IDCard: useridno,phoneNumber: usermobile}
       // 设置storeuserData + 孕产信息
       store.dispatch(setUserData(res.object));
-      store.dispatch(setOpenCaseData(d));
       this.setState({ userData: res.object,searchObj: newSearchObj});
     })
   }
@@ -310,6 +309,7 @@ export default class App extends Component {
   // }
 
   render() {
+    const { isFetching } = store.getState();
     return (
       <div className='main-body'>
         {this.renderHeader()}
@@ -320,6 +320,15 @@ export default class App extends Component {
           {this.renderDanger()}
         </div>
         {this.renderHighrisk()}
+        <div>
+          <Modal
+            visible={isFetching}
+            maskClosable={false}
+            footer={null}
+          >
+            <div><span>数据请求中</span></div>
+          </Modal>
+        </div>
       </div>
     )
   }

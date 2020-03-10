@@ -2,8 +2,6 @@ import myAxios, * as method from '../utils/myAxios';
 
 import axios from 'axios';
 
-import { default as fuzhen } from './fuzhen';
-import { default as shouzhen } from './shouzhen';
 import { default as medicalrecord } from './medicalrecord';
 import { default as operation } from './operation.js';
 import { default as historicalrecord } from './historicalrecord.js';
@@ -35,9 +33,7 @@ export default {
     return myAxios.get(`prenatalQuery/findUser?useridno=${useridno}&usermcno=${usermcno}&usermobile=${usermobile}&chanjno${chanjno}=&id=${id}`).then(res => {
       res['object']['userid'] = res['object']['id'];
       res['object']['tuserweek'] = res['object']['gesweek'];
-      userId = new Promise(resolve => {
-        resolve(res);
-      });
+      userId = new Promise(resolve => resolve(res));
       return userId;
     });
   },
@@ -46,19 +42,7 @@ export default {
   /**
    * 获取个人信息
    */
-  getuserDoc: function () {
-    userId = myAxios.get('outpatientRestful/getuserDoc' + location.search);
-    return userId;
-  },
-  /**
-   * 获取孕妇建档信息
-   */
-  // getIvisitMain: function ({userid}) {
-  //   return axios.get(`http://120.77.46.176:8899/rapi/outpatientRestful/ivisitMain?style=gravidaInfo&userid=${userid}`).then(res => {
-  //     userId = new Promise(resolve => resolve(res.data));
-  //     return userId;
-  //   })
-  // },
+  getuserDoc: function () {userId = myAxios.get('outpatientRestful/getuserDoc' + location.search);return userId;},
   /**
    * 高危数据
    */
@@ -102,19 +86,9 @@ export default {
     return userId.then(r => axios.get(`http://120.77.46.176:8899/rapi/outpatientRestful/getPacsData?userid=${r.object.userid}`))
   },
   /**
-   * 复诊所需API
-   */
-  fuzhen: Object.assign(fuzhen, { userId: () => userId, fireWatch: (...args) => watchInfoList.forEach(fn => fn(...args)) }),
-  /**
-   * 首诊所需API
-   */
-  shouzhen: Object.assign(shouzhen, { userId: () => userId, fireWatch: (...args) => watchInfoList.forEach(fn => fn(...args)) }),
-  /**
    * 专科病历 所需API
    */
   medicalrecord: Object.assign(medicalrecord, { userId: () => userId, fireWatch: (...args) => watchInfoList.forEach(fn => fn(...args)) }),
-
-
   /**
    * 手术记录所需API
    */
