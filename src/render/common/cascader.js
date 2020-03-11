@@ -26,16 +26,21 @@ export function cascader({ name, options, width, value='', onChange, onBlur=()=>
     return <span key={option.value}>{label} / </span>;
   });
 
-  const handleChange = e => {
-    onChange(e, options.filter(o=>o.value==e).pop()).then(()=>onBlur({checkedChange:true}));
+  const handleChange = (value, selectedOptions) => {
+    let valStr = "";
+    value.forEach(v => valStr += `${v}/`);
+    valStr = valStr.substring(0,valStr.length-1);
+    onChange("不可获取e", valStr).then(()=>onBlur({checkedChange:true}));
   }
 
   return (
     <Cascader
-    options={options}
-    defaultValue={['zhejiang', 'hangzhou', 'xihu']}
-    displayRender={displayRender}
-    style={{ width: 200 }}>
+      options={options}
+      defaultValue={['zhejiang', 'hangzhou', 'xihu']}
+      displayRender={displayRender}
+      style={{ width: 200 }}
+      onChange={handleChange}
+      >
     </Cascader>
   )
 }

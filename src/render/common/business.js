@@ -77,7 +77,6 @@ export function bloodinput(props) {
 }
 
 
-
 export function hemorrhageselect(props) {
   const { name, entity, onChange, onBlur } = props;
 
@@ -145,4 +144,8 @@ export function whetherbleedingselect(props) {
     </div>
     
   )
-} 
+}
+
+export function AddressInput(props) {
+  const { name, entity, onChange, onBlur } = props;
+}

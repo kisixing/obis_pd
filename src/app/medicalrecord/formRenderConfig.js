@@ -44,7 +44,7 @@ const config = {
     rows: [
       {
         columns:[
-          { name: 'other_exam[其他]', type: 'textarea', valid: 'required', span: 16 },
+          { name: 'other_exam[其他]', type: 'textarea', span: 16 },
           { name:'other_exam[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr3')}
         ]
       }
@@ -163,32 +163,32 @@ const config = {
     rows: [
       {
         columns:[
-          { name: 'hypertension[高血压]', type: 'checkinput', valid: 'required', unselect: '无', radio: true, options: baseData.wssOptions,span:24 },
+          { name: 'hypertension[高血压]', type: 'checkinput', valid: 'required', radio: true, options: baseData.wssOptions,span:24 },
         ]
       },
       {
         columns:[
-          { name: 'diabetes_mellitus[糖尿病]', type: 'checkinput', valid: 'required', unselect: '无', radio: true, options: baseData.wssOptions,span:24 },
+          { name: 'diabetes_mellitus[糖尿病]', type: 'checkinput', valid: 'required', radio: true, options: baseData.wssOptions,span:24 },
         ]
       },
       {
         columns:[
-          { name: 'heart_disease[心脏病]', type: 'checkinput', valid: 'required', unselect: '无', radio: true, options: baseData.wssOptions,span:24 },
+          { name: 'heart_disease[心脏病]', type: 'checkinput', valid: 'required', radio: true, options: baseData.wssOptions,span:24 },
         ]
       },
       {
         columns:[
-          { name: 'other_disease[其他病史]', type: 'checkinput', valid: 'required', unselect: '无', radio: true, options: baseData.wssOptions,span:24 },
+          { name: 'other_disease[其他病史]', type: 'checkinput', valid: 'required', radio: true, options: baseData.wssOptions,span:24 },
         ]
       },
       {
         columns:[
-          { name: 'allergy[过敏史]', type: 'checkinput', valid: 'required', options: baseData.ywgmOptions, unselect: '无', span:24 },
+          { name: 'allergy[过敏史]', type: 'checkinput', valid: 'required',radio: true, options: baseData.ywgmOptions, span:24 },
         ]
       },
       {
         columns:[
-          { name: 'blood_transfusion[输血史]', type: 'checkinput', valid: 'required', unselect: '无', options: baseData.sxsOptions, span: 24 },
+          { name: 'blood_transfusion[输血史]', type: 'checkinput', valid: 'required', radio: true, options: baseData.sxsOptions, span: 24 },
         ]
       }
     ]
@@ -259,9 +259,9 @@ const config = {
       },
       {
         columns:[
-          {name:'fundal_height(cm)[宫@@@高 ]', type:'input', span:8, valid: 'required|number|rang(10,100)'},
+          {name:'fundal_height(cm)[宫@@@高 ]', type:'input', span:8, valid: 'number|rang(10,100)'},
 
-          {name:'waist_hip(cm)[腹@@@围 ]', type:'input', span:8, valid: 'required|number|rang(0,100)'},
+          {name:'waist_hip(cm)[腹@@@围 ]', type:'input', span:8, valid: 'number|rang(0,100)'},
         ]
       },
       {
@@ -270,7 +270,7 @@ const config = {
 
           {name:'current_weight(kg)[现 体 重 ]', type:'input', span:6, valid: 'required|number|rang(0,100)'},
 
-          {name:'weight_gain(kg)[体重增长]',type:'input', span:6, valid: 'required|number|rang(0,100)'},
+          {name:'weight_gain(kg)[体重增长]',type:'input', span:6, valid: 'required|number'},
         ]
       }
     ]

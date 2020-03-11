@@ -84,10 +84,11 @@ export const hnOptions = toOptions('无,有');
 /**
  *有、无
 */
-export const nhOptions = toOptions('有(input){#FF3300},无');
+export const nhOptions = toOptions('无,有(input){#FF3300}');
 
-export const wssOptions = toOptions([{ k: '有{#FF3300}(input)', addspan: 2 }]);
+export const wssOptions = toOptions([{k: '无', span: 2},{ k: '有{#FF3300}(input)'}]);
 
+export const sxsOptions = toOptions([{k: '无', span: 2},{ k: '有{#FF3300}(bloodinput)'}]);
 
 /**
  *下肢浮肿
@@ -105,7 +106,7 @@ export const genotypeAnemia = toOptions('β地中海贫血基因CD14-15突变,β
 /**
  *药物或食物过敏史
 */
-export const ywgmOptions = toOptions('药物{#FF3300}(input),食物{#FF3300}(input),其他{#FF3300}(input)');
+export const ywgmOptions = toOptions('无,药物{#FF3300}(input),食物{#FF3300}(input),其他{#FF3300}(input)');
 
 /**
  * 初潮

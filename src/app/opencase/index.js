@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Select, Button, message } from 'antd';
+import { Select, Button, message, Cascader } from 'antd';
 import store from '../store/index';
 import service from '../../service/index.js';
 import { setUserData } from '../store/actionCreators'
@@ -10,24 +10,33 @@ import Page from '../../render/page';
 
 import "../index.less";
 
-import { hyOptions, numberOptions } from './data.js';
+import { hyOptions, numberOptions, IDCardOptions } from './data.js';
+import cityOptions from '../../utils/cascader-address-options';
+import  NO2ROOT from '../../utils/china-division/no2root';
 
-const { Option } = Select;
-// TODO 三级城市选择器 -- 未完成
-const citySelection = (
-  <Select placeholder='请选择' style={{width: 70}}>
-    <Option value="北京">北京</Option>
-    <Option value="上海">上海</Option>
-    <Option value="广州">广州</Option>
-  </Select>
-)
+const IDReg = /^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/;
 
+const getDataFromID = (id) => {
+  if(!id || !IDReg.test(id) ) return false;
+  let root = '';
+  for(let i = 0 ; i < NO2ROOT.length ; i++){
+    if(NO2ROOT[i].code === id.substring(0,6)){
+      root = NO2ROOT[i].name;
+      break;
+    }
+  }
+  return {
+    age: Number(new Date().getFullYear()) - Number(id.substring(6,10)),
+    root: root
+  }
+}
 export default class OpenCase extends Component {
   constructor(props) {
     super(props);
     this.state = {
       pregnancyData: {
-        ADD_FIELD_husband_useridtype: {"label":"身份证","value":"身份证"}
+        useridno: {"label":"居民身份证","value":"居民身份证"},
+        ADD_FIELD_husband_useridtype: {"label":"居民身份证","value":"居民身份证"}
       },
       benYunData: {
         yunc: {label: '0', value: '0'},
@@ -56,19 +65,17 @@ export default class OpenCase extends Component {
           {name: 'username[姓名]', type: 'input', span: 6, valid: 'required'},
           {name: 'userage[年龄]', type: 'input', span: 6, valid: 'required'},
           {
-            name: 'useridno[身份证]', type: 'input', span: 6, valid: (value) => {
-              let IDReg = new RegExp(/^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/);
-              if(IDReg.test(value)){
-                if(Number(value.slice(16,17)) % 2 === 1){
-                  message.error('请输入女性身份证');
-                  return "*请输入女性身份证";
+            name: 'useridno[身份证]', type: [{type: 'select',options: IDCardOptions, valid: 'required', span: 10},{type:'input', span: 14, valid: 'required'}], span: 8, valid: ['required',(value) => {
+              const IDType = value['0'], IDNumber = value['1']
+              if(!IDType)  return "*请选择证件类型";
+              if(IDType.value === '居民身份证' && IDNumber) {
+                if(IDReg.test(IDNumber)){
+                  if(Number(IDNumber.slice(16,17)) % 2 === 1) return "*请输入女性身份证";
                 }else{
-                  return "";
+                  return "*居民身份证格式错误"
                 }
-              }else{
-                return "*身份证格式错误"
               }
-            }
+            }]
           }
         ]
       },
@@ -110,7 +117,23 @@ export default class OpenCase extends Component {
         columns: [
           {name: 'userhname[姓名]', type: 'input', span: 6},
           {name: 'userhage[年龄]', type: 'input', span: 6},
-          {name: 'userhidno[身份证]', type: 'input', span: 6}
+          {
+            name: 'userhidno[身份证]', type: [{type: 'select',options: IDCardOptions, span: 10},{type:'input', span: 14}], span: 8, valid: (value) => {
+              const IDType = value['0'], IDNumber = value['1'];
+              if(!IDType) {
+                return "*请选择证件类型";
+              }
+              if(IDType.value === '居民身份证' && IDNumber) {
+                if(IDReg.test(IDNumber)){
+                  if(Number(IDNumber.slice(16,17)) % 2 === 0){
+                    return "*请输入男性身份证";
+                  }
+                }else{
+                  return "*居民身份证格式错误"
+                }
+              }
+            }
+          }
         ]
       },
       {
@@ -129,29 +152,17 @@ export default class OpenCase extends Component {
       },
       {
         columns: [
-          { name: 'add_FIELD_husband_smoking(支/天)[抽烟]', type: 'input', span: 6 },
-          { name: 'add_FIELD_husband_drinking(毫升/日)[抽烟]', type: 'input', span: 6 },
-        ]
-      },
-      {
-        columns: [
-          { name: 'userhjib[现有何病]', type: 'input', span: 12 }
-        ]
-      },
-      {
-        columns: [
           {label: '其他信息', span: 12}
         ]
       },
       {
         columns: [
-          // TODO 这里缺少 地级市 级联选择器
-          {name: 'useraddress[户口地址]', type: 'input', addonBefore: citySelection, placeholder: '请输入详细地址', span: 12,  options: hyOptions},
+          {name: 'useraddress[户口地址]', type: [{type: 'cascader', options: cityOptions, span: 7},{type:'input'}], span: 12, valid: 'required'},
         ]
       },
       {
         columns: [
-          {name: 'userconstant[居住地址]', type: 'input', addonBefore: citySelection,placeholder: '请输入详细地址',span: 12,valid: 'required', options: hyOptions},
+          {name: 'userconstant[居住地址]', type: [{type: 'cascader', options: cityOptions, span: 7},{type:'input'}],span: 12, valid: 'required'},
         ]
       }
     ]
@@ -194,10 +205,49 @@ export default class OpenCase extends Component {
 
 
   /* ======================= handler =============================== */
-  handlePregnancyChange = (_,{name,value}) => {
+  handlePregnancyChange = (_,{name,value,error}) => {
+    // 统一错误提示
+    if(error) {
+      message.error(error);
+      return ;
+    } 
     const { pregnancyData } = this.state;
-    let obj = Object.assign({}, pregnancyData);
-    obj[name] = value;
+    let obj = JSON.parse(JSON.stringify(pregnancyData));
+    switch(name){
+      case 'useridno':
+        const IDType = value['0'], IDNumber = value['1'];
+        if(IDType.value === '居民身份证') {
+          obj['useridtype'] = IDType;
+          obj['usernation'] = '中华人民共和国';
+          const res = getDataFromID(IDNumber);
+          console.log(res);
+          if(res){
+            obj['userage'] = res.age;
+            obj['userroot'] = res.root;
+          }
+        }
+        break;
+      case 'userhidno':{
+        const IDType = value['0'], IDNumber = value['1'];
+        if(IDType.value === '居民身份证') {
+          obj['']
+          obj['userhnation'] = '中华人民共和国';
+          const res = getDataFromID(IDNumber);
+          if(res) {
+            obj['userhage'] = res.age;
+            obj['userhroots'] = res.root;
+          }
+        }
+        break;
+      }
+      default:
+        obj[name] = value;
+        break;
+    }
+    if(name === 'useridno') {
+      console.log(value);
+    }
+    
     this.setState({pregnancyData: obj});
   };
   handleBenYunChange = (_,{name,value}) => {
@@ -216,6 +266,9 @@ export default class OpenCase extends Component {
     console.log(pregnancyData);
     fireForm(document.getElementById('form-block'),'valid').then(valid => {
       if(valid){
+        // 中间加个空格
+        pregnancyData['useraddress'] = pregnancyData['useraddress']['0'] + ' ' + pregnancyData['useraddress']['1']; 
+        pregnancyData['userconstant'] = pregnancyData['userconstant']['0'] + ' ' + pregnancyData['userconstant']['1']; 
         // 转换数据格式
         benYunData['chanc'] = Number(benYunData['chanc'].value);
         benYunData['yunc'] = Number(benYunData['yunc'].value);
