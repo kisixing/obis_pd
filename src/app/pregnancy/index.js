@@ -102,17 +102,17 @@ export default class Patient extends Component {
           { span: 1 },
           { name: 'userpeople[民族]', type: 'input', span: 4 ,valid: 'required'},
           { span: 1 },
-          { name: 'useroccupation[职业]', type: 'input', span: 6 ,valid: 'required'},
+          { name: 'useroccupation[职业]', type: 'input', span: 6 },
         ]
       }, {
         columns: [
           { name: 'usermobile[手机]', type: 'input', span: 5, valid: 'number|required' },
           { span: 1 },
-          { name: 'phone[固话]', type: 'input', span: 5},
-          { span: 1 },
           { name: 'useridtype[证件类型]', type: 'select', span: 4, showSearch: false, options: sfzOptions ,valid: 'required'},
           { span: 1 },
           { name: 'useridno[证件号码]', type: 'input', span: 6 ,valid: 'required'}
+          // { name: 'phone[固话]', type: 'input', span: 5},
+          // { span: 1 },
         ]
       }, {
         columns: [

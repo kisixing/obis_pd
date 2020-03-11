@@ -360,9 +360,12 @@ export default class HistoricalRecord extends Component{
         if(validCode){
           // 保存
           // 整合bp的格式
-          currentShowData['physical_check_up']['bp'] = '0';
-          if(currentShowData.id < 0) {
-            currentShowData.id = "";
+          const { formType } =  currentShowData;
+          if(formType !== "2"){
+            currentShowData['physical_check_up']['bp'] = '0';
+            if(currentShowData.id < 0) {
+              currentShowData.id = "";
+            }
           }
           if(!currentShowData.hasOwnProperty('downs_screen')) {
             currentShowData['downs_screen'] = {};
@@ -370,9 +373,11 @@ export default class HistoricalRecord extends Component{
           if(!currentShowData.hasOwnProperty('thalassemia')) {
             currentShowData['thalassemia'] = {};
           }
-          currentShowData.ultrasound.fetus.forEach(v => {
-            v.id = "";
-          })
+          if(formType === '1'){
+            currentShowData.ultrasound.fetus.forEach(v => {
+              v.id = "";
+            })
+          }
           service.medicalrecord.savespecialistemrdetail(currentShowData).then(res => {
               message.success('成功保存');
           }).catch(err => console.log(err));
@@ -879,9 +884,10 @@ export default class HistoricalRecord extends Component{
     })
   }
 
-  getTemplateInput = ({content}) => {
+  getTemplateInput = (items) => {
     const { currentShowData } = this.state;
     const { type } = this.state.templateObj;
+    const content = items.map(v => v.content).join(" ");
     let obj = JSON.parse(JSON.stringify(currentShowData));
     // 需要新对象
     switch(type) {

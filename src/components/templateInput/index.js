@@ -74,7 +74,7 @@ class TemplateInput extends Component {
   );
 
   rowSelection = () => ({
-    type: 'radio',
+    type: 'checkbox',
     selectedRowKeys: this.state.currentSelection,
     onChange: (selectedRowKeys, selectedRows) => {
       this.setState({ currentSelection: selectedRowKeys });
@@ -106,7 +106,7 @@ class TemplateInput extends Component {
       templateList.pop();
       this.setState({ templateList, isNewTemplate: !isNewTemplate, currentInput: '' });
     } else if (!isNewTemplate) {
-      // Delete
+      // Delete - 同时需要删除2个模板，需要和后端协商
       console.log(currentSelection);
       service.template.deleteTemplate({ key: currentSelection[0] }).then(res => {
         this.getTemplateList();
@@ -115,12 +115,19 @@ class TemplateInput extends Component {
     // this.setState({templateList, isNewTemplate: !isNewTemplate, currentInput: ''});
   };
 
-  // 传出给父组件
+  // 传出给父组件 - 传出多个对象
   submitData = () => {
     const { currentSelection, templateList } = this.state;
     const { getData } = this.props;
-    const index = templateList.findIndex(item => item.key === currentSelection[0]);
-    getData(templateList[index]);
+    let resArr = [];
+    currentSelection.forEach(key => {
+      const index = templateList.findIndex(item => item.key === key);
+      if(index !== -1){
+        resArr.push(templateList[index]);
+      }
+    })
+    // const index = templateList.findIndex(item => item.key === currentSelection[0]);
+    getData(resArr);
   };
 
   render() {
@@ -140,7 +147,7 @@ class TemplateInput extends Component {
           <Button disabled={isNewTemplate} onClick={() => this.sortTemplate(2)}>向下移动</Button>
           <Button onClick={this.handleNewOrSave}>{isNewTemplate ? <span>保存模板</span> : <span>新增模板</span>}</Button>
           <Button onClick={this.handleCancelOrDelete}>{isNewTemplate ? <span>取消新增</span> : <span>删除模板</span>}</Button>
-          <Button disabled={this.state.currentSelection.length === 0 || isNewTemplate} onClick={this.submitData}>选择模板</Button>
+          <Button className="choice-btn" disabled={this.state.currentSelection.length === 0 || isNewTemplate} onClick={this.submitData}>选择模板</Button>
         </div>
       </div>
     )

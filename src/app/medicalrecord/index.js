@@ -283,10 +283,12 @@ export default class MedicalRecord extends Component {
         // 保存
         const index = specialistemrData.findIndex(item => item['id'].toString() === currentTreeKeys[0]);
         // 整合bp的格式
-        specialistemrData[index]['physical_check_up']['bp'] = '0';
-        // specialistemrData[index]['id'] = "";
-        if(specialistemrData[index].id < 0) {
-          specialistemrData[index].id = "";
+        const { formType } = specialistemrData[index];
+        if(formType !== '2'){
+          specialistemrData[index]['physical_check_up']['bp'] = '0';
+          if(specialistemrData[index].id < 0) {
+            specialistemrData[index].id = "";
+          }
         }
         if(!specialistemrData[index].hasOwnProperty('downs_screen')) {
           specialistemrData[index]['downs_screen'] = {};
@@ -294,15 +296,18 @@ export default class MedicalRecord extends Component {
         if(!specialistemrData[index].hasOwnProperty('thalassemia')) {
           specialistemrData[index]['thalassemia'] = {};
         }
-        specialistemrData[index].ultrasound.fetus.forEach(v => {
-          v.id = "";
-        })
+        if(formType === '1') {
+          specialistemrData[index].ultrasound.fetus.forEach(v => {
+            v.id = "";
+          })
+        }
+        
         // 专科病历主体保存
         service.medicalrecord.savespecialistemrdetail(specialistemrData[index]).then(res => {
           message.success('成功保存');
           service.medicalrecord.getspecialistemr().then(res => {
             if (res.code === "200" || res.code === 200) {
-              this.setState({ specialistemrList: res.object.list }, () => { })
+              this.setState({ specialistemrList: res.object.list, currentTreeKeys: '0' }, () => { })
             }
           });
         }).catch(err => console.log(err));
@@ -671,9 +676,11 @@ export default class MedicalRecord extends Component {
     })
   };
   // 获取template的输入信息
-  getTemplateInput = ({content}) => {
+  getTemplateInput = (items) => {
     const { currentTreeKeys, specialistemrData } = this.state;
     const { type } = this.state.templateObj;
+    const content = items.map(v => v.content).join(" ");
+    console.log(content);
     const index = specialistemrData.findIndex(item => item.id.toString() === currentTreeKeys[0]);
     switch(type) {
       case 'dmr1':

@@ -493,9 +493,10 @@ export default class Operation extends Component{
     })
   }
 
-  getTemplateInput = ({content}) => {
+  getTemplateInput = (items) => {
     const { currentShowData } = this.state;
     const { type } = this.state.templateObj;
+    const content = items.map(v => v.content).join(" ");
     let obj = JSON.parse(JSON.stringify(currentShowData));
     // 需要新对象
     switch(type) {
