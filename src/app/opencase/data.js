@@ -25,3 +25,5 @@ export const hyOptions = toOptions('未婚,已婚,丧偶,离婚');
 export const IDCardOptions = toOptions('居民身份证,港澳居民来往内地通行证,台湾居民来往大陆通行证,外国人居留证 ,护照');
 
 export const numberOptions = toOptions('0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15');
+
+export const occupationOptions = toOptions('国家公务员,专业技术人员,企业管理人员,自由职业者,工人,现役军人,个体经营者,职员,农民,学生,退（离）休人员，其他');

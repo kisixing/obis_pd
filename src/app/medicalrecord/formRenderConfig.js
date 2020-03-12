@@ -230,6 +230,12 @@ const config = {
           { span: 1 },
           {name:'heritable_disease[遗传病]', type:'checkinput-5',radio:true, valid: 'required', options: baseData.nhOptions,span: 15}
         ]
+      },
+      {
+        columns: [
+          { span: 1 },
+          {name:'other[其他]', type:'checkinput-5',radio:true, valid: 'required', options: baseData.nhOptions,span: 15}
+        ]
       }
     ]
   }),
@@ -240,7 +246,10 @@ const config = {
       {
         columns:[
           {
-            name: 'bp(mmHg)[血@@@压 ]', type: ['input(/)','input'], span: 8, valid: (value)=>{
+            name: 'cktaix[胎心率](bpm)', type: 'input', span: 6, valid: 'required|number'
+          },
+          {
+            name: 'bp(mmHg)[血@@@压 ]', type: ['input(/)','input'], span: 6, valid: (value)=>{
               let message = '';
               if(value){
                 // 缺少valid
@@ -253,7 +262,7 @@ const config = {
             }
           },
           {
-            name:'edema[浮@@@肿 ]', type:'select', span:8, showSearch: true, options: baseData.xzfOptions
+            name:'edema[浮@@@肿 ]', type:'select', span: 6, showSearch: true, options: baseData.xzfOptions
           },
         ]
       },

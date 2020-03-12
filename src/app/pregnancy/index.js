@@ -50,21 +50,25 @@ export default class Patient extends Component {
   };
 
   convertPregnancyData = (object) => {
-    const { useroccupation, useridtype } = object.gravidaInfo;
+    const { useroccupation, useridtype, useridno } = object.gravidaInfo;
     const { userhoccupation, add_FIELD_husband_useridtype } = object.husbandInfo;
-    // 修改格式
+    // 整合职业数据 - 转格式
     if(useroccupation && useroccupation.indexOf('{') !== -1) {
       object.gravidaInfo.useroccupation = convertString2Json(useroccupation).label;
     }
     if(userhoccupation && userhoccupation.indexOf('{') !== -1) {
       object.husbandInfo.userhoccupation = convertString2Json(userhoccupation).label;
     }
-    // 整合身份证数据
+    // 整合身份证类型数据 - 转格式
     if(useridtype && useridtype.indexOf('{') !== -1) {
       object.gravidaInfo.useridtype = convertString2Json(useridtype);
     }
     if(add_FIELD_husband_useridtype && add_FIELD_husband_useridtype.indexOf('{') !== -1) {
       object.husbandInfo.add_FIELD_husband_useridtype = convertString2Json(add_FIELD_husband_useridtype);
+    }
+    // 剪切生日
+    if(useridno){
+      object.gravidaInfo.userbirth = `${useridno.substring(6,10)}-${useridno.substring(10,12)}-${useridno.substring(12,14)}`;
     }
     console.log(object);
     return object;
@@ -106,7 +110,7 @@ export default class Patient extends Component {
         ]
       }, {
         columns: [
-          { name: 'usermobile[手机]', type: 'input', span: 5, valid: 'number|required' },
+          { name: 'usermobile[手机]', type: 'input', span: 5, valid: 'number' },
           { span: 1 },
           { name: 'useridtype[证件类型]', type: 'select', span: 4, showSearch: false, options: sfzOptions ,valid: 'required'},
           { span: 1 },

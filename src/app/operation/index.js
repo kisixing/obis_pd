@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {Button, Collapse, Tabs, Tree, Modal, message} from "antd";
 import Page from '../../render/page';
 
+import store from '../store';
 import service from '../../service/index.js';
 import { formatDate, convertString2Json, getTimeDifference, mapValueToKey } from '../../utils/index';
 
@@ -183,6 +184,8 @@ export default class Operation extends Component{
   //
   newOperation = () => {
     const { operationList, operationNewDataList, currentExpandedKeys, currentShowData } = this.state;
+    const { userData } = store.getState();
+    console.log(userData);
     const todayStr = formatDate();
     // 新建元素的id
     const newId = 0 - Math.random()*100|0;
@@ -205,6 +208,7 @@ export default class Operation extends Component{
       operative_procedure: {fetus:[{id: newId-1}]}, 
       surgery: {},
       ward: {
+        userName: userData.username,
         operationDate: todayStr
       }
     };

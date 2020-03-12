@@ -140,6 +140,7 @@ class TemplateInput extends Component {
             columns={this.tableColumns()}
             dataSource={this.state.templateList}
           />
+          <Button className="choice-btn" disabled={this.state.currentSelection.length === 0 || isNewTemplate} onClick={this.submitData}>选择模板</Button>
         </div>
 
         <div className='btn-block'>
@@ -147,7 +148,7 @@ class TemplateInput extends Component {
           <Button disabled={isNewTemplate} onClick={() => this.sortTemplate(2)}>向下移动</Button>
           <Button onClick={this.handleNewOrSave}>{isNewTemplate ? <span>保存模板</span> : <span>新增模板</span>}</Button>
           <Button onClick={this.handleCancelOrDelete}>{isNewTemplate ? <span>取消新增</span> : <span>删除模板</span>}</Button>
-          <Button className="choice-btn" disabled={this.state.currentSelection.length === 0 || isNewTemplate} onClick={this.submitData}>选择模板</Button>
+          
         </div>
       </div>
     )

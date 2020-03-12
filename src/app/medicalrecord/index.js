@@ -233,7 +233,11 @@ export default class MedicalRecord extends Component {
    * @param name        键名路径
    * @param value       值
    */
-  handleFormChange = (path, name, value) => {
+  handleFormChange = (path, name, value, error) => {
+    if(error) {
+      message.error(error);
+      return;
+    }
     const { specialistemrData, currentTreeKeys } = this.state;
     const index = specialistemrData.findIndex(item => item.id.toString() === currentTreeKeys[0]);
     let obj = JSON.parse(JSON.stringify(specialistemrData[index]));
@@ -284,12 +288,7 @@ export default class MedicalRecord extends Component {
         const index = specialistemrData.findIndex(item => item['id'].toString() === currentTreeKeys[0]);
         // 整合bp的格式
         const { formType } = specialistemrData[index];
-        if(formType !== '2'){
-          specialistemrData[index]['physical_check_up']['bp'] = '0';
-          if(specialistemrData[index].id < 0) {
-            specialistemrData[index].id = "";
-          }
-        }
+        specialistemrData[index]['physical_check_up']['bp'] = '0'; 
         if(!specialistemrData[index].hasOwnProperty('downs_screen')) {
           specialistemrData[index]['downs_screen'] = {};
         }
@@ -301,15 +300,20 @@ export default class MedicalRecord extends Component {
             v.id = "";
           })
         }
-        
+        // 新建置空
+        if(specialistemrData[index].id < 0) {
+          specialistemrData[index].id = "";
+        }
         // 专科病历主体保存
         service.medicalrecord.savespecialistemrdetail(specialistemrData[index]).then(res => {
-          message.success('成功保存');
-          service.medicalrecord.getspecialistemr().then(res => {
-            if (res.code === "200" || res.code === 200) {
-              this.setState({ specialistemrList: res.object.list, currentTreeKeys: '0' }, () => { })
-            }
-          });
+          if(res.object.code === "200") {
+            message.success('成功保存');
+            service.medicalrecord.getspecialistemr().then(res => {
+              if (res.code === "200" || res.code === 200) {
+                this.setState({ specialistemrList: res.object.list, currentTreeKeys: '0' }, () => { })
+              }
+            });
+          }
         }).catch(err => console.log(err));
         // 这里要去重
         // ultrasoundMiddleData = [...new Set(ultrasoundMiddleData)];
@@ -516,20 +520,25 @@ export default class MedicalRecord extends Component {
       ckweek, createdate
     } = renderData;
     const { isDownsScreenChecked, isThalassemiaChecked, isUltrasoundChecked, uFetusActiveKey, ultrasoundMiddleData, operationHistoryData } = this.state;
+    const defaultActiveKeys = [
+      'fetus-0', 'fetus-1', 'fetus-2', 'fetus-3', 'fetus-4', 'fetus-5', 'fetus-6', 'fetus-7', 'fetus-8', 'fetus-9', 'fetus-10', 'fetus-11',
+      'genetic-0', 'genetic-1', 'genetic-2', 'genetic-3', 'genetic-4', 'genetic-5', 'genetic-6', 'genetic-7', 'genetic-8', 'genetic-9',
+      'fuzhen-0', 'fuzhen-1', 'fuzhen-2', 'fuzhen-3', 'fuzhen-4', 'fuzhen-5', 'fuzhen-6'
+    ]
     switch(formType){
       case '1':
         return (
-          <Collapse defaultActiveKey={['fetus-0', 'fetus-1', 'fetus-2', 'fetus-3', 'fetus-4', 'fetus-5', 'fetus-6', 'fetus-7', 'fetus-8', 'fetus-9', 'fetus-10', 'fetus-11']}>
-            <Panel header="主诉" key="fetus-0">{formRender({ chief_complaint: chief_complaint }, mdConfig.chief_complaint_config(this.openModal), (_, { name, value }) => this.handleFormChange("", name, value))}</Panel>
-            <Panel header="预产期" key="fetus-1">{formRender(pregnancy_history, mdConfig.pregnancy_history_config(), (_, { name, value }) => this.handleFormChange("pregnancy_history", name, value))}</Panel>
-            <Panel header="现病史" key="fetus-2">{formRender({ medical_history: medical_history }, mdConfig.medical_history_config(this.openModal), (_, { name, value }) => this.handleFormChange("", name, value))}</Panel>
+          <Collapse defaultActiveKey={defaultActiveKeys}>
+            <Panel header="主诉" key="fetus-0">{formRender({ chief_complaint: chief_complaint }, mdConfig.chief_complaint_config(this.openModal), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}</Panel>
+            <Panel header="预产期" key="fetus-1">{formRender(pregnancy_history, mdConfig.pregnancy_history_config(), (_, { name, value, error }) => this.handleFormChange("pregnancy_history", name, value, error))}</Panel>
+            <Panel header="现病史" key="fetus-2">{formRender({ medical_history: medical_history }, mdConfig.medical_history_config(this.openModal), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}</Panel>
             <Panel header="唐氏筛查" key="fetus-3">
               <Checkbox checked={!isDownsScreenChecked} onChange={(e) => this.handleCheckBox(e.target.checked, 'd')}>未检查</Checkbox>
               {!isDownsScreenChecked ? null : (
                 <div>
-                  {formRender(downs_screen.hasOwnProperty('early') ? downs_screen['early'] : {}, mdConfig.early_downs_screen_config(), (_, { name, value }) => this.handleFormChange("downs_screen.early", name, value))}
-                  {formRender(downs_screen.hasOwnProperty('middle') ? downs_screen['middle'] : {}, mdConfig.middle_downs_screen_config(), (_, { name, value }) => this.handleFormChange("downs_screen.middle", name, value))}
-                  {formRender(downs_screen.hasOwnProperty('nipt') ? downs_screen['nipt'] : {}, mdConfig.NIPT_downs_screen_config(), (_, { name, value }) => this.handleFormChange("downs_screen.nipt", name, value))}
+                  {formRender(downs_screen.hasOwnProperty('early') ? downs_screen['early'] : {}, mdConfig.early_downs_screen_config(), (_, { name, value, error }) => this.handleFormChange("downs_screen.early", name, value, error))}
+                  {formRender(downs_screen.hasOwnProperty('middle') ? downs_screen['middle'] : {}, mdConfig.middle_downs_screen_config(), (_, { name, value, error }) => this.handleFormChange("downs_screen.middle", name, value, error))}
+                  {formRender(downs_screen.hasOwnProperty('nipt') ? downs_screen['nipt'] : {}, mdConfig.NIPT_downs_screen_config(), (_, { name, value, error }) => this.handleFormChange("downs_screen.nipt", name, value, error))}
                 </div>
               )}
             </Panel>
@@ -537,8 +546,8 @@ export default class MedicalRecord extends Component {
               <Checkbox checked={!isThalassemiaChecked} onChange={(e) => this.handleCheckBox(e.target.checked, 't')}>未检查</Checkbox>
               {!isThalassemiaChecked ? null : (
                 <div>
-                  {formRender(thalassemia.hasOwnProperty('wife') ? thalassemia['wife'] : {}, mdConfig.wife_thalassemia(), (_, { name, value }) => this.handleFormChange("thalassemia.wife", name, value))}
-                  {formRender(thalassemia.hasOwnProperty('husband') ? thalassemia['husband'] : {}, mdConfig.husband_thalassemia(), (_, { name, value }) => this.handleFormChange("thalassemia.husband", name, value))}
+                  {formRender(thalassemia.hasOwnProperty('wife') ? thalassemia['wife'] : {}, mdConfig.wife_thalassemia(), (_, { name, value, error }) => this.handleFormChange("thalassemia.wife", name, value, error))}
+                  {formRender(thalassemia.hasOwnProperty('husband') ? thalassemia['husband'] : {}, mdConfig.husband_thalassemia(), (_, { name, value, error }) => this.handleFormChange("thalassemia.husband", name, value, error))}
                 </div>
               )}
             </Panel>
@@ -546,7 +555,7 @@ export default class MedicalRecord extends Component {
               <Checkbox checked={!isUltrasoundChecked} onChange={(e) => this.handleCheckBox(e.target.checked, 'u')}>未检查</Checkbox>
               {!isUltrasoundChecked ? null : (
                 <div>
-                  <div>{formRender({ menopause: ultrasound['menopause'] }, mdConfig.ultrasound_menopause_config(), (_, { name, value }) => this.handleFormChange("ultrasound", name, value))}</div>
+                  <div>{formRender({ menopause: ultrasound['menopause'] }, mdConfig.ultrasound_menopause_config(), (_, { name, value, error }) => this.handleFormChange("ultrasound", name, value, error))}</div>
                   <div>
                     <Tabs
                       activeKey={uFetusActiveKey}
@@ -562,54 +571,54 @@ export default class MedicalRecord extends Component {
                 </div>
               )}
             </Panel>
-            <Panel header="其他检查" key="fetus-6">{formRender({ other_exam: other_exam }, mdConfig.other_exam_config(this.openModal), (_, { name, value }) => this.handleFormChange("", name, value))}</Panel>
+            <Panel header="其他检查" key="fetus-6">{formRender({ other_exam: other_exam }, mdConfig.other_exam_config(this.openModal), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}</Panel>
             <Panel header="既往史" key="fetus-7">
               <div>
-                {formRender(past_medical_history, mdConfig.past_medical_history_config(), (_, { name, value }) => this.handleFormChange("past_medical_history", name, value))}
+                {formRender(past_medical_history, mdConfig.past_medical_history_config(), (_, { name, value, error }) => this.handleFormChange("past_medical_history", name, value, error))}
               </div>
               <div>
                 {formRender({ operation_history: operationHistoryData }, mdConfig.operation_history_config(), (_, { value }) => this.handleOperationEdit(value))}
               </div>
             </Panel>
-            <Panel header="家族史" key="fetus-8">{formRender(family_history, mdConfig.family_history_config(), (_, { name, value }) => this.handleFormChange("family_history", name, value))}</Panel>
-            <Panel header="体格检查" key="fetus-9">{formRender(physical_check_up, mdConfig.physical_check_up_config(), (_, { name, value }) => this.handleFormChange("physical_check_up", name, value))}</Panel>
-            <Panel header="诊断" key="fetus-10">{formRender({ diagnosis: diagnosis }, mdConfig.diagnosis_config(this.openModal), (_, { name, value }) => this.handleFormChange("", name, value))}</Panel>
-            <Panel header="处理" key="fetus-11">{formRender({ treatment: treatment }, mdConfig.treatment_config(this.openModal), (_, { name, value }) => this.handleFormChange("", name, value))}</Panel>
+            <Panel header="家族史" key="fetus-8">{formRender(family_history, mdConfig.family_history_config(), (_, { name, value, error }) => this.handleFormChange("family_history", name, value, error))}</Panel>
+            <Panel header="体格检查" key="fetus-9">{formRender(physical_check_up, mdConfig.physical_check_up_config(), (_, { name, value, error }) => this.handleFormChange("physical_check_up", name, value, error))}</Panel>
+            <Panel header="诊断" key="fetus-10">{formRender({ diagnosis: diagnosis }, mdConfig.diagnosis_config(this.openModal), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}</Panel>
+            <Panel header="处理" key="fetus-11">{formRender({ treatment: treatment }, mdConfig.treatment_config(this.openModal), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}</Panel>
           </Collapse>
         );
       case '2':
         return (
-          <Collapse defaultActiveKey={['genetic-0', 'genetic-1', 'genetic-2', 'genetic-3', 'genetic-4', 'genetic-5', 'genetic-6', 'genetic-7', 'genetic-8', 'genetic-9']}>
-            <Panel header="主诉" key="genetic-0">{formRender({ chief_complaint: chief_complaint }, mdConfig.chief_complaint_config(this.openModal), (_, { name, value }) => this.handleFormChange("", name, value))}</Panel>
-            <Panel header="预产期" key="genetic-1">{formRender(pregnancy_history, mdConfig.pregnancy_history_config(), (_, { name, value }) => this.handleFormChange("pregnancy_history", name, value))}</Panel>
-            <Panel header="现病史" key="genetic-2">{formRender({ medical_history: medical_history }, mdConfig.medical_history_config(this.openModal), (_, { name, value }) => this.handleFormChange("", name, value))}</Panel>
+          <Collapse defaultActiveKey={defaultActiveKeys}>
+            <Panel header="主诉" key="genetic-0">{formRender({ chief_complaint: chief_complaint }, mdConfig.chief_complaint_config(this.openModal), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}</Panel>
+            <Panel header="预产期" key="genetic-1">{formRender(pregnancy_history, mdConfig.pregnancy_history_config(), (_, { name, value, error }) => this.handleFormChange("pregnancy_history", name, value, error))}</Panel>
+            <Panel header="现病史" key="genetic-2">{formRender({ medical_history: medical_history }, mdConfig.medical_history_config(this.openModal), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}</Panel>
             <Panel header="地贫/血型检测" key="genetic-3">
               <Checkbox checked={!isThalassemiaChecked} onChange={(e) => this.handleCheckBox(e.target.checked, 't')}>未检查</Checkbox>
               {!isThalassemiaChecked ? null : (
                 <div>
-                  {formRender(thalassemia.hasOwnProperty('wife') ? thalassemia['wife'] : {}, mdConfig.wife_thalassemia(), (_, { name, value }) => this.handleFormChange("thalassemia.wife", name, value))}
-                  {formRender(thalassemia.hasOwnProperty('husband') ? thalassemia['husband'] : {}, mdConfig.husband_thalassemia(), (_, { name, value }) => this.handleFormChange("thalassemia.husband", name, value))}
+                  {formRender(thalassemia.hasOwnProperty('wife') ? thalassemia['wife'] : {}, mdConfig.wife_thalassemia(), (_, { name, value, error }) => this.handleFormChange("thalassemia.wife", name, value, error))}
+                  {formRender(thalassemia.hasOwnProperty('husband') ? thalassemia['husband'] : {}, mdConfig.husband_thalassemia(), (_, { name, value, error }) => this.handleFormChange("thalassemia.husband", name, value, error))}
                 </div>
               )}
             </Panel>
-            <Panel header="染色体核型" key="genetic-4">{formRender({ karyotype: karyotype }, mdConfig.karyotype_config(this.openModal), (_, { name, value }) => this.handleFormChange("", name, value))}</Panel>
-            <Panel header="其他检查" key="genetic-5">{formRender({ other_exam: other_exam }, mdConfig.other_exam_config(this.openModal), (_, { name, value }) => this.handleFormChange("", name, value))}</Panel>
-            <Panel header="既往史" key="genetic-6">{formRender(past_medical_history, mdConfig.past_medical_history_config(), (_, { name, value }) => this.handleFormChange("past_medical_history", name, value))}</Panel>
-            <Panel header="家族史" key="genetic-7">{formRender(family_history, mdConfig.family_history_config(), (_, { name, value }) => this.handleFormChange("family_history", name, value))}</Panel>
-            <Panel header="诊断" key="genetic-8">{formRender({ diagnosis: diagnosis }, mdConfig.diagnosis_config(this.openModal), (_, { name, value }) => this.handleFormChange("", name, value))}</Panel>
-            <Panel header="处理" key="genetic-9">{formRender({ treatment: treatment }, mdConfig.treatment_config(this.openModal), (_, { name, value }) => this.handleFormChange("", name, value))}</Panel>
+            <Panel header="染色体核型" key="genetic-4">{formRender({ karyotype: karyotype }, mdConfig.karyotype_config(this.openModal), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}</Panel>
+            <Panel header="其他检查" key="genetic-5">{formRender({ other_exam: other_exam }, mdConfig.other_exam_config(this.openModal), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}</Panel>
+            <Panel header="既往史" key="genetic-6">{formRender(past_medical_history, mdConfig.past_medical_history_config(), (_, { name, value, error }) => this.handleFormChange("past_medical_history", name, value, error))}</Panel>
+            <Panel header="家族史" key="genetic-7">{formRender(family_history, mdConfig.family_history_config(), (_, { name, value, error }) => this.handleFormChange("family_history", name, value, error))}</Panel>
+            <Panel header="诊断" key="genetic-8">{formRender({ diagnosis: diagnosis }, mdConfig.diagnosis_config(this.openModal), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}</Panel>
+            <Panel header="处理" key="genetic-9">{formRender({ treatment: treatment }, mdConfig.treatment_config(this.openModal), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}</Panel>
           </Collapse>
         );
       case '3':
         return (
-          <Collapse defaultActiveKey={['fuzhen-0', 'fuzhen-1', 'fuzhen-2', 'fuzhen-3', 'fuzhen-4', 'fuzhen-5', 'fuzhen-6']}>
-            <Panel header="复诊日期+孕周" key="fuzhen-0">{formRender({ ckweek: ckweek, createdate: createdate || '' }, mdConfig.ckweekAndcreatdate(), (_, { name, value }) => this.handleFormChange("", name, value))}</Panel>
-            <Panel header="主诉" key="fuzhen-1">{formRender({ chief_complaint: chief_complaint }, mdConfig.chief_complaint_config(this.openModal), (_, { name, value }) => this.handleFormChange("", name, value))}</Panel>
-            <Panel header="病情变化" key="fuzhen-2">{formRender({ stateChange: stateChange }, mdConfig.stateChange_config(this.openModal), (_, { name, value }) => this.handleFormChange("", name, value))}</Panel>
-            <Panel header="体格检查" key="fuzhen-3">{formRender(physical_check_up, mdConfig.physical_check_up_config(), (_, { name, value }) => this.handleFormChange("physical_check_up", name, value))}</Panel>
-            <Panel header="前次检查结果" key="fuzhen-4">{formRender({ lastResult: lastResult }, mdConfig.lastResult_config(this.openModal), (_, { name, value }) => this.handleFormChange("", name, value))}</Panel>
-            <Panel header="诊断" key="fuzhen-5">{formRender({ diagnosis: diagnosis }, mdConfig.diagnosis_config(this.openModal), (_, { name, value }) => this.handleFormChange("", name, value))}</Panel>
-            <Panel header="处理" key="fuzhen-6">{formRender({ treatment: treatment }, mdConfig.treatment_config(this.openModal), (_, { name, value }) => this.handleFormChange("", name, value))}</Panel>
+          <Collapse defaultActiveKey={defaultActiveKeys}>
+            <Panel header="复诊日期+孕周" key="fuzhen-0">{formRender({ ckweek: ckweek, createdate: createdate || '' }, mdConfig.ckweekAndcreatdate(), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}</Panel>
+            <Panel header="主诉" key="fuzhen-1">{formRender({ chief_complaint: chief_complaint }, mdConfig.chief_complaint_config(this.openModal), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}</Panel>
+            <Panel header="病情变化" key="fuzhen-2">{formRender({ stateChange: stateChange }, mdConfig.stateChange_config(this.openModal), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}</Panel>
+            <Panel header="体格检查" key="fuzhen-3">{formRender(physical_check_up, mdConfig.physical_check_up_config(), (_, { name, value, error }) => this.handleFormChange("physical_check_up", name, value, error))}</Panel>
+            <Panel header="前次检查结果" key="fuzhen-4">{formRender({ lastResult: lastResult }, mdConfig.lastResult_config(this.openModal), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}</Panel>
+            <Panel header="诊断" key="fuzhen-5">{formRender({ diagnosis: diagnosis }, mdConfig.diagnosis_config(this.openModal), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}</Panel>
+            <Panel header="处理" key="fuzhen-6">{formRender({ treatment: treatment }, mdConfig.treatment_config(this.openModal), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}</Panel>
         </Collapse>
         );
       default:

@@ -1,24 +1,26 @@
 /**
  * 返回的message里面带*的标识error级别，否则就是warning级别
+ * 2020-03-12
+ * 修改required正则
  */
 
 const validationFns = {
   required: function (value) {
     if (!/\S/.test(value) || (typeof value === 'object' && !Object.keys(value || {}).filter(i => !/^$/.test(i)).length)) {
-      return '*这个值不可为空';
+      return '*此值不可为空';
     }
   },
   number: function (value) {
     if (value && !/^\d+(\.\d+)?$/.test(value)) {
-      return '*只能输入数字';
+      return '*请输入数字';
     }
   },
   rang: function (min, max, value) {
     if (value && min && value < +min) {
-      return '不能小于' + min;
+      return '*不能小于' + min;
     }
     if (value && max && value > +max) {
-      return '不能大于' + max;
+      return '*不能大于' + max;
     }
   },
 };
@@ -53,7 +55,6 @@ export default function (validator, value) {
       }
     }
   } else if (typeof validator === 'function') {
-    console.log('idcard')
     return validatorFn(validator);
   }
 }

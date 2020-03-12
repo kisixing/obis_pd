@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Row, Col, Input, Button, Select, Modal, Tree, Icon } from 'antd';
+import { Row, Col, Input, Button, Select, Modal, Tree, Icon, message } from 'antd';
 
 import router from "../utils/router";
 import bundle from "../utils/bundle";
@@ -55,6 +55,8 @@ export default class App extends Component {
   handleStoreChange = () => {
     const { userData } = store.getState();
     // 当本页面userid与store不同
+    console.log(userData);
+    console.log(this.state.userData);
     if( this.state.userData.userid !== userData.userid &&  this.state.userData.userid) {
       this.findUser("","","","",userData.userid);
     }
@@ -264,7 +266,12 @@ export default class App extends Component {
   // id - userid
   findUser = (menzhenNumber, IDCard, phoneNumber, chanjno, id) => {
     service.findUser({ usermcno: menzhenNumber, useridno: IDCard, usermobile: phoneNumber, chanjno, id }).then(res => {
-      const { yunc, chanc , gesmoc, gesexpect, usermcno, useridno, usermobile } = res.object;
+      // 在service中处理了2个 记住！！！
+      if(!res.object.userid) {
+        message.warning('无相关信息，请确认已经进行建册');
+        return;
+      } 
+      const { yunc, chanc, usermcno, useridno, usermobile } = res.object;
       // 处理孕产
       res.object['tuseryunchan'] = `${yunc}/${chanc}`;
       res.object['userid'] = res.object.id;
@@ -272,7 +279,7 @@ export default class App extends Component {
       let newSearchObj = {menzhenNumber: usermcno,IDCard: useridno,phoneNumber: usermobile}
       // 设置storeuserData + 孕产信息
       store.dispatch(setUserData(res.object));
-      this.setState({ userData: res.object,searchObj: newSearchObj});
+      this.setState({ userData: res.object,searchObj: newSearchObj, menuIndex: 0});
     })
   }
 
