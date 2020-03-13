@@ -178,7 +178,7 @@ export default class MedicalRecord extends Component {
         specialistemrData[index]['ultrasound'] = {};
         specialistemrData[index]['ultrasound']['fetus'] = [];
       }
-      specialistemrData[index].ultrasound.fetus.push({ id: Math.random(), userId: specialistemrData.userid });
+      specialistemrData[index].ultrasound.fetus.push({ id: -Math.random(), userId: specialistemrData.userid });
     }
     this.setState({ specialistemrData });
   };
@@ -297,7 +297,9 @@ export default class MedicalRecord extends Component {
         }
         if(formType === '1') {
           specialistemrData[index].ultrasound.fetus.forEach(v => {
-            v.id = "";
+            if(Number(v.id) < 0) {
+              v.id = "";
+            }
           })
         }
         // 新建置空
@@ -306,7 +308,8 @@ export default class MedicalRecord extends Component {
         }
         // 专科病历主体保存
         service.medicalrecord.savespecialistemrdetail(specialistemrData[index]).then(res => {
-          if(res.object.code === "200") {
+          console.log(res);
+          if(res.code === "200") {
             message.success('成功保存');
             service.medicalrecord.getspecialistemr().then(res => {
               if (res.code === "200" || res.code === 200) {
@@ -315,25 +318,20 @@ export default class MedicalRecord extends Component {
             });
           }
         }).catch(err => console.log(err));
-        // 这里要去重
-        // ultrasoundMiddleData = [...new Set(ultrasoundMiddleData)];
-        for(let i = 0 ; i < ultrasoundMiddleData.length ; i++) {
-          if(!ultrasoundMiddleData[i].docUniqueid){
-            ultrasoundMiddleData.splice(i,1);
-            break;
-          }
-        }
-        for(let i = 0 ; i < operationHistoryData.length ; i++) {
-          if(!operationHistoryData[i].docUniqueid){
-            operationHistoryData.splice(i,1);
-            break;
-          }
-        }
         // TODO 暂时不保存 手术
-        ultrasoundMiddleData.forEach((v) => {if(Number(v.docUniqueid) < 0){v.docUniqueid = "";};});
-        operationHistoryData.forEach((v) => {if(Number(v.docUniqueid) < 0){v.docUniqueid = "";};});
+        ultrasoundMiddleData.forEach((v) => {
+          if(Number(v.docUniqueid) < 0){
+            v.docUniqueid = "";
+          };
+        });
+        operationHistoryData.forEach((v) => {
+          v.userid = operationHistoryData.userid;
+          if(Number(v.docUniqueid) < 0){
+            v.docUniqueid = "";
+          };
+        });
         service.ultrasound.writePrenatalPacsMg({ pacsMgVOList: ultrasoundMiddleData, recordid: currentTreeKeys[0] }).then(res => console.log(res));
-        // service.medicalrecord.writeOperationHistory({operationHistorys: operationHistoryData}).then(res => console.log(res));
+        service.medicalrecord.writeOperationHistory({operationHistorys: operationHistoryData }).then(res => console.log(res));
       } else {
         // 提示
         message.error('请填写所有信息后再次提交');
@@ -390,96 +388,82 @@ export default class MedicalRecord extends Component {
   // 处理中孕超声修改 只处理删除 ，在handleSave统一处理增加和修改
   handleUltraSoundMiddleEdit =  (newData) => {
     const { ultrasoundMiddleData } = this.state;
-    let oldData = ultrasoundMiddleData.map(v => JSON.parse(JSON.stringify(v)));
-    const oLen = oldData.length;
-    const nLen = newData.length;
-    for(let i = oLen - 1; i >= 0; i--){
-      for(let j = nLen - 1; j >= 0 ; j--){
-        // 新建 -- math.random 需要去重
-        if(!newData[j].docUniqueid){
-          console.log(newData[j]);
-          newData[j].docUniqueid =  `-${Math.random()}`;
-          newData[j].operationWriteType = "0";
-          newData[j].isShow = true;
-          oldData.push(newData[j]);
-          break;
-        }
-        // 找到 - 修改
-        if(oldData[i].docUniqueid === newData[j].docUniqueid && Number(oldData[i].docUniqueid) > 0){
-          newData[j].operationWriteType = "1";
-          newData[j].isShow = true;
-          oldData[i] = newData[j];
-          break;
-        }
-        // 未找到 - 删除
-        if(j === 0 && Number(oldData[i].docUniqueid) > 0){
-          oldData[i].operationWriteType = "2";
-          oldData[i].isShow = false;
-        }
+    console.log(ultrasoundMiddleData);
+    console.log(newData);
+    let oldData = ultrasoundMiddleData;
+    // 1.遍历新数据 - 用于新增
+    for(let i = 0 ; i < newData.length; i++){
+      if(newData[i].docUniqueid === "" || !newData[i].docUniqueid){
+        console.log('新建'); // 新建
+        newData[i].docUniqueid = `-${Math.random()}`;
+        newData[i].writeOperationType = "0";
+        newData[i].isShow = true;
+        break;
       }
     }
-    if(oLen === 0) {
-      oldData = newData.map(v => {
-        v.operationWriteType = "1";
-        v.isShow = true;
-        return v;
-      })
+    let index = -1;
+    // 遍历旧数据 删除与修改
+    for(let j = 0; j < oldData.length; j++){
+      let isFind = false,index = -1;
+      for(let i = 0 ; i< newData.length ; i++){
+        if(oldData[j].docUniqueid === newData[i].docUniqueid) {
+          index = i;
+          isFind = true;
+          break;
+        }
+      }
+      if(!isFind){
+        oldData[j].writeOperationType = "2";
+        oldData[j].isShow = false;
+        newData.push(oldData[j]);
+      }else if(isFind && Number(newData[index].docUniqueid) > 0) {
+        oldData[j].writeOperationType = "1";
+        oldData[j].isShow = true;
+        newData.splice(index, 1, oldData[j]);
+      }
     }
-    if(nLen === 0) {
-      console.log(oldData);
-      oldData = oldData.map(v => {
-        v.operationWriteType = "2";
-        v.isShow = false;
-        return v;
-      })
-    }
-    this.setState({ultrasoundMiddleData: oldData},() => console.log(this.state.ultrasoundMiddleData));
+
+
+    console.log(newData);
+    this.setState({ultrasoundMiddleData: newData});
   }
 
   // 处理手术记录输入
   handleOperationEdit = (newData) => {
-    let oldData = this.state.operationHistoryData.map(v => JSON.parse(JSON.stringify(v)));
-    const oLen = oldData.length;
-    const nLen = newData.length;
-    for(let i = oLen - 1; i >= 0; i--){
-      for(let j = nLen - 1; j >= 0 ; j--){
-        // 新建
-        if(!newData[j].docUniqueid){
-          newData[j].docUniqueid = `-${Math.random()}`;
-          newData[j].operationWriteType = "0";
-          newData[j].isShow = true;
-          oldData.push(newData[j]);
-          break;
-        }
-        // 找到 - 修改
-        if(oldData[i].docUniqueid === newData[j].docUniqueid && Number(oldData[i].docUniqueid) > 0){
-          newData[j].operationWriteType = "1";
-          newData[j].isShow = true;
-          oldData[i] = newData[j];
-          break;
-        }
-        // 未找到 - 删除
-        if(j === 0 && Number(oldData[i].docUniqueid) > 0){
-          oldData[i].operationWriteType = "2";
-          oldData[i].isShow = false;
-        }
+    const { operationHistoryData } = this.state;
+    let oldData = operationHistoryData;
+    // 1.遍历新数据 - 用于新增
+    for(let i = 0 ; i < newData.length; i++){
+      if(newData[i].docUniqueid === "" || !newData[i].docUniqueid){
+        console.log('新建'); // 新建
+        newData[i].docUniqueid = `-${Math.random()}`;
+        newData[i].writeOperationType = "0";
+        newData[i].isShow = true;
+        break;
       }
     }
-    if(oLen === 0) {
-      oldData = newData.map(v => {
-        v.operationWriteType = "1";
-        v.isShow = true;
-        return v;
-      })
+    let index = -1;
+    // 遍历旧数据 删除与修改
+    for(let j = 0; j < oldData.length; j++){
+      let isFind = false;
+      for(let i = 0 ; i< newData.length ; i++){
+        if(oldData[j].docUniqueid === newData[i].docUniqueid) {
+          isFind = true;
+          index = j;
+          break;
+        }
+      }
+      if(!isFind){
+        oldData[j].writeOperationType = "2";
+        oldData[j].isShow = false;
+        newData.push(oldData[j]);
+      }else if(isFind && Number(newData[index].docUniqueid) > 0) {
+        oldData[j].writeOperationType = "1";
+        oldData[j].isShow = true;
+        newData.splice(index, 1, oldData[j]);
+      }
     }
-    if(nLen === 0) {
-      oldData = oldData.map(v => {
-        v.operationWriteType = "2";
-        v.isShow = false;
-        return v;
-      })
-    }
-    this.setState({operationHistoryData: oldData},() => console.log(this.state.operationHistoryData));
+    this.setState({operationHistoryData: newData});
   }
   /* ========================= 渲染方法 ============================== */
   // 渲染左侧记录树 - 二级

@@ -138,10 +138,10 @@ export default class Operation extends Component{
       <div id="form-block">
         <Collapse defaultActiveKey={["operationItem","preoperative_record","operative_procedure","surgery"]}>
           <Panel header="手术项目" key="operationItem">
-            {formRender(renderData['operationItem'] || {},formRenderConfig[`config${templateId}`]['operationItem_config'](), (event,{name, value}) => this.handleFormChange("operationItem",name,value,event))}
+            {formRender(renderData['operationItem'] || {},formRenderConfig[`config${templateId}`]['operationItem_config'](), (_,{name, value, error}) => this.handleFormChange("operationItem",name,value, error))}
           </Panel>
           <Panel header="术前记录" key="preoperative_record">
-            {formRender(renderData['preoperative_record'] || {},formRenderConfig[`config${templateId}`]['preoperative_record_config'](), (_,{name, value}) => this.handleFormChange("preoperative_record",name,value))}
+            {formRender(renderData['preoperative_record'] || {},formRenderConfig[`config${templateId}`]['preoperative_record_config'](), (_,{name, value, error}) => this.handleFormChange("preoperative_record",name,value, error))}
           </Panel>
           <Panel header="手术过程" key="operative_procedure">
             <Tabs
@@ -154,7 +154,7 @@ export default class Operation extends Component{
             </Tabs>
           </Panel>
           <Panel header="术后情况" key="surgery">
-            {formRender(renderData['surgery'],formRenderConfig[`config${templateId}`]['surgery_config'](this.openModal), (_,{name, value}) => this.handleFormChange("surgery",name,value))}
+            {formRender(renderData['surgery'],formRenderConfig[`config${templateId}`]['surgery_config'](this.openModal), (_,{name, value, error}) => this.handleFormChange("surgery",name,value, error))}
           </Panel>
         </Collapse>
       </div>
@@ -166,7 +166,7 @@ export default class Operation extends Component{
     if(templateId !== 8) return null;
     return (
       <div>
-        {formRender(renderData['ward'], formRenderConfig['ward_config'](this.openModal), (_,{value, name}) => this.handleFormChange('ward',name,value))}
+        {formRender(renderData['ward'], formRenderConfig['ward_config'](this.openModal), (_,{value, name, error}) => this.handleFormChange('ward',name,value, error))}
       </div>
     )
   };
@@ -175,7 +175,7 @@ export default class Operation extends Component{
     if(fetusData.length === 0) return null;
     return fetusData.map((v, index) => (
       <TabPane tab={`胎儿${index+1}`} key={v.id}>
-        {formRender(v, formRenderConfig[`config${templateId}`][`operative_procedure_config`](this.openModal), (_,{name, value}) => this.handleFormChange(`operative_procedure.fetus-${index}`,name,value))}
+        {formRender(v, formRenderConfig[`config${templateId}`][`operative_procedure_config`](this.openModal), (_,{name, value, error}) => this.handleFormChange(`operative_procedure.fetus-${index}`,name,value,error))}
       </TabPane>
     ));
   };
@@ -276,7 +276,11 @@ export default class Operation extends Component{
     }
   };
 
-  handleFormChange = (path, name, value) => {
+  handleFormChange = (path, name, value, error) => {
+    if(error) {
+      message.error(error);
+      return;
+    }
     const { currentShowData, operationNewDataList, currentFetusKey } = this.state;
     if(name === 'operationName') {
       // 这里只可能存在 0~7 8种手术模板

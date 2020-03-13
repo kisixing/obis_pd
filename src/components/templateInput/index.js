@@ -107,8 +107,15 @@ class TemplateInput extends Component {
       this.setState({ templateList, isNewTemplate: !isNewTemplate, currentInput: '' });
     } else if (!isNewTemplate) {
       // Delete - 同时需要删除2个模板，需要和后端协商
+      let deleteTempaltes = [];
+      currentSelection.forEach(key => {
+        const index = templateList.findIndex(item => item.key === key);
+        if(index !== -1) {
+          deleteTempaltes.push({key: templateList[index].key})
+        }
+      })
       console.log(currentSelection);
-      service.template.deleteTemplate({ key: currentSelection[0] }).then(res => {
+      service.template.deleteTemplate(deleteTempaltes).then(res => {
         this.getTemplateList();
       })
     }

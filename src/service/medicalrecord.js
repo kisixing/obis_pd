@@ -53,10 +53,10 @@ export default {
    */
   writeOperationHistory: function (entity) {
     return this.userId().then(r => {
-      entity.operationHistorys.forEach(v => {
-        v.userid = r.object.userid;
-      });
-      myAxios.post(`outpatientWriteRestful/writeOperationHistory`,{userid: r.object.userid, operationHistory: entity.operationHistorys})
+      // entity.operationHistorys.forEach(v => {
+      //   v.userid = r.object.userid;
+      // });
+      myAxios.post(`/outpatientWriteRestful/writeOperationHistory`,{userid: r.object.userid, operationHistorys: entity.operationHistorys})
     })
   }
 }

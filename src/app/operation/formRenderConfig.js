@@ -48,14 +48,14 @@ const operationItem_config = () => ({
   rows: [
     {
       columns: [
-        {name: 'operationName[手术名称]', type: 'select', options: operation_itemsOptions, span: 6},
-        {name: 'operationLevel[手术级别]', type: 'select', options: operationLevelOptions, span: 6},
-        {name: 'incisionType[切口类别]', type: 'select', options: incisionTypeOptions, span: 6}
+        {name: 'operationName[手术名称]', type: 'select', valid: 'required', options: operation_itemsOptions, span: 6},
+        {name: 'operationLevel[手术级别]', type: 'select', valid: 'required', options: operationLevelOptions, span: 6},
+        {name: 'incisionType[切口类别]', type: 'select', valid: 'required',options: incisionTypeOptions, span: 6}
       ]
     },
     {
       columns: [
-        {name: 'rePuncture[是否再次穿刺]', type: 'checkinput-5', radio: true, options: nhOptions }
+        {name: 'rePuncture[是否再次穿刺]', type: 'checkinput-5',valid: 'required', radio: true, options: nhOptions }
       ]
     }
   ]

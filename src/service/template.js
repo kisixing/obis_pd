@@ -24,8 +24,8 @@ export default {
    * @param key
    * @returns {AxiosPromise}
    */
-  deleteTemplate: function({key}) {
-    return myAxios.delete(templateUri,{data: {key}})
+  deleteTemplate: function(entity) {
+    return myAxios.delete(templateUri, {data:entity})
   },
   /**
    * 移动模板

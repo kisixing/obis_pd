@@ -124,7 +124,7 @@ export const shoushushiColumns = [
 	},
 	{
 		title: '手术日期',
-		key: 'date_of_operation',
+		key: 'date',
 		type: 'date',
 		mode: "ymd"
 	},
@@ -135,7 +135,7 @@ export const shoushushiColumns = [
 	},
 	{
 		title: '术后病理',
-		key: 'pathology',
+		key: 'postoperativePathology',
 		type: 'input'
 	},
 ]

@@ -173,8 +173,6 @@ class FormItem extends Component {
       const { entity, valid, onChange } = this.props;
       const { name, value } = this.state;
       const error = validFn(valid, value);
-      console.log(name);
-      console.log(value);
       this.setState({
         error: error
       }, () => resolve());
@@ -356,7 +354,6 @@ export default function formRender(entity, config, onChange, { children, ...prop
  * 触发当前dom下的所有验证/重置等操作
  */
 export function fireForm(parentNode, type) {
-  console.log(parentNode.querySelectorAll('.form-item'));
   return new Promise(resolve => {
     Promise.all(Array.prototype.map.call(parentNode.querySelectorAll('.form-item'), el => el.fireReact(type))).then(function () {
       resolve(!parentNode.querySelector('.form-error'));
