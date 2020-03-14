@@ -15,6 +15,7 @@ import './index.less';
 const NEW_TEMPLATE = 'newTemplate'
 
 class TemplateInput extends Component {
+  static count = 0;
   constructor(props) {
     super(props);
     this.state = {
@@ -30,14 +31,20 @@ class TemplateInput extends Component {
   }
 
   componentDidMount() {
-    const { doctor = "", type } = this.props.data;
+    let { doctor = "test", type } = this.props.data;
+    console.log(doctor);
+    if(doctor === "") {
+      doctor = "test";
+    }
     this.setState({ currentTemplateData: { doctor, type } }, () => this.getTemplateList());
   }
 
   // 输入会触发这个方法，可以考虑优化
   componentDidUpdate(prevProps, prevState, snapshot) {
-    const { doctor, type } = this.props.data;
+    let { doctor, type } = this.props.data;
     if (prevProps.data.doctor !== doctor || prevProps.data.type !== type) {
+      // 用于请求
+      if(doctor === "") {doctor = "test"}
       this.setState({ currentTemplateData: { doctor, type } }, () => {
         this.getTemplateList();
       });

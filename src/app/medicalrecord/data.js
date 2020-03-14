@@ -131,7 +131,16 @@ export const shoushushiColumns = [
 	{
 		title: '手术医院',
 		key: 'hospital',
-		type: 'input'
+		type: 'select',
+		options: [
+			{value: '中山一院', label: '中山一院'},
+			{value: '中山二院', label: '中山二院'},
+			{value: '中山三院', label: '中山三院'},
+			{value: '广医一院', label: '广医一院'},
+			{value: '广医三院', label: '广医三院'},
+			{value: '省中医院', label: '省中医院'},
+			{value: '省妇幼', label: '省妇幼'},
+		]
 	},
 	{
 		title: '术后病理',

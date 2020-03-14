@@ -9,6 +9,7 @@ import formRender,{ fireForm } from '../../render/form';
 import Page from '../../render/page';
 
 import "../index.less";
+import "./index.less";
 
 import { hyOptions, numberOptions, IDCardOptions, occupationOptions } from './data.js';
 import cityOptions from '../../utils/cascader-address-options';
@@ -40,7 +41,6 @@ export default class OpenCase extends Component {
           '0': {label: "居民身份证", value: "居民身份证"}
         },
         userhidno: {},
-
         useridtype: {label: "居民身份证", value: "居民身份证"},
         ADD_FIELD_husband_useridtype: {label:"居民身份证",value:"居民身份证"}
       },
@@ -54,7 +54,16 @@ export default class OpenCase extends Component {
   // 孕妇基本信息
   pregnancy_data_config = () => ({
     step: 1,
+    className: 'container',
     rows: [
+      // {
+      //   columns: {
+      //     span: 24,
+      //     rows: [
+      //       {name: 'a', type: 'input'}
+      //     ]
+      //   }
+      // },
       {
         columns: [
           { label: '孕妇信息', span: 12  }
@@ -63,13 +72,16 @@ export default class OpenCase extends Component {
       {
         columns: [
           {name: 'usermcno[门诊号]', type: 'input', span: 6, valid: 'required'},
+          {span: 1},
           {name: 'zhunshengzheng[准生证号]', type: 'input', span: 6}
         ]
       },
       {
         columns: [
           {name: 'username[姓名]', type: 'input', span: 6, valid: 'required'},
+          {span: 1},
           {name: 'userage[年龄]', type: 'input', span: 6, valid: 'required'},
+          {span: 1},
           {
             name: 'useridno[身份证]', type: [{type: 'select',options: IDCardOptions, valid: 'required', span: 10},{type:'input', span: 14, valid: 'required'}], span: 8, valid: ['required',(value = {}) => {
               const IDType = ('0' in value) ? value['0'] : "", IDNumber = ('1' in value) ? value['1'] : "";
@@ -88,7 +100,9 @@ export default class OpenCase extends Component {
       {
         columns: [
           {name: 'usernation[国籍]', type: 'input', span: 6, valid: 'required'},
+          {span: 1},
           {name: 'userroots[籍贯]', type: 'input', span: 6, valid: 'required'},
+          {span: 1},
           {name: 'userpeople[民族]', type: 'input', span: 6, valid: 'required'}
         ]
       },
@@ -97,6 +111,7 @@ export default class OpenCase extends Component {
           // new
           // {name: 'danw[工作单位]', type: 'input', span: 6, valid: 'required'},
           {name: 'useroccupation[职业]', type: 'select', span: 6, options: occupationOptions},
+          {span: 1},
           {
             name: 'usermobile[手机]', type: 'input', span: 6, valid: (value = '') => {
               if(value !== "") {
@@ -107,7 +122,14 @@ export default class OpenCase extends Component {
             }
           }
         ]
-      },
+      }
+    ]
+  });
+
+  // 丈夫信息
+  husband_data_config = () => ({
+    step: 1,
+    rows: [
       {
         columns: [
           { label: '丈夫信息', span: 12  }
@@ -121,7 +143,9 @@ export default class OpenCase extends Component {
       {
         columns: [
           {name: 'userhname[姓名]', type: 'input', span: 6},
+          {span: 1},
           {name: 'userhage[年龄]', type: 'input', span: 6},
+          {span: 1},
           {
             name: 'userhidno[身份证]', type: [{type: 'select',options: IDCardOptions, span: 10, name: '0'},{type:'input', span: 14}], span: 8, valid: (value = {}) => {
               console.log(value);
@@ -146,16 +170,25 @@ export default class OpenCase extends Component {
       {
         columns: [
           {name: 'userhnation[国籍]', type: 'input', span: 6},
+          {span: 1},
           {name: 'userhroots[籍贯]', type: 'input', span: 6},
+          {span: 1},
           {name: 'userhpeople[民族]', type: 'input', span: 6}
         ]
       },
       {
         columns: [
           {name: 'userhoccupation[职业]', type: 'select', span: 6, options: occupationOptions},
+          {span: 1},
           {name: 'userhmobile[手机]', type: 'input', span: 6}
         ]
       },
+    ]
+  })
+
+  other_data_config = () => ({
+    step: 1,
+    rows: [
       {
         columns: [
           {label: '其他信息', span: 12}
@@ -164,7 +197,7 @@ export default class OpenCase extends Component {
       {
         columns: [
           {
-            name: 'useraddress[户口地址]', type: [{type: 'cascader', options: cityOptions, span: 8},{type:'input', vaild: 'required'}], span: 12, valid: ['required',(value = {}) => {
+            name: 'useraddress[户口地址]', type: [{type: 'cascader', options: cityOptions, span: 6},{type:'input', vaild: 'required', span: 15}], span: 24, valid: ['required',(value = {}) => {
               if(!value['0'] || !value['1']){
                 return '*请输入完整户口地址';
               }
@@ -174,7 +207,7 @@ export default class OpenCase extends Component {
       },
       {
         columns: [
-          {name: 'userconstant[居住地址]', type: [{type: 'cascader', options: cityOptions, span: 8},{type:'input', valid: 'required'}],span: 12, valid: ['required',(value = {}) => {
+          {name: 'userconstant[居住地址]', type: [{type: 'cascader', options: cityOptions,  span: 6},{type:'input', valid: 'required', span: 15}],span: 24, valid: ['required',(value = {}) => {
             if(!value['0'] || !value['1']){
               return '*请输入完整居住地址';
             }
@@ -182,7 +215,7 @@ export default class OpenCase extends Component {
         ]
       }
     ]
-  });
+  })
 
   benyun_data_config = () => ({
     step: 1,
@@ -200,19 +233,23 @@ export default class OpenCase extends Component {
       {
         columns: [
           {name: 'yunc[孕次]', value: 0, type: 'select', span: 6, options: numberOptions,  valid: 'required'},
+          {span: 1},
           {name: 'chanc[产次]', value: 0, type: 'select', span: 6, options: numberOptions,  valid: 'required'},
         ]
       },
       {
         columns: [
           {name: 'gesmoc[末次月经]', type: 'date', span: 6,  valid: 'required'},
+          {span: 1},
           {name: 'gesexpect[预产期]', type: 'date', span: 6,  valid: 'required'},
         ]
       },
       {
         columns: [
           {name: 'cktizh[孕前体重](kg)', type: 'input', span: 6,  valid: 'required'},
+          {span: 1},
           {name: 'ckcurtizh[现体重](kg)', type: 'input', span: 6,  valid: 'required'},
+          {span: 1},
           {name: 'cksheng[身高](cm)', type: 'input', span: 6,  valid: 'required'},
         ]
       }
@@ -333,10 +370,16 @@ export default class OpenCase extends Component {
     return (
       <Page id="form-block">
         <div className="bgWhite pad-mid">
-          <div>
+          <div className="container">
             {formRender(pregnancyData,this.pregnancy_data_config(), this.handlePregnancyChange)}
           </div>
-          <div>
+          <div className="container">
+            {formRender(pregnancyData,this.husband_data_config(), this.handlePregnancyChange)}
+          </div>
+          <div className="container">
+            {formRender(pregnancyData,this.other_data_config(), this.handlePregnancyChange)}
+          </div>
+          <div className="container">
             {formRender(benYunData,this.benyun_data_config(), this.handleBenYunChange)}
           </div>
         </div>
