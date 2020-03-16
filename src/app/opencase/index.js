@@ -18,6 +18,7 @@ import  NO2ROOT from '../../utils/china-division/no2root';
 const IDReg = /^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/;
 
 const getDataFromID = (id) => {
+  console.log(id);
   if(!id || !IDReg.test(id) ) return false;
   let root = '';
   for(let i = 0 ; i < NO2ROOT.length ; i++){
@@ -37,9 +38,7 @@ export default class OpenCase extends Component {
     super(props);
     this.state = {
       pregnancyData: {
-        useridno: {
-          '0': {label: "居民身份证", value: "居民身份证"}
-        },
+        useridno: [{label: "居民身份证", value: "居民身份证"},""],
         userhidno: {},
         useridtype: {label: "居民身份证", value: "居民身份证"},
         ADD_FIELD_husband_useridtype: {label:"居民身份证",value:"居民身份证"}
@@ -80,8 +79,6 @@ export default class OpenCase extends Component {
         columns: [
           {name: 'username[姓名]', type: 'input', span: 6, valid: 'required'},
           {span: 1},
-          {name: 'userage[年龄]', type: 'input', span: 6, valid: 'required'},
-          {span: 1},
           {
             name: 'useridno[身份证]', type: [{type: 'select',options: IDCardOptions, valid: 'required', span: 10},{type:'input', span: 14, valid: 'required'}], span: 8, valid: ['required',(value = {}) => {
               const IDType = ('0' in value) ? value['0'] : "", IDNumber = ('1' in value) ? value['1'] : "";
@@ -94,7 +91,10 @@ export default class OpenCase extends Component {
                 }
               }
             }]
-          }
+          },
+          {span: 1},
+          {name: 'userage[年龄]', type: 'input', span: 6, valid: 'required'},
+          
         ]
       },
       {
@@ -113,13 +113,13 @@ export default class OpenCase extends Component {
           {name: 'useroccupation[职业]', type: 'select', span: 6, options: occupationOptions},
           {span: 1},
           {
-            name: 'usermobile[手机]', type: 'input', span: 6, valid: (value = '') => {
+            name: 'usermobile[手机]', type: 'input', span: 6, valid: ["required", (value = '') => {
               if(value !== "") {
                 if(!/^1[3456789]\d{9}$/.test(value)){
                   return "*请输入正确的手机号码"
                 }
               }
-            }
+            }]
           }
         ]
       }
@@ -144,10 +144,8 @@ export default class OpenCase extends Component {
         columns: [
           {name: 'userhname[姓名]', type: 'input', span: 6},
           {span: 1},
-          {name: 'userhage[年龄]', type: 'input', span: 6},
-          {span: 1},
           {
-            name: 'userhidno[身份证]', type: [{type: 'select',options: IDCardOptions, span: 10, name: '0'},{type:'input', span: 14}], span: 8, valid: (value = {}) => {
+            name: 'userhidno[身份证]', type: [{type: 'select',options: IDCardOptions, span: 10, name: '0'},{type:'input', span: 14, name: '1'}], span: 8, valid: (value = {}) => {
               console.log(value);
               console.log('0' in value);
               const IDType = ('0' in value) ? value['0'] : "", IDNumber = ('1' in value) ? value['1'] : "";
@@ -164,7 +162,9 @@ export default class OpenCase extends Component {
                 }
               }
             }
-          }
+          },
+          {span: 1},
+          {name: 'userhage[年龄]', type: 'input', span: 6},
         ]
       },
       {
@@ -197,7 +197,7 @@ export default class OpenCase extends Component {
       {
         columns: [
           {
-            name: 'useraddress[户口地址]', type: [{type: 'cascader', options: cityOptions, span: 6},{type:'input', vaild: 'required', span: 15}], span: 24, valid: ['required',(value = {}) => {
+            name: 'useraddress[居住地址]', type: [{type: 'cascader', options: cityOptions, span: 6},{type:'input', vaild: 'required', span: 15}], span: 24, valid: ['required',(value = {}) => {
               if(!value['0'] || !value['1']){
                 return '*请输入完整户口地址';
               }
@@ -207,7 +207,7 @@ export default class OpenCase extends Component {
       },
       {
         columns: [
-          {name: 'userconstant[居住地址]', type: [{type: 'cascader', options: cityOptions,  span: 6},{type:'input', valid: 'required', span: 15}],span: 24, valid: ['required',(value = {}) => {
+          {name: 'userconstant[户口地址]', type: [{type: 'cascader', options: cityOptions,  span: 6},{type:'input', valid: 'required', span: 15}],span: 24, valid: ['required',(value = {}) => {
             if(!value['0'] || !value['1']){
               return '*请输入完整居住地址';
             }
@@ -265,12 +265,16 @@ export default class OpenCase extends Component {
       message.error(error);
       return ;
     } 
+    console.log(value);
     const { pregnancyData } = this.state;
     let obj = JSON.parse(JSON.stringify(pregnancyData));
     switch(name){
       case 'useridno':{
         obj['useridno'] = value;
+        console.log(value);
         const IDType = '0' in value ? value['0'] : "", IDNumber = '1' in  value ? value['1'] : "";
+        console.log(IDType);
+        console.log(IDNumber);
         if(IDType.value === '居民身份证') {
           obj['usernation'] = '中华人民共和国';
           const res = getDataFromID(IDNumber);
@@ -354,9 +358,11 @@ export default class OpenCase extends Component {
               }
             });
           }else {
-            message.error(data.message)
+            message.error(res.data.message)
           }; 
         });
+      }else {
+        message.error('请填写所以必填信息后再次提交');
       }
     })
     

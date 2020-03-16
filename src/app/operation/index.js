@@ -10,7 +10,7 @@ import TemplateInput from '../../components/templateInput/index';
 
 import '../index.less';
 import './index.less';
-import formRender from "../../render/form";
+import formRender,{ fireForm} from "../../render/form";
 import formRenderConfig from "./formRenderConfig";
 const { TreeNode } = Tree;
 const { Panel } = Collapse;
@@ -135,7 +135,7 @@ export default class Operation extends Component{
     const { templateId } = renderData;
     if(templateId < 0 || templateId > 7) return null;
     return (
-      <div id="form-block">
+      <div>
         <Collapse defaultActiveKey={["operationItem","preoperative_record","operative_procedure","surgery"]}>
           <Panel header="手术项目" key="operationItem">
             {formRender(renderData['operationItem'] || {},formRenderConfig[`config${templateId}`]['operationItem_config'](), (_,{name, value, error}) => this.handleFormChange("operationItem",name,value, error))}
@@ -418,33 +418,41 @@ export default class Operation extends Component{
 
   handleSave = () => {
     const { currentShowData } = this.state;
-    if(currentShowData['id'] < 0){
-      currentShowData['id'] = "";
-    }
-    currentShowData['operative_procedure']['fetus'].forEach(v => {
-      if(Number(v.id) < 0){
-        v.id = "";
+    const FORM_BLOCK = "form-block";
+    fireForm(document.getElementById(FORM_BLOCK), 'valid').then(validCode => {
+      if(validCode){
+        if(currentShowData['id'] < 0){
+          currentShowData['id'] = "";
+        }
+        currentShowData['operative_procedure']['fetus'].forEach(v => {
+          if(Number(v.id) < 0){
+            v.id = "";
+          }
+        })
+        // 转换病房中的时间
+        if(currentShowData.templateId === 8) {
+          if(currentShowData['ward']['startTime'].toString().length < 6) {
+            currentShowData['ward']['startTime'] = new Date(currentShowData['ward']['operationDate']).Format('yyyy-MM-dd') + " " +currentShowData['ward']['startTime'] + ":00";
+          }
+          if(currentShowData['ward']['endTime'].toString().length < 6) {
+            currentShowData['ward']['endTime'] =  new Date(currentShowData['ward']['operationDate']).Format('yyyy-MM-dd') + " " +currentShowData['ward']['endTime'] + ":00";
+          }
+          currentShowData['ward']['operationDate'] =   new Date(currentShowData['ward']['operationDate']).Format('yyyy-MM-dd');
+          currentShowData['preoperative_record']['operation_date'] =  currentShowData['ward']['operationDate'];
+        }
+        delete currentShowData.key;
+        delete currentShowData['templateId']; 
+        service.operation.saveOperation(currentShowData).then(res => {
+          message.success('保存成功');
+          service.operation.getOperation().then(res => {
+            this.setState({operationList: res.object.list, currentShowData: {}, currentTreeKeys: []});
+          })
+        })
+      }else {
+        message.error('请填写所以必填信息后再次提交');
       }
     })
-    // 转换病房中的时间
-    if(currentShowData.templateId === 8) {
-      if(currentShowData['ward']['startTime'].toString().length < 6) {
-        currentShowData['ward']['startTime'] = new Date(currentShowData['ward']['operationDate']).Format('yyyy-MM-dd') + " " +currentShowData['ward']['startTime'] + ":00";
-      }
-      if(currentShowData['ward']['endTime'].toString().length < 6) {
-        currentShowData['ward']['endTime'] =  new Date(currentShowData['ward']['operationDate']).Format('yyyy-MM-dd') + " " +currentShowData['ward']['endTime'] + ":00";
-      }
-      currentShowData['ward']['operationDate'] =   new Date(currentShowData['ward']['operationDate']).Format('yyyy-MM-dd');
-      currentShowData['preoperative_record']['operation_date'] =  currentShowData['ward']['operationDate'];
-    }
-    delete currentShowData.key;
-    delete currentShowData['templateId']; 
-    service.operation.saveOperation(currentShowData).then(res => {
-      message.success('保存成功');
-      service.operation.getOperation().then(res => {
-        this.setState({operationList: res.object.list, currentShowData: {}, currentTreeKeys: []});
-      })
-    })
+    
   };
   /* ========================= 其他 ============================ */
   // 获取数据整合进入state
@@ -554,7 +562,7 @@ export default class Operation extends Component{
             </div>
           ) : null}
           {clear ? null : (
-            <div>
+            <div id="form-block">
               <div>
                 {this.renderFetusTemplateForm(currentShowData)}
               </div>

@@ -110,7 +110,7 @@ export default class Patient extends Component {
         ]
       }, {
         columns: [
-          { name: 'usermobile[手机]', type: 'input', span: 5, valid: 'number' },
+          { name: 'usermobile[手机]', type: 'input', span: 5, valid: 'required|number' },
           { span: 1 },
           { name: 'useridtype[证件类型]', type: 'select', span: 4, showSearch: false, options: sfzOptions ,valid: 'required'},
           { span: 1 },

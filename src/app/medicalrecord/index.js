@@ -334,7 +334,7 @@ export default class MedicalRecord extends Component {
         service.medicalrecord.writeOperationHistory({operationHistorys: operationHistoryData }).then(res => console.log(res));
       } else {
         // 提示
-        message.error('请填写所有信息后再次提交');
+        message.error('请填写所有必填信息后再次提交');
       }
     })
   };

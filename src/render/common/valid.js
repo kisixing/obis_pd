@@ -11,7 +11,7 @@ const validationFns = {
     }
   },
   number: function (value) {
-    if (value && !/^\d+(\.\d+)?$/.test(value)) {
+    if (value && !/^[-]?\d+(\.\d+)?$/.test(value)) {
       return '*请输入数字';
     }
   },

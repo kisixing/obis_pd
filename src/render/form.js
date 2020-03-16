@@ -197,6 +197,7 @@ class FormItem extends Component {
         type: (t.type || t).replace(/\(.*\)/, ''),
         unit: /\(.*\)/.test(t.type || t) && /\((.*)\)/.exec(t.type || t)[1] || t.unit
       }));
+      // console.log(types);
       const enitorWidth = width - types.filter(i => i.unit).length * 16;
       if (typeof data !== 'object') {
         return <strong>{name} 的数据应该为数组或类数组，而当前是 {data}</strong>;

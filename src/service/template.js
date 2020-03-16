@@ -25,7 +25,7 @@ export default {
    * @returns {AxiosPromise}
    */
   deleteTemplate: function(entity) {
-    return myAxios.delete(templateUri, {data:entity})
+    return myAxios.delete('prenatal/batchMrTemplate', {data:entity})
   },
   /**
    * 移动模板
