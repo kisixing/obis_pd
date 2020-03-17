@@ -125,8 +125,9 @@ export const shoushushiColumns = [
 	{
 		title: '手术日期',
 		key: 'date',
-		type: 'date',
-		mode: "ymd"
+		type: 'input',
+		filterDate: true
+		// mode: ""
 	},
 	{
 		title: '手术医院',
@@ -407,7 +408,7 @@ export const newDataTemplate = {
 	thalassemia: {
 		wife: {
 			// blood_group: "",
-			// genotype: "",
+			genotype: [],
 			// other_anomalies: "",
 			// mcv: "",
 			// mch: "",
@@ -416,7 +417,7 @@ export const newDataTemplate = {
 		},
 		husband: {
 			// blood_group: "",
-			// genotype: "",
+			genotype: [],
 			// other_anomalies: "",
 			// mcv: "",
 			// mch: "",

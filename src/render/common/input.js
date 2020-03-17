@@ -1,18 +1,86 @@
 import React, { Component } from "react";
-import { Row, Col, Button, Input, Checkbox, Select, DatePicker } from 'antd';
+import { Row, Col, Button, Input, Checkbox, Select, DatePicker, message } from 'antd';
 
-export function input({onChange, onBlur, value, ...props}){
+export function input({onChange, onBlur, value, filterDate, ...props}){
   const handleChange = (e) => {
     if (value !== e.target.value) {
         if (onChange) {
-          onChange(e, e.target.value)
+            onChange(e, e.target.value)
         } else {
             console.log('miss onChange: ' + props.name);
         }
     }
   }
+  const handleBlur = e => {
+    if (filterDate) {
+      const nowYear = new Date().getFullYear();
+      const nuwCentury = nowYear.toString().substring(0, 2);
+      const numYear = nowYear.toString().substring(2);
+      const initValue = e.target.value;
+      const iptValue = initValue.replace(/[^0-9]+/g, '');
+
+      const getCentury = (v) => {
+        const century = v > numYear ? nuwCentury - 1 : nuwCentury;
+        return century;
+      }
+
+      let finalDate = '', finalYear = '', finalMonth = '';
+
+      if (initValue.indexOf('-') !== -1 || initValue.indexOf('~') !== -1) {
+        if (iptValue.length === 4 || iptValue.length === 8) {
+          finalDate = initValue.replace(/\-/g, '~');
+        } else {
+          finalDate = initValue;
+        }
+        message.error('输入日期为非规范的年月格式！', 5);
+      } else if (iptValue.length === 2) {
+        finalDate = getCentury(iptValue) + iptValue;
+      } else if (iptValue.length === 3) {
+        finalYear = iptValue.substring(0, 2);
+        finalMonth = iptValue.substring(2);
+
+        finalYear = getCentury(finalYear) + finalYear;
+        finalMonth = finalMonth > 10 ? finalMonth : '0' + finalMonth;
+        finalDate = finalYear + '-' + finalMonth;
+      } else if (iptValue.length === 4 && initValue.length === 4) {
+        finalDate = iptValue;
+      } else if (iptValue.length === 4 && initValue.length !== 4) {
+        finalYear = iptValue.substring(0, 2);
+        finalMonth = iptValue.substring(2);
+
+        finalYear = getCentury(finalYear) + finalYear;
+        finalDate = finalYear + '-' + finalMonth;
+      } else if (iptValue.length === 5) {
+        finalYear = iptValue.substring(0, 4);
+        finalMonth = iptValue.substring(4);
+
+        finalYear = finalYear;
+        finalMonth = finalMonth > 10 ? finalMonth : '0' + finalMonth;
+        finalDate = finalYear + '-' + finalMonth;
+      } else if (iptValue.length === 6) {
+        finalYear = iptValue.substring(0, 4);
+        finalMonth = iptValue.substring(4);
+        finalDate = finalYear + '-' + finalMonth;
+      } else {
+        finalDate = initValue;
+        message.error('输入格式错误！', 5);
+        return;
+      }
+      
+      if ((finalDate < 1900 || finalDate > nowYear) || (finalMonth !== '' && finalMonth < 1 || finalMonth > 12)) {
+        message.error(`输入日期为${finalDate}, 输入日期错误！`, 5);
+        return;
+      }
+
+      onChange(e, finalDate).then(() => {
+         onBlur(e)
+      })
+    } else {
+      onBlur(e)
+    }
+  }
   return (
-    <Input {...props} title={value} value={value} onChange={handleChange} onBlur={e=>onBlur(e)}/>
+    <Input {...props} title={value} value={value} onChange={handleChange} onBlur={handleBlur}/>
   )
 }
 
@@ -21,12 +89,17 @@ export function textarea(prop){
 }
 
 export function checkbox({onChange, onBlur, value, ...props}){
-  const handleChange = (e,value) => {
-    onChange(e, `${value}`).then(()=>onBlur())
+  const handleChange = (e, value) => {
+    onChange(e, `${value}`).then(()=>onBlur());
   };
   return (
-    <Checkbox {...props} value={value} checked={value=='true'||value===true} onChange={e=>handleChange(e, e.target.checked)}></Checkbox>
-  )
+    <Checkbox
+      {...props}
+      value={value}
+      checked={value == "true" || value === true}
+      onChange={e => handleChange(e, e.target.checked)}
+    ></Checkbox>
+  );
 }
 
 /**

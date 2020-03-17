@@ -102,7 +102,7 @@ export default class OpenCase extends Component {
           {name: 'usernation[国籍]', type: 'input', span: 6, valid: 'required'},
           {span: 1},
           {name: 'userroots[籍贯]', type: 'input', span: 6, valid: 'required'},
-          {span: 1},
+          {span: 3},
           {name: 'userpeople[民族]', type: 'input', span: 6, valid: 'required'}
         ]
       },
@@ -172,7 +172,7 @@ export default class OpenCase extends Component {
           {name: 'userhnation[国籍]', type: 'input', span: 6},
           {span: 1},
           {name: 'userhroots[籍贯]', type: 'input', span: 6},
-          {span: 1},
+          {span: 3},
           {name: 'userhpeople[民族]', type: 'input', span: 6}
         ]
       },
@@ -180,7 +180,9 @@ export default class OpenCase extends Component {
         columns: [
           {name: 'userhoccupation[职业]', type: 'select', span: 6, options: occupationOptions},
           {span: 1},
-          {name: 'userhmobile[手机]', type: 'input', span: 6}
+          {name: 'userhmobile[手机]', type: 'input', span: 6},
+          {span: 3},
+          {name: 'userhconstant[户口属地]', type: 'input', span:6}
         ]
       },
     ]

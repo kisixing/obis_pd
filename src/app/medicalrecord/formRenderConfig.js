@@ -121,11 +121,9 @@ const config = {
         columns:[
           { span: 1 },
           { 
-            name: 'genotype[地贫基因型]',  type: 'select', span: 11, showSearch: true, options: baseData.genotypeAnemia,
+            name: 'genotype[地贫基因型]',  type: 'select', span: 11, showSearch: true, multiple: true, options: baseData.genotypeAnemia,
             filterOption: function (inputValue, option) {
               const val = option.key.split('-')[1];
-              console.log(val);
-              console.log(val.indexOf(inputValue));
               // 检查是否存在字母
               if(/[a-zA-Z]+/.test(inputValue)){
                 const u = inputValue.toUpperCase();
@@ -176,11 +174,9 @@ const config = {
       },
       {
         columns:[
-          { name: 'genotype[地贫基因型]',  type: 'select', span: 11, showSearch: true, options: baseData.genotypeAnemia,
+          { name: 'genotype[地贫基因型]',  type: 'select', span: 11, showSearch: true, multiple: true, options: baseData.genotypeAnemia,
           filterOption: function (inputValue, option) {
             const val = option.key.split('-')[1];
-            console.log(val);
-            console.log(val.indexOf(inputValue));
             // 检查是否存在字母
             if(/[a-zA-Z]+/.test(inputValue)){
               const u = inputValue.toUpperCase();

@@ -33,10 +33,6 @@ const _genotypeAnemia = baseData.genotypeAnemia.map(item => {
 });
 
 
- // 新建数据模型
-const newData = {
-
-}
 /**
  * 专科病例页面备注
  * 1.新建时（包括病例和胎儿） 
@@ -268,6 +264,11 @@ export default class MedicalRecord extends Component {
             obj['physical_check_up']['weight_gain'] = weight_gain.toString();
           }
           obj['physical_check_up'][name] = value;
+          break;
+        case 'genotype':
+          // 测试多选 之后可以去掉
+          console.log(value);
+          mapValueToKey(obj, `${path}.${name}`, value);
           break;
         default:
           mapValueToKey(obj, `${path}.${name}`, value);

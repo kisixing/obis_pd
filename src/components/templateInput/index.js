@@ -76,7 +76,7 @@ class TemplateInput extends Component {
   };
 
   tableColumns = () => ([
-    { title: '单选', key: 'radio' },
+    { title: '全选', key: 'checkbox' },
     { title: '内容', dataIndex: 'content', key: 'content', render: this.renderTableCell }]
   );
 
