@@ -118,16 +118,16 @@ export const ccOptions = toOptions('1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16');
  */
 export const shoushushiColumns = [
 	{
-		title: '手术名称',
-		key: 'name',
-		type: 'input'
-	},
-	{
 		title: '手术日期',
 		key: 'date',
 		type: 'input',
 		filterDate: true
 		// mode: ""
+	},
+	{
+		title: '手术名称',
+		key: 'name',
+		type: 'input'
 	},
 	{
 		title: '手术医院',

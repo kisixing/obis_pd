@@ -644,6 +644,14 @@ export default class MedicalRecord extends Component {
         }
       })
     }
+    if(object.thalassemia){
+      if(object.thalassemia.wife){
+        object.thalassemia.wife.genotype = convertString2Json(object.thalassemia.wife.genotype);
+      }
+      if(object.thalassemia.husband){
+        object.thalassemia.husband.genotype = convertString2Json(object.thalassemia.husband.genotype);
+      }
+    }
     if(object.hasOwnProperty('physical_check_up')){
       object['physical_check_up']['edema'] = convertString2Json(object['physical_check_up']['edema']);
       object['physical_check_up'].bp = { "0": object.physical_check_up['systolic_pressure'], "1": object.physical_check_up['diastolic_pressure'] }

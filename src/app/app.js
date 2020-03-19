@@ -57,7 +57,7 @@ export default class App extends Component {
     // 当本页面userid与store不同
     console.log(userData);
     console.log(this.state.userData);
-    if( this.state.userData.userid !== userData.userid &&  this.state.userData.userid) {
+    if( this.state.userData.userid !== userData.userid) {
       this.findUser("","","","",userData.userid);
     }
   };
@@ -129,6 +129,11 @@ export default class App extends Component {
     obj[key] = value;
     this.setState({searchObj: obj});
   }
+  resetSearch = () => {
+    this.setState({searchObj:{
+      menzhenNumber: "", IDCard: "", phoneNumber: ""
+    }})
+  }
   // 孕妇建册
   toOpenCase = () => {
     this.props.history.push('/opencase');
@@ -165,7 +170,7 @@ export default class App extends Component {
           </div>
           <div className="search-btn">
             <Button onClick={this.handleSearch}>搜索</Button>
-            <Button>重置</Button>
+            <Button onClick={this.resetSearch}>重置</Button>
             <Button onClick={this.toOpenCase}>建册</Button>
           </div>
         </div>

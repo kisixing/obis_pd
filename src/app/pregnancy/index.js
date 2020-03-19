@@ -38,6 +38,7 @@ export default class Patient extends Component {
   /* ====================  请求处理 ============================= */
   getGeneralInformation = () => {
     const { userid } = store.getState()['userData'];
+    console.log(userid);
     // 防止已进入页面没有userid
     if(userid) {
       service.getgeneralinformation({userId: userid}).then((res) => {
