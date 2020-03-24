@@ -241,7 +241,6 @@ class FormItem extends Component {
         </div>
       </div>
     );
-
   }
 }
 

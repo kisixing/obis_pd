@@ -113,17 +113,15 @@ export default class Patient extends Component {
         columns: [
           { name: 'usermobile[手机]', type: 'input', span: 5, valid: 'required|number' },
           { span: 1 },
-          { name: 'useridtype[证件类型]', type: 'select', span: 4, showSearch: false, options: sfzOptions ,valid: 'required'},
+          { name: 'useridtype[证件类型]', type: 'select', span: 5, showSearch: false, options: sfzOptions ,valid: 'required'},
           { span: 1 },
           { name: 'useridno[证件号码]', type: 'input', span: 6 ,valid: 'required'}
-          // { name: 'phone[固话]', type: 'input', span: 5},
-          // { span: 1 },
         ]
       }, {
         columns: [
           { name: 'userconstant[户口地址]', type: 'input', span: 11,valid: 'required'},
           { span: 1 },
-          { name: 'useraddress[现住地址]', type: 'input', span: 11,valid: 'required'},
+          { name: 'useraddress[居住地址]', type: 'input', span: 11,valid: 'required'},
           { span: 1 },
         ]
       },
@@ -136,17 +134,19 @@ export default class Patient extends Component {
         {
           columns: [
             { name: 'userhname[丈夫姓名]', type: 'input', span: 5 },
-            { name: 'userhage[年龄]', type: 'input', span: 4 },
-            { span: 2 },
+            { span: 1 },
+            { name: 'userhage[年龄]', type: 'input', span: 5 },
+            { span: 1 },
             { name: 'userhmcno[门诊号]', type: 'input', span: 6 },
           ]
         },
         {
           columns: [           
             { name: 'userhnation[国籍]', type: 'input', span: 5 },
-            { name: 'add_FIELD_husband_userroots[籍贯]', type: 'input', span: 4 },
-            { span: 2 },
-            { name: 'userhpeople[民族]', type: 'input', span: 6 },
+            { span: 1 },
+            { name: 'userhroots[籍贯]', type: 'input', span: 5 },
+            { span: 1 },
+            { name: 'userhpeople[民族]', type: 'input', span: 4 },
             { span: 1 },
             { name: 'userhoccupation[职业]', type: 'input', span:  6},
           ]
@@ -154,9 +154,10 @@ export default class Patient extends Component {
         {
           columns: [
             { name: 'userhmobile[手机]', type: 'input', span: 5 },
-            { name: 'add_FIELD_husband_useridtype[证件类型]', type: 'select', span: 4, options: sfzOptions },
-            { span: 2 },
-            { name: 'userhidno[证件号]', type: 'input', span: 6 },
+            { span: 1 },
+            { name: 'add_FIELD_husband_useridtype[证件类型]', type: 'select', span: 5, options: sfzOptions },
+            { span: 1 },
+            { name: 'userhidno[证件号]', type: 'input', span: 4 },
             { span: 1 },
             { name: 'userhconstant[户口属地]', type: 'input', span: 6 }
           ]

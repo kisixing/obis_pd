@@ -39,7 +39,7 @@ export default class OpenCase extends Component {
     this.state = {
       pregnancyData: {
         useridno: [{label: "居民身份证", value: "居民身份证"},""],
-        userhidno: {},
+        userhidno: [{label: "居民身份证", value: "居民身份证"},""],
         useridtype: {label: "居民身份证", value: "居民身份证"},
         ADD_FIELD_husband_useridtype: {label:"居民身份证",value:"居民身份证"}
       },
@@ -146,8 +146,6 @@ export default class OpenCase extends Component {
           {span: 1},
           {
             name: 'userhidno[身份证]', type: [{type: 'select',options: IDCardOptions, span: 10, name: '0'},{type:'input', span: 14, name: '1'}], span: 8, valid: (value = {}) => {
-              console.log(value);
-              console.log('0' in value);
               const IDType = ('0' in value) ? value['0'] : "", IDNumber = ('1' in value) ? value['1'] : "";
               if(!IDType && IDNumber) {
                 return "*请选择证件类型";
@@ -341,8 +339,8 @@ export default class OpenCase extends Component {
         // 转换数据格式
         benYunData['chanc'] = Number(benYunData['chanc'].value);
         benYunData['yunc'] = Number(benYunData['yunc'].value);
+        return;
         // 孕妇建档
-        console.log(pregnancyData);
         service.opencase.addyc({...pregnancyData, ...benYunData}).then(res => {
           if(res.data.code === "200" || res.data.code === "1") {
             message.success('孕妇建档成功');

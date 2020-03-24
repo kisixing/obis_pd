@@ -1,4 +1,5 @@
 export default [
+  { code: "44", name: "广东省" },
   { code: "11", name: "北京市" },
   { code: "12", name: "天津市" },
   { code: "13", name: "河北省" },
@@ -17,7 +18,6 @@ export default [
   { code: "41", name: "河南省" },
   { code: "42", name: "湖北省" },
   { code: "43", name: "湖南省" },
-  { code: "44", name: "广东省" },
   { code: "45", name: "广西壮族自治区" },
   { code: "46", name: "海南省" },
   { code: "50", name: "重庆市" },

@@ -5,7 +5,6 @@ export const convertString2Json = function (str) {
   const splitKey = "},{";
   let index = str.indexOf(splitKey);
   if (index === -1) {
-    console
     try {
       return JSON.parse(str);
     } catch (e) {

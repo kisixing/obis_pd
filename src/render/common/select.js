@@ -1,11 +1,14 @@
 import React, { Component } from "react";
 import { Row, Col, Button, Input, Table, Select, DatePicker } from 'antd';
 
-export function select({ name, options, width, value='', onChange, onBlur=()=>{}, ...props }){
+// 新增custom字段，可以用于支持自定义输入
+export function select({ name, options, width, value='', tags = false, onChange, onBlur=()=>{}, ...props }){
   const getValue = () => {
+    console.log(value);
     if(value && Object.prototype.toString.call(value) === '[object Object]'){
       return value.value;
     }
+    // 支持tags后返回不正常
     if(Object.prototype.toString.call(value) === '[object Array]'){
       return value.map(v => v.value);
     }
@@ -13,7 +16,6 @@ export function select({ name, options, width, value='', onChange, onBlur=()=>{}
   }
   const handleChange = e => {
     // 新增支持多选
-    console.log(e);
     if(Object.prototype.toString.call(e) === '[object Array]'){
       let r = e.map(v => options.filter(o=>o.value==v).pop());
       onChange(e, r).then(()=>onBlur({checkedChange:true}));
@@ -23,7 +25,7 @@ export function select({ name, options, width, value='', onChange, onBlur=()=>{}
     }
   }
   return (
-    <Select {...props} value={getValue()} options={options} onChange={handleChange}>
+    <Select {...props} value={getValue()} options={options} onChange={handleChange} tags={tags}>
       {options.map(o => <Select.Option key={`${name}-${o.value}`} value={o.value}>{o.label}</Select.Option>)}
     </Select>
   )
