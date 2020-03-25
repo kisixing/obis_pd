@@ -30,12 +30,13 @@ export default {
     // 这里的userid字段名称不是userid 而是 id
     // 修改字段后再return Promise
     // 由于接口是使用本页面的userId，所以要在这里设置
-    return myAxios.get(`prenatalQuery/findUser?useridno=${useridno}&usermcno=${usermcno}&usermobile=${usermobile}&chanjno${chanjno}=&id=${id}`).then(res => {
-      res['object']['userid'] = res['object']['id'];
-      res['object']['tuserweek'] = res['object']['gesweek'];
-      userId = new Promise(resolve => resolve(res));
-      return userId;
-    });
+    const res = await myAxios.get(`prenatalQuery/findUser?useridno=${useridno}&usermcno=${usermcno}&usermobile=${usermobile}&chanjno${chanjno}=&id=${id}`);
+    userId = new Promise(resolve => resolve(JSON.parse(JSON.stringify(res))));
+    return userId;
+    // res['object']['tuserweek'] = res['object']['gesweek'];
+    // userId = new Promise(resolve => resolve(res));
+    // return userId;
+    
   },
   // 查询-产前诊断-基本信息
   getgeneralinformation: ({ userId }) => myAxios.get(`/prenatalQuery/getgeneralinformation?userid=${userId}`),

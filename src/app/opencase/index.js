@@ -11,7 +11,7 @@ import Page from '../../render/page';
 import "../index.less";
 import "./index.less";
 
-import { hyOptions, numberOptions, IDCardOptions, occupationOptions } from './data.js';
+import { hyOptions, numberOptions, IDCardOptions, occupationOptions, nationList } from './data.js';
 import cityOptions from '../../utils/cascader-address-options';
 import  NO2ROOT from '../../utils/china-division/no2root';
 
@@ -94,12 +94,11 @@ export default class OpenCase extends Component {
           },
           {span: 1},
           {name: 'userage[年龄]', type: 'input', span: 6, valid: 'required'},
-          
         ]
       },
       {
         columns: [
-          {name: 'usernation[国籍]', type: 'input', span: 6, valid: 'required'},
+          {name: 'usernation[国籍]', type: 'select', span: 6, valid: 'required',options: nationList,showSearch: true, tags: true},
           {span: 1},
           {name: 'userroots[籍贯]', type: 'input', span: 6, valid: 'required'},
           {span: 3},
@@ -339,7 +338,6 @@ export default class OpenCase extends Component {
         // 转换数据格式
         benYunData['chanc'] = Number(benYunData['chanc'].value);
         benYunData['yunc'] = Number(benYunData['yunc'].value);
-        return;
         // 孕妇建档
         service.opencase.addyc({...pregnancyData, ...benYunData}).then(res => {
           if(res.data.code === "200" || res.data.code === "1") {

@@ -279,7 +279,6 @@ export default class App extends Component {
       const { yunc, chanc, usermcno, useridno, usermobile } = res.object;
       // 处理孕产
       res.object['tuseryunchan'] = `${yunc}/${chanc}`;
-      res.object['userid'] = res.object.id;
       // 填充本地输入框
       let newSearchObj = {menzhenNumber: usermcno,IDCard: useridno,phoneNumber: usermobile}
       // 设置storeuserData + 孕产信息
