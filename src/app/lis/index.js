@@ -107,7 +107,7 @@ export default class Lis extends Component {
                     <div className="left-item">                   
                       <p>{subItem.name}</p>
                       {/* 2020-02-04 #121 取消审阅按钮与相关功能 */}
-                      <Button className="left-btn normal">正常</Button>
+                      {/* <Button className="left-btn normal">正常</Button> */}
                       {/*<Button className={subItem.status=="正常" ? "left-btn normal" : "left-btn"} size="small">{subItem.status}</Button>*/}
                     </div>
                   ))

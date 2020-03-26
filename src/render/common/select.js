@@ -3,7 +3,6 @@ import { Row, Col, Button, Input, Table, Select, DatePicker } from 'antd';
 
 // 新增custom字段，可以用于支持自定义输入
 export function select({ name, options, width, value='', tags = false, onChange, onBlur=()=>{}, ...props }){
-  console.log(options);
   const getValue = () => {
     if(value && Object.prototype.toString.call(value) === '[object Object]'){
       return value.value;
@@ -16,14 +15,14 @@ export function select({ name, options, width, value='', tags = false, onChange,
   }
   const handleChange = e => {
     // 新增支持自定义输入值
-    // if(tags){
-    //   for(let i=0;i<e.length;i++){
-    //     if(options.findIndex(v => v.value === e[i]) === -1){
-    //       options.push({value:e[i], label:e[i]});
-    //       console.log(options);
-    //     }
-    //   }
-    // }
+    if(tags){
+      for(let i=0;i<e.length;i++){
+        if(options.findIndex(v => v.value === e[i]) === -1){
+            options.push({value:e[i], label:e[i]}); 
+        }
+      }
+    }
+    
     // 新增支持多选
     if(Object.prototype.toString.call(e) === '[object Array]'){
       let r = e.map(v => options.filter(o=>o.value==v).pop());

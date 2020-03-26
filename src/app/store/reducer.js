@@ -27,12 +27,15 @@ export default (state = defaultState, action) => {
   if(action.type ===  SET_USER_DATA) {
     let newState = JSON.parse(JSON.stringify(state));
     newState.userData = action.data;
-    const { yunc, chanc,  gesmoc, gesexpect} = action.data;
+    const { yunc, chanc,  gesmoc, gesexpect, cktizh, ckcurtizh} = action.data;
     newState.openCaseData = {
       parity: {value: chanc, label: chanc},
       gravidity: {value: yunc, label: yunc},
       lmd: gesmoc,
-      edd: gesexpect
+      edd: gesexpect,
+      pre_weight: cktizh,
+      current_weight: ckcurtizh,
+      weight_gain: Number(ckcurtizh) - Number(cktizh)
     }
     return newState;
   }

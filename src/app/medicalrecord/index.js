@@ -139,6 +139,9 @@ export default class MedicalRecord extends Component {
     newData['pregnancy_history']['parity'] = openCaseData['parity'];
     newData['pregnancy_history']['lmd'] = openCaseData['lmd'];
     newData['pregnancy_history']['edd'] = openCaseData['edd'];
+    newData['physical_check_up']['pre_weight'] = openCaseData['pre_weight'];
+    newData['physical_check_up']['current_weight'] = openCaseData['current_weight'];
+    newData['physical_check_up']['weight_gain'] = openCaseData['weight_gain'];
 
     newData['ckweek'] = userData['tuserweek'];
     newData['createdate'] = todayStr;
