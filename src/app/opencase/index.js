@@ -35,6 +35,7 @@ export default class OpenCase extends Component {
 
   /* ======================= handler =============================== */
   handlePregnancyChange = (_,{name,value,error}) => {
+    console.log(value);
     // 统一错误提示
     if(error) {
       message.error(error);

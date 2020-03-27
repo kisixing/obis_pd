@@ -174,7 +174,7 @@ const config = {
       },
       {
         columns:[
-          { name: 'genotype[地贫基因型]',  type: 'select', span: 11, showSearch: true, multiple: true, options: baseData.genotypeAnemia,
+          { name: 'genotype[地贫基因型]',  type: 'select', span: 11, showSearch: true, multiple: true, options: baseData.genotypeAnemia, tags: true,
           filterOption: function (inputValue, option) {
             const val = option.key.split('-')[1];
             // 检查是否存在字母

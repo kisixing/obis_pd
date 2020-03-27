@@ -29,7 +29,7 @@ const formRenderConfig = {
           {span: 1},
           {name: 'userroots[籍贯]', type: 'input', span: 6, valid: 'required'},
           {span: 3},
-          {name: 'userpeople[民族]', type: 'select', span: 6,  options: nationList, showSearch: true, valid: 'required'}
+          {name: 'userpeople[民族]', type: 'select', span: 6,  options: nationList, showSearch: true, custom: true, valid: 'required'}
         ]
       },{
         columns: [
@@ -66,7 +66,7 @@ const formRenderConfig = {
           {span: 1},
           {name: 'userhroots[籍贯]', type: 'input', span: 6},
           {span: 3},
-          {name: 'userhpeople[民族]', type: 'input', span: 6, options: nationList, showSearch: true, valid: 'required'}
+          {name: 'userhpeople[民族]', type: 'input', span: 6, options: nationList, valid: 'required'}
         ]
       },{
         columns: [

@@ -2,36 +2,20 @@ import React, { Component } from 'react';
 import store from '../store';
 
 import { Tree, Tabs, Collapse, Modal, Button, Checkbox, message } from 'antd';
-import Page from '../../render/page';
-
 import formRender, { fireForm } from '../../render/form';
+import Page from '../../render/page';
 import TemplateInput from '../../components/templateInput';
-import { GetExpected, convertString2Json, mapValueToKey, formatDate } from '../../utils/index';
 import mdConfig from './formRenderConfig';
+
 import { newDataTemplate } from './data';
-
+import { convertString2Json, mapValueToKey, formatDate } from '../../utils/index';
 import service from "../../service";
-
-
 import './index.less';
-import '../index.less';
-import * as baseData from './data';
 
 const { TreeNode } = Tree;
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
 const ButtonGroup = Button.Group;
-
-// 应对 输入 b 搜索 β
-// 修改后的 提交可能还要改一下
-const _genotypeAnemia = baseData.genotypeAnemia.map(item => {
-  if (item.value.indexOf('β') >= 0) {
-    const { value } = item;
-    item.value = value.replace('β', 'b');
-  }
-  return item;
-});
-
 
 /**
  * 专科病例页面备注
@@ -44,14 +28,18 @@ export default class MedicalRecord extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      // data
+      //树形list相关
       specialistemrList: [],  // 左侧病历树形菜单
-      specialistemrData: [],  // 病历数据  主键-key
+      currentExpandedKeys: [], // 当前展开的树形菜单
+      currentTreeKeys: [],  // 当前选择的树节点的key - 永远是string 仅可选中一个
+      
+      // data
+      newSpecialistemrData: [], // 新建病历的数据
+      currentSpcialistemrData: {}, // 当前病历数据
+      
       ultrasoundMiddleData: [], // 中孕超声数据
       operationHistoryData: [], // 胎儿疾病 - 手术史数据
       /* control */
-      currentTreeKeys: [],  // 当前选择的树节点的key - 永远是string
-      currentExpandedKeys: [],
       uFetusActiveKey: '-1',  // 胎儿疾病 - 超声检查 Tab
       isDownsScreenChecked: true,
       isThalassemiaChecked: true,
@@ -66,60 +54,63 @@ export default class MedicalRecord extends Component {
   }
 
   componentDidMount() {
-    service.medicalrecord.getspecialistemr().then(res => this.setState({ specialistemrList: res.object.list }));
+    const { userData } = store.getState();
+    if(userData.userid){
+      service.medicalrecord.getspecialistemr().then(res => this.setState({ specialistemrList: res.object.list }));
+    }else{
+      message.info('用户为空');
+    }
   }
 
   /* ========================= 事件交互类 =========================== */
-  // 树形结构选择
+  // 树形结构选择 -- 
   handleTreeSelect = (selectedKeys, { selected, node }) => {
+    // 禁用取消
+    if (!selected) {  return; };
+    // 父节点，展开或收起
     if (node.props.children) {
-      // 父节点，展开或收起
+      let currentExpandedKeys = this.state.currentExpandedKeys.concat();
       const nodeKey = node.props['eventKey'];
-      const { currentExpandedKeys } = this.state;
       const i = currentExpandedKeys.findIndex(key => key === nodeKey);
       if (i !== -1) {
         currentExpandedKeys.splice(i, 1);
       } else {
         currentExpandedKeys.push(nodeKey);
       }
-      this.setState({ currentExpandedKeys });
+      this.setState({currentExpandedKeys});
       return;
     }
-    // 这里禁用取消
-    if (!selected) {  return; };
-    if (Number(selectedKeys[0]) < 0) { this.setState({ currentTreeKeys: selectedKeys });return;};
+    // 新建病历
+    if (Number(selectedKeys[0]) < 0) {
+      const curData = this.state.newSpecialistemrData.find(v => v.id === selectedKeys[0]); 
+      this.setState({ currentTreeKeys: selectedKeys, currentSpcialistemrData: curData });
+      return;
+    };
     // 获取病历详情
     service.medicalrecord.getspecialistemrdetail({ recordid: selectedKeys[0] }).then(res => {
-      let newSpecialistemrData = this.state.specialistemrData.map(v => v);
       // 获取已经整合的数据
       const obj = this.convertSpecialistemrDetail(res.object);
-      const index = newSpecialistemrData.findIndex(v => v.id === obj.id);
-      if (index === -1) {
-        newSpecialistemrData.push(obj);
-      } else {
-        newSpecialistemrData.splice(index, 1, obj);
-      }
-      this.setState({ currentTreeKeys: selectedKeys, specialistemrData: newSpecialistemrData });
+      this.setState({ currentTreeKeys: selectedKeys, currentSpcialistemrData: obj });
     });
     service.ultrasound.getPrenatalPacsMg({ recordid: selectedKeys[0] }).then(res => this.setState({ultrasoundMiddleData: res.object}));
     service.medicalrecord.getOperationHistory().then(res => this.setState({ operationHistoryData: res.object}));
   };
 
-  // 设置新建病历的formType
+  // 设置新建病历的formType --
   handleBtnChange = (key) => {
-    const { currentTreeKeys, specialistemrData } = this.state;
-    const index = specialistemrData.findIndex(item => item.id.toString() === currentTreeKeys[0]);
-    let newSpecialistemrData = specialistemrData.map(v => v);
-    newSpecialistemrData[index]['formType'] = key;
-    this.setState({ specialistemrData: newSpecialistemrData });
+    const { currentTreeKeys, newSpecialistemrData } = this.state;
+    const index = newSpecialistemrData.findIndex(item => item.id === currentTreeKeys[0]);
+    let nDatas = newSpecialistemrData.map(v => v);
+    nDatas[index]['formType'] = key;
+    this.setState({ newSpecialistemrData: nDatas, currentSpcialistemrData: nDatas[index] });
   };
 
-  // 新建病历
+  // 新建病历 -- 
   newSpecialistemr = () => {
-    const { specialistemrData, currentExpandedKeys } = this.state;
+    const { newSpecialistemrData, currentExpandedKeys } = this.state;
     // 树形菜单
     let newSpecialistemrList = this.state.specialistemrList.map(v => v);
-    const newId = 0 - Math.random() * 100 | 0;
+    const newId = (0-Math.random()*100|0).toString();
     const todayStr = formatDate();
     const todayIndex = newSpecialistemrList.findIndex(item => item.title === todayStr);
     if (todayIndex === -1) {
@@ -142,87 +133,49 @@ export default class MedicalRecord extends Component {
     newData['physical_check_up']['pre_weight'] = openCaseData['pre_weight'];
     newData['physical_check_up']['current_weight'] = openCaseData['current_weight'];
     newData['physical_check_up']['weight_gain'] = openCaseData['weight_gain'];
-
     newData['ckweek'] = userData['tuserweek'];
     newData['createdate'] = todayStr;
 
-    specialistemrData.push(newData);
+    newSpecialistemrData.push(newData);
     // 将formType设置为空 用户选择
     this.setState({specialistemrList: newSpecialistemrList,
-      currentTreeKeys: [newId.toString()],
-      specialistemrData,
-      currentExpandedKeys
+      currentTreeKeys: [newId],
+      newSpecialistemrData,
+      currentExpandedKeys,
+      currentSpcialistemrData: newData
     });
   };
   
-  // fetusTab
+  // fetusTab --
   handleTabsClick = (key) => (this.setState({ uFetusActiveKey: key }));
-  // TODO 处理超声婴儿edit
+
+  // 超声 婴儿 onEdit --
   handleUFetusEdit = (targetKey, action) => {
     console.log(action);
-    const { specialistemrData, currentTreeKeys } = this.state;
-    const index = specialistemrData.findIndex(item => item.id.toString() === currentTreeKeys[0]);
+    const { newSpecialistemrData, currentTreeKeys, currentSpcialistemrData } = this.state;
+    const index = newSpecialistemrData.findIndex(item => item.id === currentTreeKeys[0]);
+    const nS = JSON.parse(JSON.stringify(currentSpcialistemrData));
     if (action === 'remove') {
-      const uIndex = specialistemrData[index].ultrasound.fetus.findIndex(v => v.id.toString() === targetKey);
-      specialistemrData[index].ultrasound.fetus[uIndex].deleteOperation = "1"; 
-      specialistemrData[index].ultrasound.fetus[uIndex].isHidden = true; 
+      const uIndex = nS.ultrasound.fetus.findIndex(v => v.id.toString() === targetKey);
+      nS.ultrasound.fetus[uIndex].deleteOperation = "1"; 
+      nS.ultrasound.fetus[uIndex].isHidden = true; 
     } else if (action === 'add') {
-      if(specialistemrData[index].hasOwnProperty('ultrasound')){
-        if(specialistemrData[index]['ultrasound'].hasOwnProperty('fetus')){
-
-        }else {
-          specialistemrData[index]['ultrasound']['fetus'] = [];
+      if(nS.hasOwnProperty('ultrasound')){
+        if(!nS['ultrasound'].hasOwnProperty('fetus') || !Object.prototype.toString.call(nS['ultrasound']['fetus']) === '[object Array]'){
+          nS['ultrasound']['fetus'] = [];
         }
       }else{
-        specialistemrData[index]['ultrasound'] = {};
-        specialistemrData[index]['ultrasound']['fetus'] = [];
+        nS['ultrasound'] = {};
+        nS['ultrasound']['fetus'] = [];
       }
-      specialistemrData[index].ultrasound.fetus.push({ id: -Math.random(), userId: specialistemrData.userid });
+      nS.ultrasound.fetus.push({ id: (-Math.random()).toString, userId: currentSpcialistemrData.userid});
     }
-    this.setState({ specialistemrData });
+    this.setState({ currentSpcialistemrData: nS});
+    if(Number(currentTreeKeys[0]) < 0){
+      newSpecialistemrData.splice(index,1,nS);
+      this.setState({newSpecialistemrData});
+    }
   };
-
-  // 处理隐藏按钮的事件
-  handleCheckBox = (checked, name) => {
-    const { specialistemrData, currentTreeKeys } = this.state;
-    const i = specialistemrData.findIndex(v => v.id.toString() === currentTreeKeys[0]);
-    if(i === -1) {return;}
-    if(checked) {
-      let newS = specialistemrData.map(v => v);
-      let obj = Object.assign({}, newS[i]);
-      switch(name){
-        case 'u':
-          obj.ultrasound['fetus'].forEach(v => { v.deleteOperation = "1"; v.isHidden = true; });
-          obj.ultrasound.menopause = '';
-          newS.splice(i,1,obj);
-          this.setState({isUltrasoundChecked: !checked, specialistemrData: newS, ultrasoundMiddleData: []});
-          break;
-        case 't':
-          obj.thalassemia.wife = {};
-          obj.thalassemia.husband = {};
-          newS.splice(i,1,obj);
-          this.setState({isThalassemiaChecked: !checked, specialistemrData: newS});
-          break;
-        case 'd':
-          obj.downs_screen = {early: {}, middle: {}, nipt: {}};
-          newS.splice(i,1,obj);
-          this.setState({isDownsScreenChecked: !checked, specialistemrData: newS});
-          break;
-      }
-    }else{
-      switch(name){
-        case 'u':
-          this.setState({isUltrasoundChecked: !checked});
-          break;
-        case 't':
-          this.setState({isThalassemiaChecked: !checked});
-          break;
-        case 'd':
-          this.setState({isDownsScreenChecked: !checked});
-          break;
-      }
-    }
-  }
 
   // 处理form表单变化 公共处理 -
   // TODO 修改组件后必须改 - 暂时手动传入父键名
@@ -237,9 +190,9 @@ export default class MedicalRecord extends Component {
       message.error(error);
       return;
     }
-    const { specialistemrData, currentTreeKeys } = this.state;
-    const index = specialistemrData.findIndex(item => item.id.toString() === currentTreeKeys[0]);
-    let obj = JSON.parse(JSON.stringify(specialistemrData[index]));
+    const { newSpecialistemrData, currentTreeKeys, currentSpcialistemrData } = this.state;
+    const index = newSpecialistemrData.findIndex(item => item.id.toString() === currentTreeKeys[0]);
+    let obj = JSON.parse(JSON.stringify(currentSpcialistemrData));
 
     if (path === "") {
       // 为第一层值
@@ -268,56 +221,52 @@ export default class MedicalRecord extends Component {
           }
           obj['physical_check_up'][name] = value;
           break;
-        case 'genotype':
-          // 测试多选 之后可以去掉
-          console.log(value);
-          mapValueToKey(obj, `${path}.${name}`, value);
-          break;
         default:
           mapValueToKey(obj, `${path}.${name}`, value);
       }
     }
-    console.log(obj);
-    specialistemrData.splice(index,1,obj);
-    this.setState({ specialistemrData: specialistemrData }, () => console.log(this.state));
+    this.setState({currentSpcialistemrData: obj },() => console.log(this.state));
+    if(Number(currentTreeKeys) < 0) {
+      newSpecialistemrData.splice(index,1,obj);
+      this.setState({ newSpecialistemrData},() => console.log(this.state));
+    }
   };
 
-  // 表单保存 - 未检查
+  // 表单保存 - --
   handleSave = () => {
-    const { currentTreeKeys, specialistemrData, ultrasoundMiddleData, operationHistoryData } = this.state;
+    const { currentTreeKeys,  currentSpcialistemrData, ultrasoundMiddleData, operationHistoryData } = this.state;
     const FORM_BLOCK = "form-block";
     fireForm(document.getElementById(FORM_BLOCK), 'valid').then(validCode => {
       if (validCode) {
         // 保存
-        const index = specialistemrData.findIndex(item => item['id'].toString() === currentTreeKeys[0]);
         // 整合bp的格式
-        const { formType } = specialistemrData[index];
-        specialistemrData[index]['physical_check_up']['bp'] = '0'; 
-        if(!specialistemrData[index].hasOwnProperty('downs_screen')) {
-          specialistemrData[index]['downs_screen'] = {};
+        const { formType } = currentSpcialistemrData;
+        currentSpcialistemrData['physical_check_up']['bp'] = '0'; 
+        if(!currentSpcialistemrData.hasOwnProperty('downs_screen')) {
+          currentSpcialistemrData['downs_screen'] = {};
         }
-        if(!specialistemrData[index].hasOwnProperty('thalassemia')) {
-          specialistemrData[index]['thalassemia'] = {};
+        if(!currentSpcialistemrData.hasOwnProperty('thalassemia')) {
+          currentSpcialistemrData['thalassemia'] = {};
         }
         if(formType === '1') {
-          specialistemrData[index].ultrasound.fetus.forEach(v => {
+          currentSpcialistemrData.ultrasound.fetus.forEach(v => {
             if(Number(v.id) < 0) {
               v.id = "";
             }
           })
         }
         // 新建置空
-        if(specialistemrData[index].id < 0) {
-          specialistemrData[index].id = "";
+        if(currentSpcialistemrData.id < 0) {
+          currentSpcialistemrData.id = "";
         }
         // 专科病历主体保存
-        service.medicalrecord.savespecialistemrdetail(specialistemrData[index]).then(res => {
+        service.medicalrecord.savespecialistemrdetail(currentSpcialistemrData).then(res => {
           console.log(res);
           if(res.code === "200") {
             message.success('成功保存');
             service.medicalrecord.getspecialistemr().then(res => {
               if (res.code === "200" || res.code === 200) {
-                this.setState({ specialistemrList: res.object.list, currentTreeKeys: '0' }, () => { })
+                this.setState({ specialistemrList: res.object.list, currentTreeKeys: [] , currentSpcialistemrData: {} }, () => { })
               }
             });
           }
@@ -343,31 +292,28 @@ export default class MedicalRecord extends Component {
     })
   };
 
-  // 处理隐藏按钮的事件
+  // 处理隐藏按钮的事件 -- 
   handleCheckBox = (checked, name) => {
-    const { specialistemrData, currentTreeKeys } = this.state;
-    const i = specialistemrData.findIndex(v => v.id.toString() === currentTreeKeys[0]);
-    if(i === -1) {return;}
-    if(checked) {
-      let newS = specialistemrData.map(v => v);
-      let obj = Object.assign({}, newS[i]);
+    const { newSpecialistemrData, currentTreeKeys, currentSpcialistemrData } = this.state;
+    const i = newSpecialistemrData.findIndex(v => v.id === currentTreeKeys[0]);
+    const nS = JSON.parse(JSON.stringify(currentSpcialistemrData));
+    console.log(checked);
+    console.log(name);
+    if(checked){
       switch(name){
         case 'u':
-          obj.ultrasound['fetus'].forEach(v => { v.deleteOperation = "1"; v.isHidden = true; });
-          obj.ultrasound.menopause = '';
-          newS.splice(i,1,obj);
-          this.setState({isUltrasoundChecked: !checked, specialistemrData: newS, ultrasoundMiddleData: []});
+          nS.ultrasound['fetus'].forEach(v => { v.deleteOperation = "1"; v.isHidden = true; });
+          nS.ultrasound.menopause = '';
+          this.setState({isUltrasoundChecked: !checked, ultrasoundMiddleData: [], currentSpcialistemrData: nS});
           break;
         case 't':
-          obj.thalassemia.wife = {};
-          obj.thalassemia.husband = {};
-          newS.splice(i,1,obj);
-          this.setState({isThalassemiaChecked: !checked, specialistemrData: newS});
+          nS.thalassemia.wife = {genotype:[]};
+          nS.thalassemia.husband = {genotype:[]};
+          this.setState({isThalassemiaChecked: !checked, currentSpcialistemrData: nS});
           break;
         case 'd':
-          obj.downs_screen = {early: {}, middle: {}, nipt: {}};
-          newS.splice(i,1,obj);
-          this.setState({isDownsScreenChecked: !checked, specialistemrData: newS});
+          nS.downs_screen = {early: {}, middle: {}, nipt: {}};
+          this.setState({isDownsScreenChecked: !checked, currentSpcialistemrData: nS});
           break;
       }
     }else{
@@ -383,6 +329,12 @@ export default class MedicalRecord extends Component {
           break;
       }
     }
+
+    this.setState({currentSpcialistemrData: nS },() => console.log(this.state));
+    if(Number(currentTreeKeys) < 0){
+      newSpecialistemrData.splice(i,1,nS);
+      this.setState({newSpecialistemrData},() => console.log(this.setState));
+    }
   }
 
   /**
@@ -392,8 +344,6 @@ export default class MedicalRecord extends Component {
   // 处理中孕超声修改 只处理删除 ，在handleSave统一处理增加和修改
   handleUltraSoundMiddleEdit =  (newData) => {
     const { ultrasoundMiddleData } = this.state;
-    console.log(ultrasoundMiddleData);
-    console.log(newData);
     let oldData = ultrasoundMiddleData;
     // 1.遍历新数据 - 用于新增
     for(let i = 0 ; i < newData.length; i++){
@@ -426,9 +376,6 @@ export default class MedicalRecord extends Component {
         newData.splice(index, 1, oldData[j]);
       }
     }
-
-
-    console.log(newData);
     this.setState({ultrasoundMiddleData: newData});
   }
 
@@ -471,26 +418,23 @@ export default class MedicalRecord extends Component {
   }
   /* ========================= 渲染方法 ============================== */
   // 渲染左侧记录树 - 二级
-  renderTree = (data) => {
-    const { currentExpandedKeys } = this.state;
-    return (
-      <Tree
-        onSelect={this.handleTreeSelect}
-        defaultExpandAll
-        selectedKeys={this.state.currentTreeKeys || []}
-        expandedKeys={currentExpandedKeys}
-        multiple={false}
-      >
-        {data.map(v => (
-          <TreeNode title={v.title.slice(0,12)} key={v.key}>
-            {v.children.map(u => (
-              <TreeNode title={u.key < 0 ? <span style={{color:'red'}}>{u.title}</span> : u.title} key={u.key} />
-            ))}
-          </TreeNode>
-        ))}
-      </Tree>
-    );
-  };
+  renderTree = (data) => (
+    <Tree
+      onSelect={this.handleTreeSelect}
+      defaultExpandAll
+      selectedKeys={this.state.currentTreeKeys || []}
+      expandedKeys={this.state.currentExpandedKeys || []}
+    >
+      {data.map(v => (
+        <TreeNode title={v.title.slice(0,12)} key={v.key}>
+          {v.children.map(u => (
+            <TreeNode title={Number(u.key) < 0 ? <span style={{color:'red'}}>{u.title}</span> : u.title} key={u.key} />
+          ))}
+        </TreeNode>
+      ))}
+    </Tree>
+  );
+  
   // 渲染btnGroup
   renderBtn = (formType) => (
     <ButtonGroup>
@@ -614,7 +558,7 @@ export default class MedicalRecord extends Component {
     }
   }
 
-  // 渲染 超声检查 胎儿Tab
+  // 渲染 超声检查 胎儿Tab -- 
   renderUFetusTabPane = (fetusData) => {
     if (fetusData.length === 0) return <div key="none">暂无数据</div>;
     const fetusTabPaneDOM = [];
@@ -622,7 +566,6 @@ export default class MedicalRecord extends Component {
       if(!fetus.isHidden) {
         fetusTabPaneDOM.push(
           <TabPane key={fetus.id} tab={`胎儿-${index + 1}`}>
-            {/*// TODO 这里的处理需要另外做*/}
             {formRender(fetus, mdConfig.ultrasound_fetus_config(), (_, { name, value }) => this.handleFormChange(`ultrasound.fetus-${index}`, name, value))}
           </TabPane>
         );
@@ -669,8 +612,8 @@ export default class MedicalRecord extends Component {
   // 打开modal框 & 根据type值搜索对应模板
   openModal = (type) => {
     if (type) {
-      const { currentTreeKeys, specialistemrData } = this.state;
-      const doctor = specialistemrData[specialistemrData.findIndex(item => item.id.toString() === currentTreeKeys[0])].doctor || "";
+      const { currentSpcialistemrData } = this.state;
+      const doctor = currentSpcialistemrData.doctor || "";
       this.setState({templateObj: {isShowTemplateModal: true,type: type,doctor: doctor}});
     }
   };
@@ -682,52 +625,52 @@ export default class MedicalRecord extends Component {
   };
   // 获取template的输入信息
   getTemplateInput = (items) => {
-    const { currentTreeKeys, specialistemrData } = this.state;
+    const { currentTreeKeys, currentSpcialistemrData, newSpecialistemrData } = this.state;
     const { type } = this.state.templateObj;
     const content = items.map(v => v.content).join(" ");
-    console.log(content);
-    const index = specialistemrData.findIndex(item => item.id.toString() === currentTreeKeys[0]);
+    const index = newSpecialistemrData.findIndex(item => item.id === currentTreeKeys[0]);
+    let nS = JSON.parse(JSON.stringify(currentSpcialistemrData));
     switch(type) {
       case 'dmr1':
-        specialistemrData[index]['chief_complaint'] = content;
+        nS['chief_complaint'] = content;
         break;
       case 'dmr2':
-        specialistemrData[index]['medical_history'] = content;
+        nS['medical_history'] = content;
         break;
       case 'dmr3':
-        specialistemrData[index]['other_exam'] = content;
+        nS['other_exam'] = content;
         break;
       case 'dmr4':
-        specialistemrData[index]['diagnosis'] = content;
+        nS['diagnosis'] = content;
         break;
       case 'dmr5':
-        specialistemrData[index]['treatment'] = content;
+        nS['treatment'] = content;
         break;
       case 'dmr6':
-        specialistemrData[index]['karyotype'] = content;
+        nS['karyotype'] = content;
         break;
       case 'dmr7':
-        specialistemrData[index]['stateChange'] = content;
+        nS['stateChange'] = content;
         break;
       case 'dmr8':
-        specialistemrData[index]['lastResult'] = content;
+        nS['lastResult'] = content;
         break;
       default:
         console.log('type error');
         break;
     }
-    this.setState({specialistemrData},() => this.closeModal())
+    this.setState({currentSpcialistemrData: nS},() => {this.closeModal();console.log(this.state)});
+    if(Number(currentTreeKeys) < 0) {
+      newSpecialistemrData.splice(index,1,ns);
+      this.setState({newSpecialistemrData});
+    }
   }
 
 
   render() {
-    const { specialistemrList, specialistemrData, currentTreeKeys } = this.state;
+    const { specialistemrList, currentSpcialistemrData ,currentTreeKeys } = this.state;
     const { isShowTemplateModal, doctor, type } = this.state.templateObj;
-    // data index用于回调赋值
-    const i = specialistemrData.findIndex(item => item.id.toString() === currentTreeKeys[0]);
-    let renderData = {};
-    if(i !== -1) { renderData = specialistemrData[i]; }
-    const { formType } = renderData;
+    const { formType = "" } = currentSpcialistemrData;
     return (
       <Page className='fuzhen font-16 ant-col'>
         <div className="fuzhen-left ant-col-5">
@@ -741,7 +684,7 @@ export default class MedicalRecord extends Component {
           </div>
           {/* 表单主体 */}
           <div id="form-block">
-            {this.renderForm(renderData)}
+            {this.renderForm(currentSpcialistemrData)}
           </div>
           {/* 操作按钮 */}
           <div>

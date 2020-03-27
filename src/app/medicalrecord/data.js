@@ -1,13 +1,3 @@
-// function toOptions(data, vfn = ()=>({})){
-// 	if(data instanceof Array){
-// 		return data.map((v,i) => ({ label: v, value: v, ...vfn(v,i) }))
-// 	}
-// 	if(data && typeof data === 'object'){
-// 		return Object.keys(data).map(i => ({ label: data[i], value: i, ...vfn(v,i) }))
-// 	}
-// 	return [];
-// }
-
 /**
  * 如果不想在value里面使用label的数据，可以换成用index作为value
  */
@@ -27,27 +17,6 @@ function toOptions(data, vfn = () => ({})) {
 	return [];
 }
 
-/**
- * 浮肿
- */
-export const ckfuzhOptions = [
-	{ label: '-', value: '1' },
-	{ label: '+', value: '2' },
-	{ label: '++', value: '3' },
-	{ label: '+++', value: '4' },
-	{ label: '++++', value: '5' },
-];
-
-
-
-
-
-
-
-
-
-
-
 
 /**
  * 血型O,A,B,AB
@@ -66,22 +35,6 @@ export const xuexing2Options = [{ label: 'RH(+)', value: 'RH(+)' },
 //toOptions('RH(+),RH(-)');
 
 /**
- * 一般症状
- */
-export const ybzzOptions = toOptions('头晕{#FF3300},头痛{#FF3300},呕吐{#FF3300},胸闷{#FF3300},肚痛{#FF3300},腰酸{#FF3300},流血{#FF3300},白带增多{#FF3300},便秘{#FF3300},抽筋{#FF3300},浮肿{#FF3300},其他{#FF3300}');
-
-/**
- * 疾病
- */
-export const jibOptions = toOptions('高血压{#FF3300},心脏病{#FF3300},癫痫{#FF3300},甲亢{#FF3300},甲减{#FF3300},糖尿病{#FF3300},肾脏疾病{#FF3300},风湿{#FF3300},肝脏疾病{#FF3300},肺结核{#FF3300},血栓疾病{#FF3300},地中海贫血{#FF3300},G6PD缺乏症{#FF3300},其他');
-
-
-
-/**
- *无、有
-*/
-export const hnOptions = toOptions('无,有');
-/**
  *有、无
 */
 export const nhOptions = toOptions('无,有(input){#FF3300}');
@@ -91,7 +44,7 @@ export const wssOptions = toOptions([{k: '无', span: 2},{ k: '有{#FF3300}(inpu
 export const sxsOptions = toOptions([{k: '无', span: 2},{ k: '有{#FF3300}(bloodinput)'}]);
 
 /**
- *下肢浮肿
+ *浮肿
 */
 export const xzfOptions = toOptions('-,+,+-,++,+++');
 
@@ -109,7 +62,7 @@ export const genotypeAnemia = toOptions('β地中海贫血基因CD14-15突变,β
 export const ywgmOptions = toOptions('无,药物{#FF3300}(input),食物{#FF3300}(input),其他{#FF3300}(input)');
 
 /**
- * 初潮
+ * 次数选择
  */
 export const ccOptions = toOptions('1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16');
 
@@ -195,165 +148,6 @@ export const BvColumns = [
 		type: 'input'
 	},
 ]
-
-/**
- * 孕产史表头
- */
-export const pregnanciesColumns = [
-	{
-		title: '孕次',
-		key: 'index',
-		width: '50',
-		format: (v, { row }) => row + 1
-	},
-	{
-		title: '   年-月    ',
-		key: 'datagridYearMonth',
-		type: 'date',
-		width: '160',
-		mode: "ym",
-	},
-	{
-		title: '流产',
-		children: [
-			{
-				title: '自然',
-				key: 'zir',
-				type: 'input'
-			},
-			{
-				title: '清宫',
-				key: 'removalUterus',
-				type: 'checkbox',
-				holdeditor: true
-			},
-			{
-				title: '人工',
-				key: 'reng',
-				type: 'input'
-			}
-		]
-	},
-	{
-		title: '引产',
-		key: 'yinch',
-		type: 'input'
-	},
-	{
-		title: '死胎',
-		key: 'sit',
-		type: 'checkbox',
-		holdeditor: true
-	},
-	{
-		title: '早产',
-		key: 'zaoch',
-		type: 'input'
-	},
-	{
-		title: '足月产',
-		key: 'zuych',
-		type: 'input'
-	},
-	{
-		title: '分娩方式',
-		children: [
-			{
-				title: '顺产',
-				key: 'shunch',
-				type: 'checkbox',
-				holdeditor: true
-			},
-			{
-				title: '手术产式',
-				key: 'shouShuChanType',
-				type: 'input'
-			}
-		]
-	},
-	{
-		title: '产后情况',
-		children: [
-			{
-				title: '出血',
-				key: 'chuxue',
-				type: 'checkbox',
-				holdeditor: true
-			},
-			{
-				title: '产褥热',
-				key: 'chanrure',
-				type: 'checkbox',
-				holdeditor: true
-			}
-		]
-	},
-	{
-		title: '并发症',
-		key: 'bingfzh',
-		type: 'input',
-		width: '200',
-	},
-	{
-		title: '小孩情况',
-		children: [
-			{
-				title: '性别',
-				key: 'xingb',
-				type: 'select',
-				showSearch: true,
-				options: [
-					{ label: '男', value: '1' },
-					{ label: '女', value: '2' },
-					{ label: '未知', value: '3' },
-				],
-			},
-			{
-				title: '生存',
-				key: 'child',
-				type: 'select',
-				showSearch: true,
-				options: [
-					{ label: '健在', value: '1' },
-					{ label: '死亡', value: '2' },
-					{ label: '未知', value: '3' },
-				],
-			},
-			{
-				title: '死亡时间',
-				key: 'siw',
-				type: 'input'
-			},
-			{
-				title: '死亡原因',
-				key: 'deathCause',
-				type: 'input'
-			},
-			{
-				title: '后遗症',
-				key: 'sequela',
-				type: 'input'
-			},
-			{
-				title: '出生体重(kg)',
-				key: 'tizh',
-				type: 'input'
-			}
-		]
-	},
-	{
-		title: '分娩医院',
-		key: 'hospital',
-		type: 'input'
-	},
-	{
-		title: '备注',
-		key: 'hospital',
-		type: 'input'
-	}
-]
-
-
 
 export const newDataTemplate = {
 	userid: "",
