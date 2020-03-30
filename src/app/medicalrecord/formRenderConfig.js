@@ -292,9 +292,15 @@ const config = {
     rows:[
       {
         columns:[
-          {
-            name: 'cktaix[胎心率](bpm)', type: 'input', span: 6, valid: 'required|number'
-          },
+          {name:'pre_weight(kg)[孕前体重]', type:'input', span:6, valid: 'required|number|rang(10,100)'},
+
+          {name:'current_weight(kg)[现 体 重 ]', type:'input', span:6, valid: 'required|number|rang(0,100)'},
+
+          {name:'weight_gain(kg)[体重增长]',type:'input', span:6, valid: 'required|number'},
+        ]
+      },
+      {
+        columns: [
           {
             name: 'bp(mmHg)[血@@@压 ]', type: ['input(/)','input'], span: 6, valid: (value)=>{
               let message = '';
@@ -319,14 +325,20 @@ const config = {
 
           {name:'waist_hip(cm)[腹@@@围 ]', type:'input', span:8, valid: 'number|rang(0,100)'},
         ]
-      },
+      }
+    ]
+  }),
+  // 体格检查
+  check_up_CKandPRE_config:() => ({
+    row:[
       {
         columns:[
-          {name:'pre_weight(kg)[孕前体重]', type:'input', span:6, valid: 'required|number|rang(10,100)'},
-
-          {name:'current_weight(kg)[现 体 重 ]', type:'input', span:6, valid: 'required|number|rang(0,100)'},
-
-          {name:'weight_gain(kg)[体重增长]',type:'input', span:6, valid: 'required|number'},
+          {
+            name: 'cktaix[胎心率](bpm)', type: 'input', span: 6, valid: 'required|number'
+          },
+          {
+            name: 'presentation[先露]', type: 'select', span: 6, options: baseData.presentationOptions
+          }
         ]
       }
     ]

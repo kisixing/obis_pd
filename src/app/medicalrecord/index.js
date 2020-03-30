@@ -41,6 +41,7 @@ export default class MedicalRecord extends Component {
       operationHistoryData: [], // 胎儿疾病 - 手术史数据
       /* control */
       uFetusActiveKey: '-1',  // 胎儿疾病 - 超声检查 Tab
+      pFetusActiveKey: '-1', // 体格检查 - 先露/胎心率 Tab
       isDownsScreenChecked: true,
       isThalassemiaChecked: true,
       isUltrasoundChecked: true,
@@ -513,7 +514,24 @@ export default class MedicalRecord extends Component {
               </div>
             </Panel>
             <Panel header="家族史" key="fetus-8">{formRender(family_history, mdConfig.family_history_config(), (_, { name, value, error }) => this.handleFormChange("family_history", name, value, error))}</Panel>
-            <Panel header="体格检查" key="fetus-9">{formRender(physical_check_up, mdConfig.physical_check_up_config(), (_, { name, value, error }) => this.handleFormChange("physical_check_up", name, value, error))}</Panel>
+            <Panel header="体格检查" key="fetus-9">
+              <div>
+                {formRender(physical_check_up, mdConfig.physical_check_up_config(), (_, { name, value, error }) => this.handleFormChange("physical_check_up", name, value, error))}
+              </div>
+              {/* <div>
+                <div>
+                    <Tabs
+                      activeKey={pFetusActiveKey}
+                      onTabClick={this.handleTabsClick}
+                      type="editable-card"
+                      onEdit={this.handleUFetusEdit}
+                    >{this.renderUFetusTabPane(ultrasound['fetus'])}</Tabs>
+                  </div>
+                  <div>
+                    {formRender({ cktaix: physical_check_up.cktaix , presentation:  }, mdConfig.middle_config(), (_, { value }) => this.handleUltraSoundMiddleEdit(value))}
+                  </div>
+              </div> */ }
+              </Panel>
             <Panel header="诊断" key="fetus-10">{formRender({ diagnosis: diagnosis }, mdConfig.diagnosis_config(this.openModal), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}</Panel>
             <Panel header="处理" key="fetus-11">{formRender({ treatment: treatment }, mdConfig.treatment_config(this.openModal), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}</Panel>
           </Collapse>
@@ -661,7 +679,7 @@ export default class MedicalRecord extends Component {
     }
     this.setState({currentSpcialistemrData: nS},() => {this.closeModal();console.log(this.state)});
     if(Number(currentTreeKeys) < 0) {
-      newSpecialistemrData.splice(index,1,ns);
+      newSpecialistemrData.splice(index,1,nS);
       this.setState({newSpecialistemrData});
     }
   }

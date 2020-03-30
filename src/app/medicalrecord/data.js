@@ -66,6 +66,12 @@ export const ywgmOptions = toOptions('无,药物{#FF3300}(input),食物{#FF3300}
  */
 export const ccOptions = toOptions('1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16');
 
+
+/**
+ * 先露
+ */
+export const presentationOptions = toOptions('头,臀,肩');
+
 /**
  * 手术史表头
  */
