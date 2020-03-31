@@ -1,12 +1,12 @@
 /**
  * 返回的message里面带*的标识error级别，否则就是warning级别
  * 2020-03-12
- * 修改required正则
+ * 修改required正则 - 这里的required是不判断undefined的
  */
 
 const validationFns = {
   required: function (value) {
-    if (!/\S/.test(value) || (typeof value === 'object' && !Object.keys(value || {}).filter(i => !/^$/.test(i)).length)) {
+    if (value === "" || !/\S/.test(value) || (typeof value === 'object' && !Object.keys(value || {}).filter(i => !/^$/.test(i)).length)) {
       return '*此值不可为空';
     }
   },

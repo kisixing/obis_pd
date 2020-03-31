@@ -26,6 +26,7 @@ export const validIDCard = (value = {}, isP = true) => {
  * @param {n} - string number
  */
 export const validPhoneNumber = (n = "") => {
+  if(n === "") return "";
   return numberReg.test(n) ? "" : "*请输入正确的手机号码"
 }
 

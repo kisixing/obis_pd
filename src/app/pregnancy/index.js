@@ -5,7 +5,7 @@ import Page from '../../render/page';
 import service from '../../service/index';
 import store from '../store';
 
-import { sfzOptions } from './data';
+import { sfzOptions, nationList } from './data';
 
 import { convertString2Json } from '../../utils/index';
 
@@ -51,8 +51,8 @@ export default class Patient extends Component {
   };
 
   convertPregnancyData = (object) => {
-    const { useroccupation, useridtype, useridno } = object.gravidaInfo;
-    const { userhoccupation, add_FIELD_husband_useridtype } = object.husbandInfo;
+    const { useroccupation, useridtype, useridno, userpeople } = object.gravidaInfo;
+    const { userhoccupation, add_FIELD_husband_useridtype, userhpeople} = object.husbandInfo;
     // 整合职业数据 - 转格式
     if(useroccupation && useroccupation.indexOf('{') !== -1) {
       object.gravidaInfo.useroccupation = convertString2Json(useroccupation).label;
@@ -66,6 +66,12 @@ export default class Patient extends Component {
     }
     if(add_FIELD_husband_useridtype && add_FIELD_husband_useridtype.indexOf('{') !== -1) {
       object.husbandInfo.add_FIELD_husband_useridtype = convertString2Json(add_FIELD_husband_useridtype);
+    }
+    if(userpeople && userpeople.indexOf('{') !== -1) {
+      object.gravidaInfo.userpeople = convertString2Json(userpeople);
+    }
+    if(userhpeople && userhpeople.indexOf('{') !== -1) {
+      object.husbandInfo.userhpeople = convertString2Json(userhpeople);
     }
     // 剪切生日
     if(useridno){
@@ -105,7 +111,7 @@ export default class Patient extends Component {
           { span: 1 },
           { name: 'userroots[籍贯]', type: 'input', span: 5 ,valid: 'required'},
           { span: 1 },
-          { name: 'userpeople[民族]', type: 'input', span: 4 ,valid: 'required'},
+          { name: 'userpeople[民族]', type: 'select', span: 4 ,options: nationList, valid: 'required'},
           { span: 1 },
           { name: 'useroccupation[职业]', type: 'input', span: 6 },
         ]

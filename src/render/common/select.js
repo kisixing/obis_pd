@@ -1,80 +1,77 @@
 import React, { Component } from "react";
-import { Row, Col, Button, Input, Table, Select, DatePicker } from 'antd';
-
-/**
- * 2020-03-20
- * 中文输入时也增加进入了options中
- */
-
-// 新增custom字段，可以用于支持自定义输入
-export function select({ name, options, width, value='', tags = false , custom, onChange, onBlur=()=>{}, ...props }){
-  
-  // let mySelect ;
-
-  // mySelect.current.addEventListener('compositionStart',() => {
-  //   console.log('11');
-  // })
-
-  
-
-  const getValue = () => {
-    if(value && Object.prototype.toString.call(value) === '[object Object]'){
-      return value.value;
-    }
-    // 支持tags后返回不正常
-    if(Object.prototype.toString.call(value) === '[object Array]'){
-      return value.map(v => v.value);
-    }
-    return value;
+import { Select } from 'antd';
+class MySelect extends Component{
+  constructor(props){
+    super(props);
+    this.state = {
+      options: [],
+      value: [],
+      isEnd: false
+    };
   }
-  // 这个函数只有选择才会触发
-  const handleChange = e => {
-    // 新增支持多选
-    if(Object.prototype.toString.call(e) === '[object Array]'){
-      let r = e.map(v => options.filter(o=>o.value==v).pop());
-      onChange(e, r).then(()=>onBlur({checkedChange:true}));
-    }else{
-      // 一般对象
-      onChange(e, options.filter(o=>o.value==e).pop()).then(()=>onBlur({checkedChange:true}));
-    }
+
+
+  componentDidMount() {
+    const { options } = this.props;
+    this.setState({options: options})
   }
-  // 在输入框输入即会触发
-  // TODO 有bug 待定
-  const handleSearch = (e) => {
-    // 新增支持自定义输入值 - 多选
-    if(tags){
-      for(let i=0;i<e.length;i++){
-        if(options.findIndex(v => v.value === e[i]) === -1){
-          // options.push({value:e[i], label:e[i]}); 
+
+  handleSearch = (val) => {
+    // 这个位置延时一下，确保onCompositionEnd在这一个方法后触发
+    setTimeout(() => {
+      if(!this.state.isEnd) return;
+      const {custom,tags} = this.props;
+      this.setState((state) => {
+        // 仅在custom与tags模式下才可以自定义输入
+        if(!state.options.find(o => o.value === val) && (custom || tags)){
+          state.options.push({label:val,value:val});
         }
-      }
-    }
-    // 新增支持自定义输入值 - 单选
-    console.log(e);
-    if(custom){
-      if(options.findIndex(v => v.value === e) === -1){
-        options.push({value:e, label:e});
-        onChange(e, {value: e, label: e}).then(()=>onBlur({checkedChange:true}));
-      }
-    }
+        return state;
+      })
+    }, 200)
   }
 
-  return (
-    <Select 
-      {...props} 
-      value={getValue()} 
-      options={options} 
-      onChange={handleChange} 
-      onSearch={handleSearch} 
-      tags={tags}
-      // ref={node => mySelect = node}
-    >
-      {options.map(o => <Select.Option key={`${name}-${o.value}`} value={o.value}>{o.label}</Select.Option>)}
-    </Select>
-  )
+  handleChange = (val) => {
+    if(Object.prototype.toString.call(val) === '[object Array]'){
+      this.setState({value:val},() => {
+        const { onChange, onBlur } = this.props;
+        const { options } = this.state;
+        const res = val.map(v => options.find(o => o.value === v));
+        onChange('event', res).then(() => onBlur({checkedChange:true}));
+      });
+    }else{
+      // 单选
+      this.setState({value:val},() => {
+        const { onChange, onBlur } = this.props;
+        const { options } = this.state;
+        // 这个event是空的
+        onChange('event', {label: val, vale: val}).then(() => onBlur({checkedChange:true}));
+      });
+    }
+    
+  }
+  render() {
+    const { options, value } = this.state;
+    return (
+      <div 
+        onCompositionStart={() => this.setState({isEnd: false})}
+        onCompositionEnd={() => this.setState({isEnd: true})}
+      >
+        <Select
+        {...this.props} 
+        value={value} 
+        options={options} 
+        onChange={this.handleChange} 
+        onSearch={this.handleSearch} 
+        ref="mySelect"
+      >
+        {options.map(o => <Select.Option key={`${name}-${o.value}`} value={o.value}>{o.label}</Select.Option>)}
+      </Select>
+      </div> 
+    )
+  }
 }
 
-export function combobox(props){
-  return select({...props, showSearch:true, combobox:true, showArrow:false})
+export function select(props) {
+  return <MySelect {...props}/>
 }
-

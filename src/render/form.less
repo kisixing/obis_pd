@@ -28,6 +28,13 @@
     >* {
       display: inline-block;
     }
+    select, input, .ant-select-selection{
+      font-size: 16px;
+      border-radius: 0;
+      border: none ;
+      border-bottom: 1px solid #cccccc;
+      background: none ;
+    }
     .form-unit{
       font-size: 0.7em;
       padding-left: 2px;
@@ -55,6 +62,7 @@
   }
   .inputxxx{
     border: none ;
+    border-bottom: 1px solid #cccccc;
   }
   .ant-checkbox-wrapper{
     // color: #d3d3d3;
@@ -65,6 +73,7 @@
   input,textarea,.checkinput,.ant-select-selection {
     // color: #ff3300;
     border: 1px solid #ff3300 !important;
+    border-radius: 5px;
   }
 }
 .form-warn {
@@ -107,8 +116,10 @@
 
 .inputxxx{
   background: #ffffff;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  // border: 1px solid #ccc;
+  border: none;
+  border-bottom: 1px solid #cccccc;
+  // border-radius: 5px;
   >*{
     display: inline-block;
     select, input, .ant-select-selection{

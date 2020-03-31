@@ -11,12 +11,19 @@ import { newDataTemplate } from './data';
 import { convertString2Json, mapValueToKey, formatDate } from '../../utils/index';
 import service from "../../service";
 import './index.less';
+import '../index.less';
 
 const { TreeNode } = Tree;
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
 const ButtonGroup = Button.Group;
 
+// 展开所有
+const defaultActiveKeys = [
+  'fetus-0', 'fetus-1', 'fetus-2', 'fetus-3', 'fetus-4', 'fetus-5', 'fetus-6', 'fetus-7', 'fetus-8', 'fetus-9', 'fetus-10', 'fetus-11',
+  'genetic-0', 'genetic-1', 'genetic-2', 'genetic-3', 'genetic-4', 'genetic-5', 'genetic-6', 'genetic-7', 'genetic-8', 'genetic-9',
+  'fuzhen-0', 'fuzhen-1', 'fuzhen-2', 'fuzhen-3', 'fuzhen-4', 'fuzhen-5', 'fuzhen-6'
+]
 /**
  * 专科病例页面备注
  * 1.新建时（包括病例和胎儿） 
@@ -41,7 +48,7 @@ export default class MedicalRecord extends Component {
       operationHistoryData: [], // 胎儿疾病 - 手术史数据
       /* control */
       uFetusActiveKey: '-1',  // 胎儿疾病 - 超声检查 Tab
-      pFetusActiveKey: '-1', // 体格检查 - 先露/胎心率 Tab
+      cFetusActiveKey: '-1', // 体格检查 - 先露/胎心率 Tab
       isDownsScreenChecked: true,
       isThalassemiaChecked: true,
       isUltrasoundChecked: true,
@@ -61,6 +68,10 @@ export default class MedicalRecord extends Component {
     }else{
       message.info('用户为空');
     }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    console.log(prevState);
   }
 
   /* ========================= 事件交互类 =========================== */
@@ -148,7 +159,13 @@ export default class MedicalRecord extends Component {
   };
   
   // fetusTab --
-  handleTabsClick = (key) => (this.setState({ uFetusActiveKey: key }));
+  handleTabsClick = (key, type) => {
+    if(type === 'u'){
+      this.setState({ uFetusActiveKey: key });
+    }else if(type === 'c'){
+      this.setState({ cFetusActiveKey: key });
+    }
+  };
 
   // 超声 婴儿 onEdit --
   handleUFetusEdit = (targetKey, action) => {
@@ -177,6 +194,35 @@ export default class MedicalRecord extends Component {
       this.setState({newSpecialistemrData});
     }
   };
+
+  handleCFetusEdit = (targetKey, action) => {
+    console.log(action);
+    const { newSpecialistemrData, currentTreeKeys, currentSpcialistemrData } = this.state;
+    const index = newSpecialistemrData.findIndex(item => item.id === currentTreeKeys[0]);
+    const nS = JSON.parse(JSON.stringify(currentSpcialistemrData));
+    console.log(nS);
+    if (action === 'remove') {
+      const uIndex = nS.ultrasound.fetus.findIndex(v => v.id.toString() === targetKey);
+      nS.ultrasound.fetus[uIndex].deleteOperation = "1"; 
+      nS.ultrasound.fetus[uIndex].isHidden = true; 
+    } else if (action === 'add') {
+      if(nS.hasOwnProperty('physical_check_up')){
+        if(!nS['physical_check_up'].hasOwnProperty('fetusCheckUp') || !(Object.prototype.toString.call(nS['physical_check_up']['fetusCheckUp']) === '[object Array]')){
+          nS['physical_check_up']['fetusCheckUp'] = [];
+        }
+      }else{
+        nS['physical_check_up'] = {};
+        nS['physical_check_up']['fetusCheckUp'] = [];
+      }
+      nS['physical_check_up']['fetusCheckUp'].push({});
+    }
+    this.setState({ currentSpcialistemrData: nS},() => console.log(this.state.currentSpcialistemrData));
+    if(Number(currentTreeKeys[0]) < 0){
+      newSpecialistemrData.splice(index,1,nS);
+      this.setState({newSpecialistemrData});
+    }
+  };
+
 
   // 处理form表单变化 公共处理 -
   // TODO 修改组件后必须改 - 暂时手动传入父键名
@@ -249,6 +295,9 @@ export default class MedicalRecord extends Component {
         if(!currentSpcialistemrData.hasOwnProperty('thalassemia')) {
           currentSpcialistemrData['thalassemia'] = {};
         }
+        if(!currentSpcialistemrData.hasOwnProperty('physical_check_up')) {
+          currentSpcialistemrData['physical_check_up'] = {};
+        }
         if(formType === '1') {
           currentSpcialistemrData.ultrasound.fetus.forEach(v => {
             if(Number(v.id) < 0) {
@@ -260,6 +309,8 @@ export default class MedicalRecord extends Component {
         if(currentSpcialistemrData.id < 0) {
           currentSpcialistemrData.id = "";
         }
+        // console.log(currentSpcialistemrData);
+        // return;
         // 专科病历主体保存
         service.medicalrecord.savespecialistemrdetail(currentSpcialistemrData).then(res => {
           console.log(res);
@@ -453,14 +504,89 @@ export default class MedicalRecord extends Component {
       ckweek, createdate
     } = renderData;
     const { isDownsScreenChecked, isThalassemiaChecked, isUltrasoundChecked, uFetusActiveKey, ultrasoundMiddleData, operationHistoryData } = this.state;
-    const defaultActiveKeys = [
-      'fetus-0', 'fetus-1', 'fetus-2', 'fetus-3', 'fetus-4', 'fetus-5', 'fetus-6', 'fetus-7', 'fetus-8', 'fetus-9', 'fetus-10', 'fetus-11',
-      'genetic-0', 'genetic-1', 'genetic-2', 'genetic-3', 'genetic-4', 'genetic-5', 'genetic-6', 'genetic-7', 'genetic-8', 'genetic-9',
-      'fuzhen-0', 'fuzhen-1', 'fuzhen-2', 'fuzhen-3', 'fuzhen-4', 'fuzhen-5', 'fuzhen-6'
-    ]
     switch(formType){
       case '1':
         return (
+          // <div>
+          //   <div>{formRender({ chief_complaint: chief_complaint }, mdConfig.chief_complaint_config(this.openModal), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}</div>
+          //   <div>{formRender(pregnancy_history, mdConfig.pregnancy_history_config(), (_, { name, value, error }) => this.handleFormChange("pregnancy_history", name, value, error))}</div>
+          //   <div>{formRender({ medical_history: medical_history }, mdConfig.medical_history_config(this.openModal), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}</div>
+          //   <div>
+          //     <Checkbox checked={!isDownsScreenChecked} onChange={(e) => this.handleCheckBox(e.target.checked, 'd')}>未检查</Checkbox>
+          //       {!isDownsScreenChecked ? null : (
+          //         <div>
+          //           {formRender(downs_screen.hasOwnProperty('early') ? downs_screen['early'] : {}, mdConfig.early_downs_screen_config(), (_, { name, value, error }) => this.handleFormChange("downs_screen.early", name, value, error))}
+          //           {formRender(downs_screen.hasOwnProperty('middle') ? downs_screen['middle'] : {}, mdConfig.middle_downs_screen_config(), (_, { name, value, error }) => this.handleFormChange("downs_screen.middle", name, value, error))}
+          //           {formRender(downs_screen.hasOwnProperty('nipt') ? downs_screen['nipt'] : {}, mdConfig.NIPT_downs_screen_config(), (_, { name, value, error }) => this.handleFormChange("downs_screen.nipt", name, value, error))}
+          //         </div>
+          //       )}
+          //   </div>
+          //   <div>
+          //     <Checkbox checked={!isThalassemiaChecked} onChange={(e) => this.handleCheckBox(e.target.checked, 't')}>未检查</Checkbox>
+          //       {!isThalassemiaChecked ? null : (
+          //         <div>
+          //           {formRender(thalassemia.hasOwnProperty('wife') ? thalassemia['wife'] : {}, mdConfig.wife_thalassemia(), (_, { name, value, error }) => this.handleFormChange("thalassemia.wife", name, value, error))}
+          //           {formRender(thalassemia.hasOwnProperty('husband') ? thalassemia['husband'] : {}, mdConfig.husband_thalassemia(), (_, { name, value, error }) => this.handleFormChange("thalassemia.husband", name, value, error))}
+          //         </div>
+          //       )}
+          //   </div>
+          //   <div>
+          //     <Checkbox checked={!isUltrasoundChecked} onChange={(e) => this.handleCheckBox(e.target.checked, 'u')}>未检查</Checkbox>
+          //       {!isUltrasoundChecked ? null : (
+          //         <div>
+          //           <div>{formRender({ menopause: ultrasound['menopause'] }, mdConfig.ultrasound_menopause_config(), (_, { name, value, error }) => this.handleFormChange("ultrasound", name, value, error))}</div>
+          //           <div>
+          //             <Tabs
+          //               activeKey={uFetusActiveKey}
+          //               onTabClick={(key) => this.handleTabsClick(key,'u')}
+          //               type="editable-card"
+          //               onEdit={this.handleUFetusEdit}
+          //             >{this.renderUFetusTabPane(ultrasound['fetus'])}</Tabs>
+          //           </div>
+          //           <div>
+          //             {/*  中孕超声  */}
+          //             {formRender({ middle: ultrasoundMiddleData }, mdConfig.middle_config(), (_, { value }) => this.handleUltraSoundMiddleEdit(value))}
+          //           </div>
+          //         </div>
+          //       )}
+          //   </div>
+          //   <div>
+          //     {formRender({ other_exam: other_exam }, mdConfig.other_exam_config(this.openModal), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}
+          //   </div>
+          //   <div>
+          //     <div>
+          //         {formRender(past_medical_history, mdConfig.past_medical_history_config(), (_, { name, value, error }) => this.handleFormChange("past_medical_history", name, value, error))}
+          //       </div>
+          //       <div>
+          //         {formRender({ operation_history: operationHistoryData }, mdConfig.operation_history_config(), (_, { value }) => this.handleOperationEdit(value))}
+          //       </div>
+          //   </div>
+          //   <div>
+          //     {formRender(family_history, mdConfig.family_history_config(), (_, { name, value, error }) => this.handleFormChange("family_history", name, value, error))}
+          //   </div>
+          //   <div>
+          //     <div>
+          //         {formRender(physical_check_up, mdConfig.physical_check_up_config(), (_, { name, value, error }) => this.handleFormChange("physical_check_up", name, value, error))}
+          //       </div>
+          //       <div>
+          //         <div>
+          //           <Tabs
+          //             activeKey={this.state.cFetusActiveKey}
+          //             onTabClick={(key) => this.handleTabsClick(key,'c')}
+          //             type="editable-card"
+          //             onEdit={this.handleCFetusEdit}
+          //           >{this.renderCFetusTabPane(physical_check_up.fetusCheckUp)}</Tabs>
+          //         </div>
+          //       </div>
+          //   </div>
+          //   <div>
+          //     {formRender({ diagnosis: diagnosis }, mdConfig.diagnosis_config(this.openModal), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}
+          //   </div>
+          //   <div>
+          //     {formRender({ treatment: treatment }, mdConfig.treatment_config(this.openModal), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}
+          //   </div>
+          // </div>
+
           <Collapse defaultActiveKey={defaultActiveKeys}>
             <Panel header="主诉" key="fetus-0">{formRender({ chief_complaint: chief_complaint }, mdConfig.chief_complaint_config(this.openModal), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}</Panel>
             <Panel header="预产期" key="fetus-1">{formRender(pregnancy_history, mdConfig.pregnancy_history_config(), (_, { name, value, error }) => this.handleFormChange("pregnancy_history", name, value, error))}</Panel>
@@ -492,7 +618,7 @@ export default class MedicalRecord extends Component {
                   <div>
                     <Tabs
                       activeKey={uFetusActiveKey}
-                      onTabClick={this.handleTabsClick}
+                      onTabClick={(key) => this.handleTabsClick(key,'u')}
                       type="editable-card"
                       onEdit={this.handleUFetusEdit}
                     >{this.renderUFetusTabPane(ultrasound['fetus'])}</Tabs>
@@ -518,19 +644,16 @@ export default class MedicalRecord extends Component {
               <div>
                 {formRender(physical_check_up, mdConfig.physical_check_up_config(), (_, { name, value, error }) => this.handleFormChange("physical_check_up", name, value, error))}
               </div>
-              {/* <div>
+              <div>
                 <div>
-                    <Tabs
-                      activeKey={pFetusActiveKey}
-                      onTabClick={this.handleTabsClick}
-                      type="editable-card"
-                      onEdit={this.handleUFetusEdit}
-                    >{this.renderUFetusTabPane(ultrasound['fetus'])}</Tabs>
-                  </div>
-                  <div>
-                    {formRender({ cktaix: physical_check_up.cktaix , presentation:  }, mdConfig.middle_config(), (_, { value }) => this.handleUltraSoundMiddleEdit(value))}
-                  </div>
-              </div> */ }
+                  <Tabs
+                    activeKey={this.state.cFetusActiveKey}
+                    onTabClick={(key) => this.handleTabsClick(key,'c')}
+                    type="editable-card"
+                    onEdit={this.handleCFetusEdit}
+                  >{this.renderCFetusTabPane(physical_check_up.fetusCheckUp)}</Tabs>
+                </div>
+              </div>
               </Panel>
             <Panel header="诊断" key="fetus-10">{formRender({ diagnosis: diagnosis }, mdConfig.diagnosis_config(this.openModal), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}</Panel>
             <Panel header="处理" key="fetus-11">{formRender({ treatment: treatment }, mdConfig.treatment_config(this.openModal), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}</Panel>
@@ -565,7 +688,21 @@ export default class MedicalRecord extends Component {
             <Panel header="复诊日期+孕周" key="fuzhen-0">{formRender({ ckweek: ckweek, createdate: createdate || '' }, mdConfig.ckweekAndcreatdate(), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}</Panel>
             <Panel header="主诉" key="fuzhen-1">{formRender({ chief_complaint: chief_complaint }, mdConfig.chief_complaint_config(this.openModal), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}</Panel>
             <Panel header="病情变化" key="fuzhen-2">{formRender({ stateChange: stateChange }, mdConfig.stateChange_config(this.openModal), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}</Panel>
-            <Panel header="体格检查" key="fuzhen-3">{formRender(physical_check_up, mdConfig.physical_check_up_config(), (_, { name, value, error }) => this.handleFormChange("physical_check_up", name, value, error))}</Panel>
+            <Panel header="体格检查" key="fuzhen-3">
+              <div>
+                  {formRender(physical_check_up, mdConfig.physical_check_up_config(), (_, { name, value, error }) => this.handleFormChange("physical_check_up", name, value, error))}
+                </div>
+                <div>
+                  <div>
+                    <Tabs
+                      activeKey={this.state.cFetusActiveKey}
+                      onTabClick={(key) => this.handleTabsClick(key,'c')}
+                      type="editable-card"
+                      onEdit={this.handleCFetusEdit}
+                    >{this.renderCFetusTabPane(physical_check_up.fetusCheckUp)}</Tabs>
+                  </div>
+                </div>
+            </Panel>
             <Panel header="前次检查结果" key="fuzhen-4">{formRender({ lastResult: lastResult }, mdConfig.lastResult_config(this.openModal), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}</Panel>
             <Panel header="诊断" key="fuzhen-5">{formRender({ diagnosis: diagnosis }, mdConfig.diagnosis_config(this.openModal), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}</Panel>
             <Panel header="处理" key="fuzhen-6">{formRender({ treatment: treatment }, mdConfig.treatment_config(this.openModal), (_, { name, value, error }) => this.handleFormChange("", name, value, error))}</Panel>
@@ -578,7 +715,7 @@ export default class MedicalRecord extends Component {
 
   // 渲染 超声检查 胎儿Tab -- 
   renderUFetusTabPane = (fetusData) => {
-    if (fetusData.length === 0) return <div key="none">暂无数据</div>;
+    if(fetusData.length === 0) return <div key="none">暂无数据</div>;
     const fetusTabPaneDOM = [];
     fetusData.forEach((fetus, index) => {
       if(!fetus.isHidden) {
@@ -591,6 +728,25 @@ export default class MedicalRecord extends Component {
     })
     return fetusTabPaneDOM;
   };
+
+  // 渲染 体格检查 胎儿Tab
+  renderCFetusTabPane = (fetusData) => {
+    if(!fetusData) return;
+    if(fetusData.length === 0) return <div>暂无数据</div>;
+    const fetusTabPaneDOM = [];
+    fetusData.forEach((fetus, index) => {
+      if(!fetus.isHidden) {
+        console.log('in');
+        fetusTabPaneDOM.push(
+          <TabPane key={index} tab={`胎儿-${index + 1}`}>
+            {formRender(fetus, mdConfig.fetusCheckUp_config(), (_, { name, value }) => this.handleFormChange(`physical_check_up.fetusCheckUp-${index}`, name, value))}
+          </TabPane>
+        );
+      }
+    })
+    console.log(fetusTabPaneDOM);
+    return fetusTabPaneDOM;
+  }
 
   /* ========================= 其他 ================================== */
   // 获取数据 整合 返回
@@ -618,6 +774,7 @@ export default class MedicalRecord extends Component {
     }
     if(object.hasOwnProperty('physical_check_up')){
       object['physical_check_up']['edema'] = convertString2Json(object['physical_check_up']['edema']);
+      object['physical_check_up']['fetusCheckUp'] = convertString2Json(object['physical_check_up']['fetusCheckUp']);
       object['physical_check_up'].bp = { "0": object.physical_check_up['systolic_pressure'], "1": object.physical_check_up['diastolic_pressure'] }
     }
     if(object.downs_screen === null) object.downs_screen = {early: {} , middle: {}, nipt: {}};
@@ -700,8 +857,8 @@ export default class MedicalRecord extends Component {
           <div>
             {(Number(currentTreeKeys[0]) < 0) ? this.renderBtn(formType) : null}
           </div>
-          {/* 表单主体 */}
-          <div id="form-block">
+          {/* 表单主体 className="bgWhite form-block" */}
+          <div id="form-block" >
             {this.renderForm(currentSpcialistemrData)}
           </div>
           {/* 操作按钮 */}

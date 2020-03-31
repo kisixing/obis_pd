@@ -48,7 +48,7 @@
 ### 各类插件值的设置与获取
 > ##### checkinput
 
-options键值说明
+- options键值说明
 
 |键名|类型|含义|
 |-----|-----|-----|
@@ -69,7 +69,19 @@ Cannot update during an existing state transition (such as within `render`).
 
 > ##### select
 
-options 键值说明
+- 配置键值说明
+
+|键名|类型|含义|
+|-----|-----|-----|
+|showSearch|boolean|是否展示搜索输入框|
+|tags|boolean|tags输入，支持自定义，更多请查看antd1.x文档|
+|multiple|boolean|是否支持多选|
+|radio|boolean|为true时仅能单选|
+|custom|boolean|单选是否可以自定义输入|
+
+！备注 showSearch开启后 tags与custom 的自定义输入功能才可以开启
+
+- options 键值说明
 
 |键名|类型|含义|
 |-----|-----|-----|
@@ -78,13 +90,18 @@ options 键值说明
 
 设置请传入 {value: "", label: ""}
 
-备注 select是第一个单选框，仅能传入对象，不可使用数组包裹
+！备注 select是第一个单选框，仅能传入对象，不可使用数组包裹
 
 回调value形式同上
 
+<b>修改记录</b>
+- 2020-03-31
+1.改为class
+2.部增加包裹层进行composition的监听，使用延时策略确保了事件顺序
+
 > ##### table
 
-options（tableColumn） 键值说明
+- options（tableColumn） 键值说明
 
 |键名|类型|含义|
 |-----|-----|-----|

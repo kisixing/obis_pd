@@ -21,7 +21,7 @@ const config = {
       {
         columns:[
           { name: 'chief_complaint[主诉]', type: 'textarea', valid: 'required',span: 16 },
-          { name:'chief_complaintBtn[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr1')}
+          { type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr1')}
         ]
       },
     ]
@@ -33,7 +33,7 @@ const config = {
       {
         columns:[
           { name: 'medical_history[现病史]', type: 'textarea', valid: 'required', span: 16 },
-          { name:'medical_history[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr2')}
+          { type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr2')}
         ]
       }
     ]
@@ -45,7 +45,7 @@ const config = {
       {
         columns:[
           { name: 'other_exam[其他]', type: 'textarea', span: 16 },
-          { name:'other_exam[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr3')}
+          { type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr3')}
         ]
       }
     ]
@@ -57,7 +57,7 @@ const config = {
       {
         columns:[
           { name: 'diagnosis[诊断]', type: 'textarea', valid: 'required', span: 16 },
-          { name:'diagnosisBtn[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr4'), valid: 'required'}
+          { type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr4'), valid: 'required'}
         ]
       }
     ]
@@ -69,7 +69,7 @@ const config = {
       {
         columns:[
           { name: 'treatment[处理措施]', type: 'textarea', valid: 'required', span: 16 },
-          { name:'treatment[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr5')}
+          { type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr5')}
         ]
       },
     ]
@@ -329,15 +329,15 @@ const config = {
     ]
   }),
   // 体格检查
-  check_up_CKandPRE_config:() => ({
-    row:[
+  fetusCheckUp_config:() => ({
+    rows:[
       {
         columns:[
           {
-            name: 'cktaix[胎心率](bpm)', type: 'input', span: 6, valid: 'required|number'
+            name: 'taix[胎心率](bpm)', type: 'input', span: 6, valid: 'required|number'
           },
           {
-            name: 'presentation[先露]', type: 'select', span: 6, options: baseData.presentationOptions
+            name: 'position[先露]', type: 'select', span: 6, options: baseData.presentationOptions
           }
         ]
       }

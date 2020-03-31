@@ -109,6 +109,9 @@ export default class OpenCase extends Component {
         // 地址型中间加个空格
         pregnancyData['useraddress'] = pregnancyData['useraddress']['0'].replace(/\//g,' ') + ' ' + pregnancyData['useraddress']['1']; 
         pregnancyData['userconstant'] = pregnancyData['userconstant']['0'].replace(/\//g,' ') + ' ' + pregnancyData['userconstant']['1']; 
+        // 民族
+        pregnancyData['userpeople'] = ('userpeople' in pregnancyData) ? JSON.stringify(pregnancyData['userpeople']) : '';
+        pregnancyData['userhpeople'] = ('userhpeople' in pregnancyData) ? JSON.stringify(pregnancyData['userhpeople']) : '';
         // 转换数据格式
         benYunData['chanc'] = Number(benYunData['chanc'].value);
         benYunData['yunc'] = Number(benYunData['yunc'].value);
@@ -118,9 +121,9 @@ export default class OpenCase extends Component {
             message.success('孕妇建档成功');
             res.data.object['tuseryunchan'] = `${res.data.object['yunc']}/${res.data.object['chanc']}`;
             res.data.object['userid'] = res.data.object.id;
-            store.dispatch(setUserData(res.data.object))
+            
             // 保存孕妇信息
-            service.opencase.useryc({id,...pregnancyData, ...benYunData}).then(uRes => {
+            service.opencase.useryc({id: res.data.object.id,...pregnancyData, ...benYunData}).then(uRes => {
               if(uRes.data.code === "200" || uRes.data.code === "1") {
                 message.success('保存信息成功');
                 this.props.history.push('/pregnancy');
@@ -128,6 +131,10 @@ export default class OpenCase extends Component {
                 message.error(uRes.data.message)
               }
             });
+
+            setTimeout(() => {
+              store.dispatch(setUserData(res.data.object))
+            }, 2000);
           }else {
             message.error(res.data.message)
           }; 

@@ -2,33 +2,15 @@
 @colorGray : #dfe1ee;
 @widthLeft : 220px;
 
-.bgDOM {
-  position: fixed;
-  z-index: 0;
-  left: 0;
-  top: 0;
-  width: @widthLeft;
-  height: 2200px;
-  background-color: #e8f4ff;
+.form-block {
+  > div {
+    > div {
+      margin: 10px;
+      padding: 10px;
+    }
+  }
 }
-.single{
-  background-color: #fff;
-  margin: 0;
-}
-.ant-divider-left{
-  display: table;
-    margin: 16px 0;
-    color: rgba(0, 0, 0, 0.85);
-    font-weight: 500;
-    font-size: 16px;
-    white-space: nowrap;
-    text-align: center;
-    background: transparent;
-    clear: both;
-    width: 100%;
-    min-width: 100%;
-    height: 1px;
-}
+
 .fuzhen-left {
   width: @widthLeft;
   padding: 0 0 1rem;
@@ -207,30 +189,7 @@
     }
   }
 }
-.table-content {
-  text-align: right;
-  .ant-select {
-    width: 100%;
-  }
-}
-.fuzhenTable {
-  table {
-    padding: 0 !important;
-  }
-  // .ant-table-tbody tr:first-child, .ant-table-tbody tr:first-child +tr {
-  //   background: #F1F9FE !important;
-  // }
-  // .ant-table-tbody tr:first-child td, .ant-table-tbody tr:first-child +tr td {   
-  //   border-color: #c9d1d7;
-  //   padding: 2px 0;
-  // }
-}
 
-.delBModal {
-  .ant-btn {
-    font-size: 1rem;
-  }
-}
 
 
 
