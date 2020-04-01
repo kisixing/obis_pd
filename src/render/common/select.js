@@ -16,6 +16,21 @@ class MySelect extends Component{
     this.setState({options: options})
   }
 
+  componentDidUpdate(prevProps,prevState) {
+    if(JSON.stringify(this.props) !== JSON.stringify(prevProps)){
+      const { value } = this.props;
+      console.log(this.props);
+      if(Object.prototype.toString.call(value) === '[object Object]'){
+        this.setState({value: [value.value]});
+      }else if(Object.prototype.toString.call(value) === '[object Array]'){
+        // value的格式是 ["","",""]
+        if(value.length !== 0) {
+          this.setState({value: value.map(v => v.value)})
+        }
+      }
+    }
+  }
+
   handleSearch = (val) => {
     // 这个位置延时一下，确保onCompositionEnd在这一个方法后触发
     setTimeout(() => {
@@ -45,13 +60,14 @@ class MySelect extends Component{
         const { onChange, onBlur } = this.props;
         const { options } = this.state;
         // 这个event是空的
-        onChange('event', {label: val, vale: val}).then(() => onBlur({checkedChange:true}));
+        onChange('event', {label: val, value: val}).then(() => onBlur({checkedChange:true}));
       });
     }
     
   }
   render() {
     const { options, value } = this.state;
+    console.log(this.state.value);
     return (
       <div 
         onCompositionStart={() => this.setState({isEnd: false})}

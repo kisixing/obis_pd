@@ -43,7 +43,6 @@ export default class App extends Component {
       highriskShow: false,
       menuIndex: 0, // 默认 pregnancy
       userData: {},
-      userData: {},
       highriskAlert: [],
       searchObj: {
         menzhenNumber: "", IDCard: "", phoneNumber: ""

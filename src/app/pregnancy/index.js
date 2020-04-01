@@ -1,12 +1,11 @@
 import React, { Component } from "react";
-import { message } from 'antd';
+import { message, Button } from 'antd';
 import formRender from '../../render/form';
 import Page from '../../render/page';
 import service from '../../service/index';
 import store from '../store';
 
-import { sfzOptions, nationList } from './data';
-
+import formRenderConfig from './formRender';
 import { convertString2Json } from '../../utils/index';
 
 import "../index.less";
@@ -43,12 +42,27 @@ export default class Patient extends Component {
     if(userid) {
       service.getgeneralinformation({userId: userid}).then((res) => {
         const obj = this.convertPregnancyData(res.object);
-        this.setState({userid: obj.userid, gravidaInfo: obj.gravidaInfo, husbandInfo: obj.husbandInfo});
+        this.setState({userid: obj.userid, gravidaInfo: obj.gravidaInfo, husbandInfo: obj.husbandInfo},() => console.log(this.state));
       })
     }else {
       message.info('请输入孕妇门诊号/身份证/手机号码进行信息获取',5);
     }
   };
+
+  handleSave = () => {
+    const { userid, gravidaInfo, husbandInfo} = this.state;
+    // 这里的userid 要输入 id...
+    service.upDataDoc({id: this.state.userid, ...gravidaInfo}).then(res => {
+      if(res.code === "200"){
+        message.success('保存信息成功');
+      }
+    })
+    service.upDataDoc({id: userid, ...husbandInfo}).then(res => {
+      if(res.code === "200"){
+        message.success('保存信息成功');
+      }
+    })
+  }
 
   convertPregnancyData = (object) => {
     const { useroccupation, useridtype, useridno, userpeople } = object.gravidaInfo;
@@ -90,97 +104,7 @@ export default class Patient extends Component {
   handleHusbandInfo = (_, {name, value}) => {
     let newObj = Object.assign({}, this.state.husbandInfo);
     newObj[name] = value;
-    this.setState({gravidaInfhusbandInfoo: newObj});
-  };
-  /* ====================  UI视图渲染 ============================= */
-  gravidaInfo_config = () => ({
-    step: 1,
-    rows: [
-      {
-        columns: [
-          { name: 'userage[年龄]', type: 'input', span: 5, valid: 'required|number'},
-          { span: 1 },
-          { name: 'userbirth[出生日期]', type: 'date', span: 5,valid: 'required'},
-          { span: 1 },
-          { name: 'usercuzh[建档日期]', type: 'date', span: 5 ,valid: 'required'},
-        ]
-      },
-      {
-        columns: [
-          { name: 'usernation[国籍]', type: 'input', span: 5 ,valid: 'required'},
-          { span: 1 },
-          { name: 'userroots[籍贯]', type: 'input', span: 5 ,valid: 'required'},
-          { span: 1 },
-          { name: 'userpeople[民族]', type: 'select', span: 4 ,options: nationList, valid: 'required'},
-          { span: 1 },
-          { name: 'useroccupation[职业]', type: 'input', span: 6 },
-        ]
-      }, {
-        columns: [
-          { name: 'usermobile[手机]', type: 'input', span: 5, valid: 'required|number' },
-          { span: 1 },
-          { name: 'useridtype[证件类型]', type: 'select', span: 5, showSearch: false, options: sfzOptions ,valid: 'required'},
-          { span: 1 },
-          { name: 'useridno[证件号码]', type: 'input', span: 6 ,valid: 'required'}
-        ]
-      }, {
-        columns: [
-          { name: 'userconstant[户口地址]', type: 'input', span: 11,valid: 'required'},
-          { span: 1 },
-          { name: 'useraddress[居住地址]', type: 'input', span: 11,valid: 'required'},
-          { span: 1 },
-        ]
-      },
-    ]
-  });
-  husbandInfo_config() {
-    return {
-      step: 1,
-      rows: [
-        {
-          columns: [
-            { name: 'userhname[丈夫姓名]', type: 'input', span: 5 },
-            { span: 1 },
-            { name: 'userhage[年龄]', type: 'input', span: 5 },
-            { span: 1 },
-            { name: 'userhmcno[门诊号]', type: 'input', span: 6 },
-          ]
-        },
-        {
-          columns: [           
-            { name: 'userhnation[国籍]', type: 'input', span: 5 },
-            { span: 1 },
-            { name: 'userhroots[籍贯]', type: 'input', span: 5 },
-            { span: 1 },
-            { name: 'userhpeople[民族]', type: 'input', span: 4 },
-            { span: 1 },
-            { name: 'userhoccupation[职业]', type: 'input', span:  6},
-          ]
-        },
-        {
-          columns: [
-            { name: 'userhmobile[手机]', type: 'input', span: 5 },
-            { span: 1 },
-            { name: 'add_FIELD_husband_useridtype[证件类型]', type: 'select', span: 5, options: sfzOptions },
-            { span: 1 },
-            { name: 'userhidno[证件号]', type: 'input', span: 4 },
-            { span: 1 },
-            { name: 'userhconstant[户口属地]', type: 'input', span: 6 }
-          ]
-        }
-        // {
-        //   columns: [
-        //     { name: 'add_FIELD_husband_smoking(支/天)[抽烟]', type: 'input', span: 5 },
-        //     // { name: entity=>'add_FIELD_husband_drink_data[喝酒]' + (!entity.add_FIELD_husband_drink_data[0]||isMY(entity.add_FIELD_husband_drink_data[0])?'(ml/天)':''), className:'h_26', span: 6, type: [
-        //     //     { type: 'select', options: baseData.jiuOptions },
-        //     //     { type:'input',filter: data=>!data||isMY(data[0])}
-        //     //   ] 
-        //     // },
-        //     { name: 'userhjib[现有何病]', type: 'input', span: 12 }
-        //   ]
-        // }
-      ]
-    };
+    this.setState({husbandInfo: newObj});
   };
 
   render(){
@@ -188,8 +112,12 @@ export default class Patient extends Component {
       <Page className='fuzhen font-16 ant-col'>
         <div className="bgWhite pad-mid ">
           <div className="">
-            {formRender(this.state.gravidaInfo, this.gravidaInfo_config(), this.handleGravidaInfoChange)}
-            {formRender(this.state.husbandInfo, this.husbandInfo_config(), this.handleHusbandInfo)}
+            {formRender(this.state.gravidaInfo, formRenderConfig.gravidaInfo_config(), this.handleGravidaInfoChange)}
+            {formRender(this.state.husbandInfo, formRenderConfig.husbandInfo_config(), this.handleHusbandInfo)}
+          </div>
+          <div className="btn-group pull-right bottom-btn">
+            <Button className="blue-btn">打印</Button>
+            <Button className="blue-btn" onClick={this.handleSave}>保存</Button>
           </div>
         </div>
       </Page>

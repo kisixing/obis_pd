@@ -48,7 +48,7 @@ export default class MedicalRecord extends Component {
       operationHistoryData: [], // 胎儿疾病 - 手术史数据
       /* control */
       uFetusActiveKey: '-1',  // 胎儿疾病 - 超声检查 Tab
-      cFetusActiveKey: '-1', // 体格检查 - 先露/胎心率 Tab
+      cFetusActiveKey: '0', // 体格检查 - 先露/胎心率 Tab
       isDownsScreenChecked: true,
       isThalassemiaChecked: true,
       isUltrasoundChecked: true,
@@ -200,11 +200,9 @@ export default class MedicalRecord extends Component {
     const { newSpecialistemrData, currentTreeKeys, currentSpcialistemrData } = this.state;
     const index = newSpecialistemrData.findIndex(item => item.id === currentTreeKeys[0]);
     const nS = JSON.parse(JSON.stringify(currentSpcialistemrData));
-    console.log(nS);
+    console.log(targetKey);
     if (action === 'remove') {
-      const uIndex = nS.ultrasound.fetus.findIndex(v => v.id.toString() === targetKey);
-      nS.ultrasound.fetus[uIndex].deleteOperation = "1"; 
-      nS.ultrasound.fetus[uIndex].isHidden = true; 
+      nS['physical_check_up']['fetusCheckUp'].splice(targetKey,1);
     } else if (action === 'add') {
       if(nS.hasOwnProperty('physical_check_up')){
         if(!nS['physical_check_up'].hasOwnProperty('fetusCheckUp') || !(Object.prototype.toString.call(nS['physical_check_up']['fetusCheckUp']) === '[object Array]')){

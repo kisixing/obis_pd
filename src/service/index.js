@@ -36,10 +36,15 @@ export default {
     // res['object']['tuserweek'] = res['object']['gesweek'];
     // userId = new Promise(resolve => resolve(res));
     // return userId;
-    
   },
   // 查询-产前诊断-基本信息
   getgeneralinformation: ({ userId }) => myAxios.get(`/prenatalQuery/getgeneralinformation?userid=${userId}`),
+  /**
+   * 修改 孕妇基本页面 中的信息
+   */
+  upDataDoc: (data) => {
+    return myAxios.put('/outpatientWriteRestful/udpateDoc',data);
+  },  
   /**
    * 获取个人信息
    */

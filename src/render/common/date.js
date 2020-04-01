@@ -34,6 +34,6 @@ export function date({onChange, onBlur, ...props}){
     onChange(e,value).then(()=>onBlur())
   };
   return (
-    <MDatePicker {...props} onChange={handleChange}/>
+    <MDatePicker {...props} onChange={handleChange} width="100%" />
   )
 }
