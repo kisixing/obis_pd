@@ -25,6 +25,7 @@ class TableItem extends Component{
   }
 
   componentDidMount(){
+    console.log('a');
     this.refs.tableItem.parentNode.ondbclick = ()=>this.setState({force:true});
   }
 
@@ -190,7 +191,8 @@ export default function(keys, data, {onChange = ()=>{}, onRowChange, className, 
     buttons: [{title:'添加',fn:()=>onRowChange('create', {$type:dateType.CREATE})},{title:'删除',fn:item=>onRowChange('delete', item)}]
   }
   return (
-    <MTable loading={!data} {...extendProps}  {...events(props)} className={`table-render ${className}`} size="small" bordered={true} dataSource={Array(rows.length).fill({$head:true}).concat(dataSource)} showHeader={false} columns={columns} head={rows}/>
+    // loading={!data}
+    <MTable  {...extendProps}  {...events(props)} className={`table-render ${className}`} size="small" bordered={true} dataSource={Array(rows.length).fill({$head:true}).concat(dataSource)} showHeader={false} columns={columns} head={rows}/>
   );
 }
 

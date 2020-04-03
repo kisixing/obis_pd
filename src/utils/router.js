@@ -1,8 +1,9 @@
 import React from "react";
 import {Router,Switch,Route} from "react-router-dom";
-import createHistory from "history/createHashHistory";
 
-const history = createHistory();
+const r = require("history").createBrowserHistory;
+
+const history = r();
 /*history.listen(
 	(location, action) => 0 &&
 		history.push({

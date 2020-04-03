@@ -71,7 +71,7 @@ export default class MedicalRecord extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    console.log(prevState);
+    // console.log(prevState);
   }
 
   /* ========================= 事件交互类 =========================== */
@@ -270,10 +270,10 @@ export default class MedicalRecord extends Component {
           mapValueToKey(obj, `${path}.${name}`, value);
       }
     }
-    this.setState({currentSpcialistemrData: obj },() => console.log(this.state));
+    this.setState({currentSpcialistemrData: obj });
     if(Number(currentTreeKeys) < 0) {
       newSpecialistemrData.splice(index,1,obj);
-      this.setState({ newSpecialistemrData},() => console.log(this.state));
+      this.setState({ newSpecialistemrData});
     }
   };
 
@@ -742,7 +742,6 @@ export default class MedicalRecord extends Component {
         );
       }
     })
-    console.log(fetusTabPaneDOM);
     return fetusTabPaneDOM;
   }
 

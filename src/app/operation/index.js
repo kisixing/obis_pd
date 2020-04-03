@@ -185,7 +185,7 @@ export default class Operation extends Component{
   newOperation = () => {
     const { operationList, operationNewDataList, currentExpandedKeys, currentShowData } = this.state;
     const { userData } = store.getState();
-    console.log(userData);
+    // console.log(userData);
     const todayStr = formatDate();
     // 新建元素的id
     const newId = 0 - Math.random()*100|0;

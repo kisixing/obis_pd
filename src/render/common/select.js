@@ -19,7 +19,6 @@ class MySelect extends Component{
   componentDidUpdate(prevProps,prevState) {
     if(JSON.stringify(this.props) !== JSON.stringify(prevProps)){
       const { value } = this.props;
-      console.log(this.props);
       if(Object.prototype.toString.call(value) === '[object Object]'){
         this.setState({value: [value.value]});
       }else if(Object.prototype.toString.call(value) === '[object Array]'){
@@ -67,7 +66,6 @@ class MySelect extends Component{
   }
   render() {
     const { options, value } = this.state;
-    console.log(this.state.value);
     return (
       <div 
         onCompositionStart={() => this.setState({isEnd: false})}

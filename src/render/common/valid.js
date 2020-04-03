@@ -6,7 +6,7 @@
 
 const validationFns = {
   required: function (value) {
-    if (value === "" || !/\S/.test(value) || (typeof value === 'object' && !Object.keys(value || {}).filter(i => !/^$/.test(i)).length)) {
+    if (!value || !/\S/.test(value) || (typeof value === 'object' && !Object.keys(value || {}).filter(i => !/^$/.test(i)).length)) {
       return '*此值不可为空';
     }
   },

@@ -21,7 +21,7 @@ const config = {
       {
         columns:[
           { name: 'chief_complaint[主诉]', type: 'textarea', valid: 'required',span: 16 },
-          { type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr1')}
+          { type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr1'), valid: ""}
         ]
       },
     ]
@@ -33,7 +33,7 @@ const config = {
       {
         columns:[
           { name: 'medical_history[现病史]', type: 'textarea', valid: 'required', span: 16 },
-          { type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr2')}
+          { type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr2'), valid: ""}
         ]
       }
     ]
@@ -45,7 +45,7 @@ const config = {
       {
         columns:[
           { name: 'other_exam[其他]', type: 'textarea', span: 16 },
-          { type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr3')}
+          { type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr3'), valid: ""}
         ]
       }
     ]
@@ -57,7 +57,7 @@ const config = {
       {
         columns:[
           { name: 'diagnosis[诊断]', type: 'textarea', valid: 'required', span: 16 },
-          { type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr4'), valid: 'required'}
+          { type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr4'), valid: ''}
         ]
       }
     ]
@@ -69,7 +69,7 @@ const config = {
       {
         columns:[
           { name: 'treatment[处理措施]', type: 'textarea', valid: 'required', span: 16 },
-          { type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr5')}
+          { type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr5'), valid: ""}
         ]
       },
     ]
@@ -504,7 +504,7 @@ const config = {
       {
         columns:[
           { name: 'karyotype[诊断]', type: 'textarea', span: 16 },
-          { name:'karyotype[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr6')}
+          { name:'[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr6'), valid: ""}
         ]
       }
     ]
@@ -532,7 +532,7 @@ const config = {
       {
         columns:[
           { name: 'stateChange[病情变化]', type: 'textarea', span: 16 },
-          { name:'stateChange[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr7')}
+          { name:'stateChange[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr7'), valid: ""}
         ]
       },
     ]
@@ -544,7 +544,7 @@ const config = {
       {
         columns:[
           { name: 'lastResult[前次检查结果]', type: 'textarea', span: 16 },
-          { name:'lastResult[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr8')}
+          { name:'lastResult[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr8'), valid: ""}
         ]
       },
     ]
