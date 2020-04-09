@@ -54,8 +54,6 @@ export default class App extends Component {
   handleStoreChange = () => {
     const { userData } = store.getState();
     // 当本页面userid与store不同
-    console.log(userData);
-    console.log(this.state.userData);
     if( this.state.userData.userid !== userData.userid) {
       this.findUser("","","","",userData.userid);
     }
@@ -151,7 +149,7 @@ export default class App extends Component {
           <div><strong>孕产:</strong>{tuseryunchan}</div>
           <div><strong>预产期:</strong>{gesexpect}</div>
           <div><strong>门诊号:</strong>{usermcno}</div>
-          <div><strong>产检编号:</strong>{chanjno}</div>
+          <div><strong>病例号:</strong>{chanjno}</div>
         </div>
         {/* 这里做个搜索栏 */}
         <div className="search-block patient-Info_title">
@@ -285,38 +283,6 @@ export default class App extends Component {
       this.setState({ userData: res.object,searchObj: newSearchObj, menuIndex: 0});
     })
   }
-
-  // 暂时不使用 - 此方法数据最全
-  // 获取孕妇建档信息，用于之后所有页面的同步
-  // getIvisitMain = () => {
-  //   const storeData = store.getState();
-  //   const { userData } = storeData;
-  //   if(userData.userid !== this.state.userData.userid) {
-  //     service.getIvisitMain({userid: userData.userid}).then(res => {
-  //       // 在这个地方就整理好，后面去使用
-  //       const { yunc, chanc } = res.object.diagnosis;
-  //       const { gesmoc, gesexpect } = res.object.pregnantInfo;
-  //       let d = {
-  //         gravidity: yunc,
-  //         parity: chanc,
-  //         lmd: gesmoc,
-  //         edd: gesexpect
-  //       }
-  //       // 设置store
-  //       store.dispatch(setUserData(res.object.gravidaInfo));
-  //       // 设置app.js的userData
-  //       this.setState({userData: res.object.gravidaInfo },() => {
-  //         let newSearchObj = Object.assign({}, this.state.searchObj);
-  //         newSearchObj.menzhenNumber = this.state.userData.usermcno;
-  //         newSearchObj.IDCard = this.state.userData.useridno;
-  //         newSearchObj.phoneNumber = this.state.userData.usermobile;
-  //         this.setState({searchObj: newSearchObj})
-  //       }); 
-  //       // 设置建档信息
-  //       store.dispatch(setOpenCaseData(d));
-  //     });
-  //   }
-  // }
 
   render() {
     const { isFetching } = store.getState();

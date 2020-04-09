@@ -100,9 +100,14 @@ export default class Operation extends Component{
   }
 
   componentDidMount() {
-    service.operation.getOperation().then(res => {
-      if(res.code === '200' || 200)  this.setState({operationList: res.object.list});
-    })
+    const { userData } = store.getState();
+    if(userData.userid){
+      service.operation.getOperation().then(res => {
+        if(res.code === '200' || 200)  this.setState({operationList: res.object.list});
+      })
+    }else{
+      message.info('用户为空');
+    }
   }
 
 

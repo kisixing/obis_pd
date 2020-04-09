@@ -1,6 +1,7 @@
 import React,{ Component } from 'react';
 import {Button, Checkbox, Collapse, message, Tabs, Tree, Modal} from 'antd';
 import Page from '../../render/page';
+import store from '../store';
 
 import {convertString2Json, getTimeDifference } from '../../utils/index';
 
@@ -109,11 +110,16 @@ export default class HistoricalRecord extends Component{
   }
 
   componentDidMount() {
-    service.historicalrecord.gethistoricalrecords().then(res => {
-      if(res.code === "200" || 200) {
-        this.setState({historicalRecordList: res.object})
-      }
-    });
+    const { userData } = store.getState();
+    if(userData.userid){
+      service.historicalrecord.gethistoricalrecords().then(res => {
+        if(res.code === "200" || 200) {
+          this.setState({historicalRecordList: res.object})
+        }
+      });
+    }else{
+      message.info('用户为空');
+    }
   }
 
   /*================================ 事件交互类 ======================================*/

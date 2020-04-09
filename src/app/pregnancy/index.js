@@ -37,15 +37,14 @@ export default class Patient extends Component {
   /* ====================  请求处理 ============================= */
   getGeneralInformation = () => {
     const { userid } = store.getState()['userData'];
-    console.log(userid);
     // 防止已进入页面没有userid
     if(userid) {
       service.getgeneralinformation({userId: userid}).then((res) => {
         const obj = this.convertPregnancyData(res.object);
-        this.setState({userid: obj.userid, gravidaInfo: obj.gravidaInfo, husbandInfo: obj.husbandInfo},() => console.log(this.state));
+        this.setState({userid: obj.userid, gravidaInfo: obj.gravidaInfo, husbandInfo: obj.husbandInfo});
       })
     }else {
-      message.info('请输入孕妇门诊号/身份证/手机号码进行信息获取',5);
+      message.info('请输入孕妇门诊号/身份证/手机号码进行信息获取',3);
     }
   };
 
@@ -91,7 +90,6 @@ export default class Patient extends Component {
     if(useridno){
       object.gravidaInfo.userbirth = `${useridno.substring(6,10)}-${useridno.substring(10,12)}-${useridno.substring(12,14)}`;
     }
-    console.log(object);
     return object;
   }
 
@@ -101,6 +99,7 @@ export default class Patient extends Component {
     newObj[name] = value;
     this.setState({gravidaInfo: newObj});
   };
+  
   handleHusbandInfo = (_, {name, value}) => {
     let newObj = Object.assign({}, this.state.husbandInfo);
     newObj[name] = value;

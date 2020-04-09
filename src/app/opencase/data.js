@@ -20,6 +20,8 @@ function toOptions(data, vfn = () => ({})) {
   return [];
 }
 
+export const isOption = toOptions('是,否')
+
 export const hyOptions = toOptions('未婚,已婚,丧偶,离婚');
 
 export const IDCardOptions = toOptions('居民身份证,港澳居民来往内地通行证,台湾居民来往大陆通行证,外国人居留证 ,护照');

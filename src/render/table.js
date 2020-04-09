@@ -25,7 +25,6 @@ class TableItem extends Component{
   }
 
   componentDidMount(){
-    console.log('a');
     this.refs.tableItem.parentNode.ondbclick = ()=>this.setState({force:true});
   }
 
