@@ -90,12 +90,11 @@ export const mapValueToKey = (obj, keyStr = "", val) => {
   const objectIndex = keyStr.indexOf(OBJECT_SPLIT_KEY);
   const arrayIndex = keyStr.indexOf(ARRAY_SPLIT_KEY);
   const len = keyStr.length;
-  // console.log(keyStr);
+  console.log(keyStr);
   if (objectIndex === -1 && arrayIndex === -1) {
     obj[keyStr] = val;
   } else if (objectIndex < arrayIndex || (objectIndex !== -1 && arrayIndex === -1)) {
     const nextKey = keyStr.slice(0, objectIndex);
-    console.log(nextKey);
     if (!obj.hasOwnProperty(nextKey)) {
       obj[nextKey] = {};
     }
@@ -106,6 +105,7 @@ export const mapValueToKey = (obj, keyStr = "", val) => {
     if (Object.prototype.toString.call(obj[nextKey]) !== "[object Array]") {
       obj[nextKey] = [];
     }
+    console.log(obj);
     mapValueToKey(obj[nextKey], keyStr.slice(arrayIndex + 1, len), val);
   }
 }

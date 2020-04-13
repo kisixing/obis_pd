@@ -7,7 +7,7 @@ import formRender, { fireForm } from '../../render/form';
 import { newDataTemplate } from './data';
 import mdConfig from './formRenderConfig';
 
-import { convertString2Json, mapValueToKey, formatDate } from '../../utils/index';
+import { mapValueToKey } from '../../utils/index';
 
 import '../index.less';
 import operation from '../../service/operation';
@@ -18,7 +18,7 @@ const { TabPane } = Tabs;
 // 可编辑tab的识别符
 const ULTRA = 'u', CHECK = 'c';
 
-const defaultActiveKeys = ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15'];
+const defaultActiveKeys = ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16'];
 
 /**
  * 本页面用于描述 专科病历 右侧的表单区域
@@ -38,6 +38,7 @@ export default class MedicalRecordForm extends Component{
       cFetusActiveKey: '0',
 
       ultrasoundMiddleData: [],
+      operationHistoryData: [],
 
       templateObj: {
         isShowTemplateModal: false,
@@ -74,9 +75,7 @@ export default class MedicalRecordForm extends Component{
     }
   }
 
-
-
-  
+  /* ================== 表单处理事件 ===================== */
 
   // 处理form表单变化 公共处理 -
   // TODO 修改组件后必须改 - 暂时手动传入父键名
@@ -230,6 +229,16 @@ export default class MedicalRecordForm extends Component{
     }
   }
 
+  // handleUltrasoundMiddleEdit
+  handleUSEdit = (newData) => {
+    this.setState({ultrasoundMiddleData: newData});
+  }
+
+  // handleOperationEdit
+  handleOEdit = (newData) => {
+    this.setState({operationHistoryData: newData},() => console.log(this.state));
+  }
+
   renderForm = (data, ultrasoundMiddleData, operationHistoryData) => {
     if(Object.keys(data).length === 0 ){
       data = newDataTemplate;
@@ -258,7 +267,7 @@ export default class MedicalRecordForm extends Component{
                 </div>
                 <div>
                   {/* TODO 中孕超声 删除逻辑还没有解决  */}
-                  {formRender({ middle: ultrasoundMiddleData }, mdConfig.middle_config(), (_, { value }) => this.handleUltraSoundMiddleEdit(value))}
+                  {formRender({ middle: ultrasoundMiddleData }, mdConfig.middle_config(), (_, { value }) => this.handleUSEdit(value))}
                 </div>
               </div>
             )}
@@ -281,7 +290,7 @@ export default class MedicalRecordForm extends Component{
         {formType === '2' ? (
           <Panel header="染色体核型" key='4'>{formRender({ karyotype: data.karyotype }, mdConfig.karyotype_config(this.openModal), (_, e) => this.handleFormChange("", e))}</Panel>
         ) : (
-          <Panel header="体格检查" key='5'>
+          <Panel header="体格检查" key='16'>
             <div>
               {formRender(data.physical_check_up, mdConfig.physical_check_up_config(), (_, e) => this.handleFormChange("physical_check_up", e))}
             </div>
@@ -324,7 +333,7 @@ export default class MedicalRecordForm extends Component{
               </div>
               <div>
                 {/* TODO 这个位置的处理还没有完成 */}
-                {formRender({ operation_history: operationHistoryData }, mdConfig.operation_history_config(), (_, { value }) => this.handleOperationEdit(value))}
+                {formRender({ operation_history: operationHistoryData }, mdConfig.operation_history_config(), (_, { value }) => this.handleOEdit(value))}
               </div>
             </Panel>,
             <Panel header="其他检查" key='12'>{formRender({other_exam: data.other_exam}, mdConfig.other_exam_config(this.openModal), (_, e) => this.handleFormChange("", e))}</Panel>,
@@ -337,7 +346,7 @@ export default class MedicalRecordForm extends Component{
     )
   }
 
-  /* ================ Form表单相关 ==================== */
+  /* ================ templateInput ==================== */
   openModal = (type) => {
     if(type){
       const doctor = this.state.formData.doctor || "";
@@ -397,6 +406,8 @@ export default class MedicalRecordForm extends Component{
       } 
     },() => console.log(this.state));
   }
+
+  /* ================ 保存传递给父组件 ==================== */
 
   save = () => {
     const { formData, ultrasoundMiddleData, operationHistoryData} = this.state;

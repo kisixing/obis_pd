@@ -202,32 +202,32 @@ const config = {
     rows: [
       {
         columns:[
-          { name: 'hypertension[高血压]', type: 'checkinput', valid: 'required', radio: true, options: baseData.wssOptions,span:24 },
+          { name: 'hypertension[高血压]', type: 'checkinput-5', valid: 'required', radio: true, options: baseData.wssOptions,span:24 },
         ]
       },
       {
         columns:[
-          { name: 'diabetes_mellitus[糖尿病]', type: 'checkinput', valid: 'required', radio: true, options: baseData.wssOptions,span:24 },
+          { name: 'diabetes_mellitus[糖尿病]', type: 'checkinput-5', valid: 'required', radio: true, options: baseData.wssOptions,span:24 },
         ]
       },
       {
         columns:[
-          { name: 'heart_disease[心脏病]', type: 'checkinput', valid: 'required', radio: true, options: baseData.wssOptions,span:24 },
+          { name: 'heart_disease[心脏病]', type: 'checkinput-5', valid: 'required', radio: true, options: baseData.wssOptions,span:24 },
         ]
       },
       {
         columns:[
-          { name: 'other_disease[其他病史]', type: 'checkinput', valid: 'required', radio: true, options: baseData.wssOptions,span:24 },
+          { name: 'other_disease[其他病史]', type: 'checkinput-5', valid: 'required', radio: true, options: baseData.wssOptions,span:24 },
         ]
       },
       {
         columns:[
-          { name: 'allergy[过敏史]', type: 'checkinput', valid: 'required',radio: true, options: baseData.ywgmOptions, span:24 },
+          { name: 'allergy[过敏史]', type: 'checkinput-5', valid: 'required',radio: true, options: baseData.ywgmOptions, span:24 },
         ]
       },
       {
         columns:[
-          { name: 'blood_transfusion[输血史]', type: 'checkinput', valid: 'required', radio: true, options: baseData.sxsOptions, span: 24 },
+          { name: 'blood_transfusion[输血史]', type: 'checkinput-5', valid: 'required', radio: true, options: baseData.sxsOptions, span: 24 },
         ]
       }
     ]
@@ -248,32 +248,27 @@ const config = {
     rows:[
       {
         columns:[
-          { span: 1 },
-          {name:'hypertension[高血压]', type:'checkinput',radio:true, valid: 'required', options: baseData.nhOptions,span: 15}
+          {name:'hypertension[高血压]', type:'checkinput-5',radio:true, valid: 'required', options: baseData.nhOptions,span: 15}
         ]
       },
       {
         columns:[
-          { span: 1 },
           {name:'diabetes_mellitus[糖尿病]', type:'checkinput-5',radio:true, valid: 'required', options: baseData.nhOptions,span: 15}
         ]
       },
       {
         columns:[
-          { span: 1 },
           {name:'congenital_malformation[先天畸形]', type:'checkinput-5',radio:true, valid: 'required', options: baseData.nhOptions,span: 15}
         ]
       },
       {
         columns:[
-          { span: 1 },
           {name:'heritable_disease[遗传病]', type:'checkinput-5',radio:true, valid: 'required', options: baseData.nhOptions,span: 15}
         ]
       },
       {
         columns: [
-          { span: 1 },
-          {name:'other[其他]', type:'checkinput',radio:true, valid: 'required', options: baseData.nhOptions,span: 15}
+          {name:'other[其他]', type:'checkinput-5',radio:true, valid: 'required', options: baseData.nhOptions,span: 15}
         ]
       }
     ]

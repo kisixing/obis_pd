@@ -8,6 +8,8 @@ import { formatDate, convertString2Json, getTimeDifference, mapValueToKey } from
 
 import TemplateInput from '../../components/templateInput/index';
 
+import OperationFrom from './operationForm';
+
 import '../index.less';
 import './index.less';
 import formRender,{ fireForm} from "../../render/form";
@@ -133,57 +135,6 @@ export default class Operation extends Component{
       multiple={false}
     >{tnDOM}</Tree>;
   };
-  // 渲染 胎儿中心类模板 - templateId 0~7
-  renderFetusTemplateForm = (renderData) => {
-    const { currentFetusKey } = this.state;
-    if(Object.keys(renderData).length === 0) return <div>无数据展示</div> ;
-    const { templateId } = renderData;
-    if(templateId < 0 || templateId > 7) return null;
-    return (
-      <div>
-        <Collapse defaultActiveKey={["operationItem","preoperative_record","operative_procedure","surgery"]}>
-          <Panel header="手术项目" key="operationItem">
-            {formRender(renderData['operationItem'] || {},formRenderConfig[`config${templateId}`]['operationItem_config'](), (_,{name, value, error}) => this.handleFormChange("operationItem",name,value, error))}
-          </Panel>
-          <Panel header="术前记录" key="preoperative_record">
-            {formRender(renderData['preoperative_record'] || {},formRenderConfig[`config${templateId}`]['preoperative_record_config'](), (_,{name, value, error}) => this.handleFormChange("preoperative_record",name,value, error))}
-          </Panel>
-          <Panel header="手术过程" key="operative_procedure">
-            <Tabs
-              type="editable-card"
-              onEdit={this.handleTabsEdit}
-              onTabClick={this.handleTabClick}
-              activeKey={currentFetusKey}
-            >
-              {this.renderFetusTabPane(renderData['operative_procedure']['fetus'],templateId)}
-            </Tabs>
-          </Panel>
-          <Panel header="术后情况" key="surgery">
-            {formRender(renderData['surgery'],formRenderConfig[`config${templateId}`]['surgery_config'](this.openModal), (_,{name, value, error}) => this.handleFormChange("surgery",name,value, error))}
-          </Panel>
-        </Collapse>
-      </div>
-    )
-  };
-  // 渲染病房病历
-  renderWardForm = (renderData) => {
-    const { templateId } = renderData;
-    if(templateId !== 8) return null;
-    return (
-      <div>
-        {formRender(renderData['ward'], formRenderConfig['ward_config'](this.openModal), (_,{value, name, error}) => this.handleFormChange('ward',name,value, error))}
-      </div>
-    )
-  };
-  // 渲染 手术操作 胎儿Tab
-  renderFetusTabPane = (fetusData, templateId) => {
-    if(fetusData.length === 0) return null;
-    return fetusData.map((v, index) => (
-      <TabPane tab={`胎儿${index+1}`} key={v.id}>
-        {formRender(v, formRenderConfig[`config${templateId}`][`operative_procedure_config`](this.openModal), (_,{name, value, error}) => this.handleFormChange(`operative_procedure.fetus-${index}`,name,value,error))}
-      </TabPane>
-    ));
-  };
 
   /* ========================= 事件交互 ============================ */
   //
@@ -206,7 +157,12 @@ export default class Operation extends Component{
     }
     const currentData = {
       id: newId, key: newId, templateId: 0,createdate: todayStr,
-      operationItem: {},
+      operationItem: {
+        operationName: {},
+        operationLevel: {},
+        incisionType: {},
+        rePuncture: []
+      },
       preoperative_record: {
         operation_date: todayStr
       },
@@ -249,7 +205,7 @@ export default class Operation extends Component{
         // 非新建病例
         service.operation.getOperationdetail({recordid: selectedKeys[0]}).then(res => {
           // 整合请求下来的数据
-          let formatData = this.convertOperationDetail(res.object);
+          let formatData = this.convertOperationData(res.object);
           let targetFetusKey = ''
           if(formatData['operative_procedure']['fetus'].length !== 0) {
             targetFetusKey = formatData['operative_procedure']['fetus'][0]['id'];
@@ -281,136 +237,6 @@ export default class Operation extends Component{
     }
   };
 
-  handleFormChange = (path, name, value, error) => {
-    if(error) {
-      message.error(error);
-      return;
-    }
-    const { currentShowData, operationNewDataList, currentFetusKey } = this.state;
-    if(name === 'operationName') {
-      // 这里只可能存在 0~7 8种手术模板
-      let templateId = operationItemTemplateId(value.value);
-      // 清除当前数据
-      const newFetusId = -Math.random();
-      let newCurrentShowData = Object.assign({},{
-        id: currentShowData.id,
-        key: currentShowData.key,
-        createdate: currentShowData.createdate,
-        templateId: templateId,
-        operationItem: {
-          operationName: value
-        },
-        preoperative_record: {
-          operation_date: currentShowData['preoperative_record']['operation_date']
-        },
-        operative_procedure: {fetus:[{id: newFetusId}]},
-        surgery: {},
-        ward: {
-          operationDate:  currentShowData['preoperative_record']['operation_date']
-        }
-      });
-      this.setState({clear: true}, () => {
-        this.setState({currentShowData: newCurrentShowData, clear: false, currentFetusKey: newFetusId.toString()});
-      })
-      // 这个return一定要加
-      return ;
-    }
-    let obj = JSON.parse(JSON.stringify(currentShowData));
-    // 修改超声|其他table类 - 这里使用operationWriteType方式
-    if(specialEdit.findIndex(i => i === name) !== -1) {
-    // if(name.indexOf('preoperativeUltrasonography') !== -1) {
-      // 删除问题 逻辑
-      let oldValue = obj['preoperative_record'][name] || [];
-      if(oldValue.length > value.length) {
-        // 比较旧值和新值长度
-        for(let i = 0; i < oldValue.length; i++) {
-          // 将所有得旧值isShow设置为false，写操作置为 2 - 删除
-          if(oldValue[i]['docUniqueid'] === "" || oldValue[i]['docUniqueid'] === undefined) {
-            oldValue[i]['isShow'] = true;
-            oldValue[i]['writeOperationType'] = 0;
-          }else {
-            oldValue[i]['isShow'] = false;
-            oldValue[i]['writeOperationType'] = 2;
-          }
-          for(let j = 0; j < value.length; j++) {
-            if(oldValue[i]['docUniqueid'] ===  value[j]['docUniqueid'] && oldValue[i]['docUniqueid']) {
-              oldValue[i]['isShow'] = true;
-              oldValue[i]['writeOperationType'] = 1;
-              break;
-            }
-          }
-        }
-        obj['preoperative_record'][name] = oldValue;
-      }else {
-        // 新增 & 修改 都不用管
-        mapValueToKey(obj, `${path}.${name}`,value);
-      }
-      this.setState({currentShowData: obj});
-      return;
-    }
-    // 通用
-    
-    // 当前胎儿的index
-    const fIndex = obj['operative_procedure']['fetus'].findIndex(item => item.id.toString() === currentFetusKey);
-    let fObj = obj['operative_procedure']['fetus'][fIndex];
-    if(path === "") {
-      mapValueToKey(obj, value);
-    }else {
-      switch (name){
-        // 时间计算
-        case 'start_time':
-          if(!fObj.hasOwnProperty('end_time')) {fObj['end_time'] = ""};
-          if(fObj['end_time'] !== "") {
-            fObj['duration'] = getTimeDifference(value, fObj['end_time']);
-            obj['operative_procedure']['fetus'].splice(fIndex,1,fObj);
-          }
-          break;
-        case 'end_time':
-          if(!fObj.hasOwnProperty('start_time')) {fObj['start_time'] = ""};
-          if(fObj['start_time'] !== "") {
-            fObj['duration'] = getTimeDifference(fObj['start_time'],value);
-            obj['operative_procedure']['fetus'].splice(fIndex,1,fObj);
-          }
-          break;
-        // 日期要同步
-        case 'operationDate':
-          obj['preoperative_record']['operation_date'] = value;
-          break;
-        case 'operation_date':
-          obj['ward']['operationDate'] = value;
-          break;
-        default:
-          break;
-      }
-      mapValueToKey(obj, `${path}.${name}`,value);
-    }
-    if(obj.templateId === 8) {console.log(value)}
-    // 如何时新建病例 ，需要存储本地
-    if(obj.id < 0) {
-      const index = operationNewDataList.findIndex(item => item.id === obj.id);
-      operationNewDataList[index] = obj;
-      this.setState({operationNewDataList});
-    }
-    this.setState({currentShowData: obj});
-  };
-  // TODO
-  // 婴儿数量变化 需要特殊处理
-  handleTabsEdit = (targetKey, action) => {
-    let { currentShowData } = this.state;
-    let newFetusId = -Math.random();
-    if( action === 'remove') {
-      const i = currentShowData['operative_procedure']['fetus'].findIndex(item => item.id === targetKey);
-      currentShowData['operative_procedure']['fetus'].splice(i,1);
-    }else if(action === 'add') {
-      currentShowData['operative_procedure']['fetus'].push({
-        id:newFetusId, operationWriteType: 0
-      })
-    }
-    this.setState({currentShowData, currentFetusKey: newFetusId.toString()});
-  };
-  // 处理
-  handleTabClick = (key) => {this.setState({currentFetusKey: key})}
-
 
   handleTemplateSelect = (templateId) => {
     const { currentShowData } = this.state;
@@ -421,47 +247,39 @@ export default class Operation extends Component{
     this.setState({currentShowData});
   };
 
-  handleSave = () => {
-    const { currentShowData } = this.state;
-    const FORM_BLOCK = "form-block";
-    fireForm(document.getElementById(FORM_BLOCK), 'valid').then(validCode => {
-      if(validCode){
-        if(currentShowData['id'] < 0){
-          currentShowData['id'] = "";
-        }
-        currentShowData['operative_procedure']['fetus'].forEach(v => {
-          if(Number(v.id) < 0){
-            v.id = "";
-          }
-        })
-        // 转换病房中的时间
-        if(currentShowData.templateId === 8) {
-          if(currentShowData['ward']['startTime'].toString().length < 6) {
-            currentShowData['ward']['startTime'] = new Date(currentShowData['ward']['operationDate']).Format('yyyy-MM-dd') + " " +currentShowData['ward']['startTime'] + ":00";
-          }
-          if(currentShowData['ward']['endTime'].toString().length < 6) {
-            currentShowData['ward']['endTime'] =  new Date(currentShowData['ward']['operationDate']).Format('yyyy-MM-dd') + " " +currentShowData['ward']['endTime'] + ":00";
-          }
-          currentShowData['ward']['operationDate'] =   new Date(currentShowData['ward']['operationDate']).Format('yyyy-MM-dd');
-          currentShowData['preoperative_record']['operation_date'] =  currentShowData['ward']['operationDate'];
-        }
-        delete currentShowData.key;
-        delete currentShowData['templateId']; 
-        service.operation.saveOperation(currentShowData).then(res => {
-          message.success('保存成功');
-          service.operation.getOperation().then(res => {
-            this.setState({operationList: res.object.list, currentShowData: {}, currentTreeKeys: []});
-          })
-        })
-      }else {
-        message.error('请填写所以必填信息后再次提交');
+  handleSave = (data) => {
+    if(data['id'] < 0){
+      data['id'] = "";
+    }
+    console.log(data);
+    data['operative_procedure']['fetus'].forEach(v => {
+      if(Number(v.id) < 0){
+        v.id = "";
       }
     })
-    
+    // 转换病房中的时间
+    if(data.templateId === 8) {
+      if(data['ward']['startTime'].toString().length < 6) {
+        data['ward']['startTime'] = new Date(data['ward']['operationDate']).Format('yyyy-MM-dd') + " " +currentShowData['ward']['startTime'] + ":00";
+      }
+      if(data['ward']['endTime'].toString().length < 6) {
+        data['ward']['endTime'] =  new Date(data['ward']['operationDate']).Format('yyyy-MM-dd') + " " +currentShowData['ward']['endTime'] + ":00";
+      }
+      data['ward']['operationDate'] =   new Date(data['ward']['operationDate']).Format('yyyy-MM-dd');
+      data['preoperative_record']['operation_date'] =  data['ward']['operationDate'];
+    }
+    delete data.key;
+    delete data['templateId']; 
+    service.operation.saveOperation(data).then(res => {
+      message.success('保存成功');
+      service.operation.getOperation().then(res => {
+        this.setState({operationList: res.object.list, currentShowData: {}, currentTreeKeys: []});
+      })
+    })
   };
   /* ========================= 其他 ============================ */
   // 获取数据整合进入state
-  convertOperationDetail = (object) => {
+  convertOperationData = (object) => {
     let { currentTreeKeys } = this.state;
     let { operative_procedure, operationItem } = object;
     /* string -> json */
@@ -477,7 +295,7 @@ export default class Operation extends Component{
     // 转换库血
     object['preoperative_record']['bloodBank'] = convertString2Json(object['preoperative_record']['bloodBank']);
     // 手动添加对应的key值 - 因为这里是使用treeRecordId请求回来的
-    object['key'] = currentTreeKeys[0];
+    // object['key'] = currentTreeKeys[0];
     // 转换时间戳
     object['preoperative_record']['operation_date'] = new Date(object['preoperative_record']['operation_date']);
     object['preoperative_record']['collectBloodDate'] = new Date(object['preoperative_record']['collectBloodDate']);
@@ -551,7 +369,9 @@ export default class Operation extends Component{
       <Page className="fuzhen font-16">
         <div className="fuzhen-left ant-col-5">
           <div style={{textAlign: 'center'}}>
-            <Button size="small" onClick={this.newOperation}>新增手术记录</Button>
+            <div className="new-button">
+              <Button size="default" onClick={this.newOperation}>新增手术记录</Button>
+            </div>
           </div>
           <div>
             {this.renderTree(operationList)}
@@ -566,7 +386,7 @@ export default class Operation extends Component{
               </ButtonGroup>
             </div>
           ) : null}
-          {clear ? null : (
+          {/* {clear ? null : (
             <div id="form-block">
               <div>
                 {this.renderFetusTemplateForm(currentShowData)}
@@ -575,11 +395,12 @@ export default class Operation extends Component{
                 {this.renderWardForm(currentShowData)}
               </div>
             </div>
-          )}
-          <div className="btn-group pull-right bottom-btn">
-            <Button className="blue-btn">打印</Button>
-            <Button className="blue-btn" onClick={this.handleSave}>保存</Button>
-          </div>
+          )} */}
+          <OperationFrom
+            dataSource={currentShowData}
+            handleSave={this.handleSave}
+          />
+          
         </div>
         <Modal 
           visible={isShowTemplateModal}
