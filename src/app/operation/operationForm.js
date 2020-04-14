@@ -66,8 +66,7 @@ export default class OperationForm extends Component{
     this.setFormData();
   }
 
-  componentDidUpdate(prevProps) {
-    console.log(this.props.dataSource);
+  componentDidUpdate(prevProps = {}) {
     if(JSON.stringify(this.props.dataSource) !== JSON.stringify(prevProps.dataSource)){
       this.setFormData();
     }
@@ -127,7 +126,7 @@ export default class OperationForm extends Component{
       // 这个return一定要加
       return ;
     }
-    
+
     let obj = JSON.parse(JSON.stringify(formData));
     // 通用
     const fIndex = obj['operative_procedure']['fetus'].findIndex(item => item.id.toString() === currentFetusKey);
@@ -192,7 +191,6 @@ export default class OperationForm extends Component{
   handleTabClick = (key) => {this.setState({currentFetusKey: key})}
 
   renderFetusTemplateForm = (renderData = {}) => {
-    console.log(renderData);
     if(Object.keys(renderData).length === 0) return <div>无数据</div>;
     const { templateId = -1} = renderData;
     if(templateId < 0 || templateId > 7) return null;
@@ -298,9 +296,9 @@ export default class OperationForm extends Component{
                 <div>
                   {this.renderFetusTemplateForm(formData)}
                 </div>
-                <div>
+                {/* <div>
                   {this.renderWardForm(formData)}
-                </div>
+                </div> */}
               </div>
             )
           }

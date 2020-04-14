@@ -1,5 +1,6 @@
 import React,{Component} from 'react';
 import { Input, Select } from 'antd';
+import { newDataTemplate } from '../../app/medicalrecord/data';
 // 业务组件
 const { Option } = Select;
 
@@ -77,45 +78,74 @@ export function bloodinput(props) {
 }
 
 
-export function hemorrhageselect(props) {
-  const { name, entity, onChange, onBlur } = props;
-
-  let data = {label:'', value:''};
-  // 设置初始值
-  if(entity[name]){
-    // console.log(entity);
-    data.label = entity[name].label;
-    data.value = entity[name].value;
+class HemorrhageSelect extends Component{
+  constructor(props){
+    super(props);
+    this.state = {
+      data:{
+        label:"",value:""
+      }
+    }
   }
+  componentDidMount(){
+    const { entity } = this.props;
+    this.mapPropsToState();
+  }
+  componentDidUpdate(prevProps){
+    const {name,entity} = this.props;
+    if(JSON.stringify(entity[name]) !== JSON.stringify(prevProps.entity[prevProps.name])){
+      this.mapPropsToState();
+    }
+  }
+  mapPropsToState = () => {
+    const {name, entity} = this.props;
+    const d = entity[name] || {value: "", label: ""};
+    this.setState({data:d});
+  }
+  handleSelect = (val,e) => {
+    if(val === "无"){
+      this.setState({data: {label: "无",value: ""}},() => this.emit(e));
+    }else if(val === "有"){
+      this.setState({data: {label: "有",value: ""}},() => this.emit(e));
+    }
+  }
+  handleInput = (e) => {
+    const { label } = this.state.data;
+    this.setState({data: {label,value: e.target.value}},() => this.emit(e));
+  }
+  emit = (event) => {
+    const { data } = this.state;
+    const { onChange, onBlur} = this.props;
+    onChange(event, data).then(() => onBlur({checkedChange: true}));
+  }
+  render(){
+    const defaultOption = [
+      {value: "有", label: "有"},
+      {value: "无", label: "无"},
+    ]
+    const { data} = this.state;
+    return(
+      <div style={{display: "flex"}}>
+        <Select 
+          value={data.label} 
+          onSelect={(value,event) => this.handleSelect(value, event)}  
+        >
+          {defaultOption.map((v,index) => <Option value={v.value} key={index}>{v.label}</Option>)}
+        </Select>
+        {data.label === "有" ? 
+          <Input
+            value={this.state.data.value || ""}
+            onChange={this.handleInput}
+          /> 
+          : null}
+      </div>
+    )
+  }
+}
 
-  // 回调
-  const handleSelect = (value,event) => {
-    console.log(event);
-    data['label'] = value;
-    onChange(event, data).then(() => onBlur({checkedChange:true}));
-  };
-
-  const handleChange = (value,e) => {
-    console.log(e);
-    data['value'] = value;
-    onChange(e, data).then(() => onBlur({checkedChange:true}));
-  };
-
-  return (
-    <Select value={data.label} onSelect={(value,event) => handleSelect(value, event)}>
-      <Option value="有">
-        <div style={{display: 'flex'}}>
-          <div><span>有</span></div>
-          &nbsp;&nbsp;
-          {/* 这个位置只能阻止冒泡，在展开li时貌似li 的 zIndex比较高 */}
-          <div onClick={(e) => {e.cancelBubble = true; e.stopPropagation();}}>
-            <Input value={data.value} onChange={(e) => handleChange(e.target.value, e)}/><span>s</span>
-          </div>
-        </div>
-      </Option>
-      <Option value="无">无</Option>
-    </Select>
-  )
+// 出血类select
+export function hemorrhageselect(props) {
+  return <HemorrhageSelect {...props} />
 }
 
 export function whetherbleedingselect(props) {
@@ -144,8 +174,4 @@ export function whetherbleedingselect(props) {
     </div>
     
   )
-}
-
-export function AddressInput(props) {
-  const { name, entity, onChange, onBlur } = props;
 }

@@ -4,7 +4,7 @@ import {
   characterOptions2,
   characterOptions7,
   incisionTypeOptions,
-  nhOptions,
+  isOptions,
   wbOptions,
   operation_itemsOptions,
   operationLevelOptions,
@@ -55,7 +55,7 @@ const operationItem_config = () => ({
     },
     {
       columns: [
-        {name: 'rePuncture[是否再次穿刺]', type: 'checkinput-5',valid: 'required', radio: true, options: nhOptions }
+        {name: 'rePuncture[是否再次穿刺]', type: 'checkinput-5',valid: 'required', radio: true, options: isOptions }
       ]
     }
   ]
@@ -91,7 +91,7 @@ const assistant = {name: 'assistant[助手]', type: 'input', span: SPAN_6};
 const start_time = {name: 'start_time[开始时间]', type: 'time', placeholder: "", format: "HH:mm", span: SPAN_6};
 const end_time = {name: 'end_time[结束时间]', type: 'time', placeholder: "", format: "HH:mm",span: SPAN_6};
 const duration = {name: 'duration[持续时间](min)', type: 'input', span: SPAN_6};
-const timesOfNeedleInsertion = {name: 'timesOfNeedleInsertion[进针次术]', type: 'input', span: SPAN_6};
+const timesOfNeedleInsertion = {name: 'timesOfNeedleInsertion[进针次数]', type: 'input', span: SPAN_6};
 const placenta = {name: 'placenta[经否胎盘]', type: 'select',options: [{label: '经',value: '经'},{label: '否',value: '否'}], span: SPAN_6};
 const placentaHemorrhage = {name: 'placentaHemorrhage[胎盘出血]', type: 'hemorrhageselect', span: SPAN_6};
 const uterineWallHemorrhage = {name: 'uterineWallHemorrhage[宫壁出血]', type: 'hemorrhageselect',options: yesOptions, span: SPAN_6};
@@ -131,9 +131,9 @@ const config0 = {
   operative_procedure_config:(templateFn) => ({
     step: 1,
     rows: [
-      {columns: [operation_no,operator, assistant]},
+      {columns: [operation_no,operator]},
       {columns: [start_time, end_time, duration]},
-      {columns: [{name: 'puncturePosition[穿刺部位]', type: 'select', options: puncturePositionOptions0, span: SPAN_6},timesOfNeedleInsertion]},
+      {columns: [{name: 'puncturePosition[穿刺部位]', type: 'select', showSearch: true, options: puncturePositionOptions0, span: SPAN_6},timesOfNeedleInsertion]},
       {columns: [placenta,placentaHemorrhage,uterineWallHemorrhage]},
       {columns: [inspectionItems,amniotic_fluid,{name: 'character[性状]', type: 'select',options: characterOptions0, span: SPAN_6}]},
       {columns: [isPharmacy]},
@@ -165,7 +165,7 @@ const config1 = {
   operative_procedure_config: () => ({
     step: 1,
     rows: [
-      {columns: [operation_no, operator, assistant]},
+      {columns: [operation_no, operator]},
       {columns: [start_time, end_time, duration]},
       {columns: [
           {name: 'puncturePosition[穿刺部位]', type: 'select', options: puncturePositionOptions1 ,span: SPAN_6},
@@ -211,10 +211,10 @@ const config2 = {
   operative_procedure_config:() => ({
     step: 1,
     rows: [
-      {columns: [operation_no, operator, assistant]},
+      {columns: [operation_no, operator]},
       {columns: [start_time, end_time, duration]},
       {columns: [
-          {name: 'puncturePosition[穿刺部位]', type: 'select', options: puncturePositionOptions2, span: SPAN_6},
+          {name: 'puncturePosition[穿刺部位]', type: 'select', showSearch: true, options: puncturePositionOptions2, span: SPAN_6},
           timesOfNeedleInsertion,
           numberOfHits
       ]},
@@ -253,11 +253,11 @@ const config3 = {
   operative_procedure_config:() => ({
     step: 1,
     rows: [
-      {columns: [operation_no, operator, assistant]},
+      {columns: [operation_no, operator]},
       {columns: [start_time, end_time, duration]},
       {columns: [
         // 此处的 穿刺部位/羊水性状 与config0 - 羊膜腔穿刺 相同
-        {name: 'puncturePosition[穿刺部位]', type: 'select', options: puncturePositionOptions0,span: SPAN_6},
+        {name: 'puncturePosition[穿刺部位]', type: 'select', showSearch: true, options: puncturePositionOptions0,span: SPAN_6},
         punctureCount,
         {name: 'perfusionVolume[灌注液量](ml)', type: 'input', span: SPAN_6}
       ]},
@@ -300,7 +300,7 @@ const config4 = {
   operative_procedure_config: () => ({
     step: 1,
     rows: [
-      {columns: [operation_no, operator, assistant]},
+      {columns: [operation_no, operator]},
       {columns: [start_time, end_time, duration]},
       {columns: [
         // TODO 这里的options应该需要动态设置
@@ -351,7 +351,7 @@ const config5 = {
   operative_procedure_config: () => ({
     step: 1,
     rows: [
-      {columns: [operation_no, operator, assistant]},
+      {columns: [operation_no, operator]},
       {columns: [start_time, end_time, duration]},
       {
         columns: [
@@ -415,7 +415,7 @@ const config6 = {
   operative_procedure_config: () => ({
     step: 1,
     rows: [
-      {columns: [operation_no, operator, assistant]},
+      {columns: [operation_no, operator]},
       {columns: [
           {name: 'start_time[输血开始时间]', type: 'time', span: SPAN_6},
           {name: 'end_time[输血结束时间]', type: 'time', span: SPAN_6},
@@ -487,7 +487,7 @@ const config7 = {
   operative_procedure_config: () => ({
     step: 1,
     rows: [
-      {columns: [operation_no, operator, assistant]},
+      {columns: [operation_no, operator]},
       {columns: [start_time, end_time, duration]},
       {
         columns: [
@@ -570,7 +570,7 @@ const ward_config = (templateFn) => ({
       columns:[
         {name: 'operationNo[手术编号]', type: 'input', valid: 'required', span: SPAN_6},
         {name: 'operator[术者]', type: 'input', valid: 'required' ,span: SPAN_6},
-        {name: 'assistant[助手]', type: 'input', valid: 'required', format: "HH:mm", span: SPAN_6}
+        // {name: 'assistant[助手]', type: 'input', valid: 'required', format: "HH:mm", span: SPAN_6}
       ]
     },
     {

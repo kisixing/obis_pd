@@ -51,11 +51,6 @@ export default {
    * 专科病历 - 胎儿疾病 - 既往史 - 手术史
    */
   writeOperationHistory: function (entity) {
-    return this.userId().then(r => {
-      // entity.operationHistorys.forEach(v => {
-      //   v.userid = r.object.userid;
-      // });
-      myAxios.post(`/outpatientWriteRestful/writeOperationHistory`,{userid: r.object.userid, operationHistorys: entity.operationHistorys})
-    })
+    return this.userId().then(r => myAxios.post(`/outpatientWriteRestful/writeOperationHistory`,{userid: r.object.userid, operationHistorys: entity.operationHistorys}))
   }
 }

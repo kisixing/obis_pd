@@ -648,6 +648,11 @@ export const eoOptions = toOptions('无,其他(input){#FF3300}');
 export const jxOptions = toOptions('正常,畸形{#FF3300}');
 
 /**
+ * 是 否
+ */
+export const isOptions = toOptions('是(input){#FF3300},否')
+
+/**
  *无、有
  */
 export const hnOptions = toOptions('无,有');
@@ -664,6 +669,8 @@ export const wssOptions = toOptions([{ k: '有{#FF3300}(input)', addspan: 2 }]);
  * 是否用药 （含有用药特殊输入框）
  */
 export const iumOption = toOptions('有(右)(input),无');
+
+
 
 /**
  * 是否出血 （含特殊输入框）
@@ -1055,7 +1062,7 @@ export const preoperativeUltrasonographyColumns0 = [
   { title: 'AFV(mm)', key: 'afv', type: 'input' },
   { title: '胎盘厚度(mm)', key: 'fetalThickness', type: 'input' },
   { title: '胎盘位置', key: 'fetalPosition', type: 'input' },
-  { title: '脐静脉直径(mm)', key: 'umbilicalVeins', type: 'input' },
+  // { title: '脐静脉直径(mm)', key: 'umbilicalVeins', type: 'input' },
   { title: '胎心率(bpm)', key: 'fhr', type: 'input' },
   { title: '备注', key: 'remark', type: 'input' },
 ];

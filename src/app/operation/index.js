@@ -1,23 +1,18 @@
 import React, {Component} from 'react';
-import {Button, Collapse, Tabs, Tree, Modal, message} from "antd";
+import {Button, Tree, message} from "antd";
 import Page from '../../render/page';
 
 import store from '../store';
 import service from '../../service/index.js';
-import { formatDate, convertString2Json, getTimeDifference, mapValueToKey } from '../../utils/index';
+import { formatDate, convertString2Json } from '../../utils/index';
 
-import TemplateInput from '../../components/templateInput/index';
 
 import OperationFrom from './operationForm';
 
 import '../index.less';
 import './index.less';
-import formRender,{ fireForm} from "../../render/form";
-import formRenderConfig from "./formRenderConfig";
+
 const { TreeNode } = Tree;
-const { Panel } = Collapse;
-const { TabPane } = Tabs;
-const ButtonGroup = Button.Group;
 
 
 /**
@@ -74,7 +69,7 @@ Date.prototype.Format = function (fmt) { //author: meizz
 
 
 // 'bleedIndex','hemogram','measurement'
-const specialEdit = ['preoperativeUltrasonography','preoperativeUltrasonographyLast',];
+// const specialEdit = ['preoperativeUltrasonography','preoperativeUltrasonographyLast',];
 
 
 export default class Operation extends Component{
@@ -87,17 +82,6 @@ export default class Operation extends Component{
       currentTreeKeys: [], // 树形菜单选择
       currentExpandedKeys: [],
       currentShowData: {}, // 当前展示的数据
-
-      clear: false, // 用于清空表单的渲染，不然会造成前一表单遗留
-      
-      currentFetusKey: '-1',
-
-      // 模板功能
-      templateObj: {
-        isShowTemplateModal: false,
-        type: '',
-        doctor: ''
-      },
     };
   }
 
@@ -105,7 +89,7 @@ export default class Operation extends Component{
     const { userData } = store.getState();
     if(userData.userid){
       service.operation.getOperation().then(res => {
-        if(res.code === '200' || 200)  this.setState({operationList: res.object.list});
+        if(res.code === '200')  this.setState({operationList: res.object.list});
       })
     }else{
       message.info('用户为空');
@@ -137,7 +121,7 @@ export default class Operation extends Component{
   };
 
   /* ========================= 事件交互 ============================ */
-  //
+  // 新建手术记录
   newOperation = () => {
     const { operationList, operationNewDataList, currentExpandedKeys, currentShowData } = this.state;
     const { userData } = store.getState();
@@ -238,14 +222,14 @@ export default class Operation extends Component{
   };
 
 
-  handleTemplateSelect = (templateId) => {
-    const { currentShowData } = this.state;
-    currentShowData['templateId'] = templateId;
-    if(templateId === 8) {
-      currentShowData.operationItem.operationName = {value: '病房病历', label: '病房病历'}
-    }
-    this.setState({currentShowData});
-  };
+  // handleTemplateSelect = (templateId) => {
+  //   const { currentShowData } = this.state;
+  //   currentShowData['templateId'] = templateId;
+  //   if(templateId === 8) {
+  //     currentShowData.operationItem.operationName = {value: '病房病历', label: '病房病历'}
+  //   }
+  //   this.setState({currentShowData});
+  // };
 
   handleSave = (data) => {
     if(data['id'] < 0){
@@ -280,7 +264,6 @@ export default class Operation extends Component{
   /* ========================= 其他 ============================ */
   // 获取数据整合进入state
   convertOperationData = (object) => {
-    let { currentTreeKeys } = this.state;
     let { operative_procedure, operationItem } = object;
     /* string -> json */
     // 手术记录
@@ -318,53 +301,9 @@ export default class Operation extends Component{
     return object;
   };
 
-  openModal = (type) => {
-    if (type) {
-      let { doctor = ""} = this.state.currentShowData;
-      if(doctor === null) doctor = "";
-      this.setState({templateObj: {isShowTemplateModal: true,type: type,doctor: doctor}});
-    }
-  }
-
-  closeModal = () => {
-    this.setState({
-      templateObj: { isShowTemplateModal: false, type: '', doctor: ''}
-    })
-  }
-
-  getTemplateInput = (items) => {
-    const { currentShowData } = this.state;
-    const { type } = this.state.templateObj;
-    const content = items.map(v => v.content).join(" ");
-    let obj = JSON.parse(JSON.stringify(currentShowData));
-    // 需要新对象
-    switch(type) {
-      case 'or2':
-        const { currentFetusKey } = this.state;
-        const i = obj['operative_procedure']['fetus'].findIndex(item => item.id.toString() === currentFetusKey);
-        let fetus = JSON.parse(JSON.stringify(obj['operative_procedure']['fetus'][i]));
-        fetus['special_case'] = "";
-        fetus['special_case'] = content;
-        obj['operative_procedure']['fetus'].splice(i,1,fetus);
-        break;
-      case 'or3':
-        obj['surgery']['doctors_advice'] = content;
-        break;
-      case 'or6':
-        obj['ward']['operationProcedure'] = content;
-        break;
-      default:
-        console.log('type error');
-        break;
-    }
-    this.setState({currentShowData: obj},() => this.closeModal())
-  }
-
 
   render() {
-    const { operationList, currentShowData = {}, clear } = this.state;
-    const { id, templateId = 0 } = currentShowData;
-    const { isShowTemplateModal, type, doctor = "" } = this.state.templateObj;
+    const { operationList, currentShowData = {}} = this.state;
     return (
       <Page className="fuzhen font-16">
         <div className="fuzhen-left ant-col-5">
@@ -378,43 +317,20 @@ export default class Operation extends Component{
           </div>
         </div>
         <div className="fuzhen-right ant-col-19 main main-pad-small width_7">
-          {id < 0 ? (
+          {/* {id < 0 ? (
             <div className="btn-group">
               <ButtonGroup>
                 <Button type={ (templateId<=7&&templateId>=0) ? "primary" : ""} onClick={() => this.handleTemplateSelect(0)}>胎儿中心</Button>
                 <Button type={templateId === 8 ? "primary" : ""} onClick={() => this.handleTemplateSelect(8)}>病房</Button>
               </ButtonGroup>
             </div>
-          ) : null}
-          {/* {clear ? null : (
-            <div id="form-block">
-              <div>
-                {this.renderFetusTemplateForm(currentShowData)}
-              </div>
-              <div>
-                {this.renderWardForm(currentShowData)}
-              </div>
-            </div>
-          )} */}
+          ) : null} */}
           <OperationFrom
             dataSource={currentShowData}
             handleSave={this.handleSave}
           />
           
         </div>
-        <Modal 
-          visible={isShowTemplateModal}
-          onCancel={this.closeModal}
-          footer={false}
-          width="800px"
-        >
-          <div>
-            <TemplateInput
-              data={{doctor,type}}
-              getData={this.getTemplateInput}
-            /> 
-          </div>
-        </Modal>
       </Page>
     )
   }

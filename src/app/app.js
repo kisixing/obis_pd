@@ -285,7 +285,7 @@ export default class App extends Component {
   }
 
   render() {
-    const { isFetching } = store.getState();
+    // const { isFetching } = store.getState();
     return (
       <div className='main-body'>
         {this.renderHeader()}
@@ -296,7 +296,7 @@ export default class App extends Component {
           {this.renderDanger()}
         </div>
         {this.renderHighrisk()}
-        <div>
+        {/* <div>
           <Modal
             visible={isFetching}
             maskClosable={false}
@@ -304,7 +304,7 @@ export default class App extends Component {
           >
             <div><span>数据请求中</span></div>
           </Modal>
-        </div>
+        </div> */}
       </div>
     )
   }

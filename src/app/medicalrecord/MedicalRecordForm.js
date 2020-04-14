@@ -53,7 +53,7 @@ export default class MedicalRecordForm extends Component{
     this.setFormData();
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps = {}) {
     if(JSON.stringify(this.props.dataSource) !== JSON.stringify(prevProps.dataSource)){
       this.setFormData();
     }
@@ -239,7 +239,7 @@ export default class MedicalRecordForm extends Component{
     this.setState({operationHistoryData: newData},() => console.log(this.state));
   }
 
-  renderForm = (data, ultrasoundMiddleData, operationHistoryData) => {
+  renderForm = (data = {}, ultrasoundMiddleData, operationHistoryData) => {
     if(Object.keys(data).length === 0 ){
       data = newDataTemplate;
     }
@@ -411,6 +411,8 @@ export default class MedicalRecordForm extends Component{
 
   save = () => {
     const { formData, ultrasoundMiddleData, operationHistoryData} = this.state;
+    console.log(ultrasoundMiddleData);
+    console.log(operationHistoryData);
     fireForm(document.getElementById('form-block'), 'valid').then(r => {
       if(r){
         this.props.handleSave(formData, ultrasoundMiddleData, operationHistoryData);
