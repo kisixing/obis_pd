@@ -73,7 +73,8 @@ export default class OperationForm extends Component{
   }
 
   setFormData = () => {
-    let c = '-1';
+    // 如果为空对象，默认设置为0
+    let c = '0';
     try{
       if(this.props.dataSource.operative_procedure.fetus.length !== 0){
         c = this.props.dataSource.operative_procedure.fetus[0].id;
@@ -81,7 +82,8 @@ export default class OperationForm extends Component{
     }catch(e){
       console.error(e);
     }
-    this.setState({formData: this.props.dataSource, currentFetusKey: c});
+    // currentFetusKey 类型为string
+    this.setState({formData: this.props.dataSource, currentFetusKey: c.toString()});
   }
 
 
@@ -91,12 +93,10 @@ export default class OperationForm extends Component{
   /* =================== 表单 ========================= */
 
   handleFormChange = (path, {name, value, error}) => {
-    console.log(name);
     if(error) {
       message.error(error);
       return;
     }
-    console.log(name);
     const { formData, currentFetusKey } = this.state;
     if(name === 'operationName') {
       // 这里只可能存在 0~7 8种手术模板
@@ -188,7 +188,7 @@ export default class OperationForm extends Component{
     }
     this.setState({formData, currentFetusKey: newFetusId.toString()});
   };
-  handleTabClick = (key) => {this.setState({currentFetusKey: key})}
+  handleTabClick = (key) => {this.setState({currentFetusKey: key},() => console.log(this.state))}
 
   renderFetusTemplateForm = (renderData = {}) => {
     if(Object.keys(renderData).length === 0) return <div>无数据</div>;

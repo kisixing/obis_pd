@@ -20,6 +20,8 @@ export function eventFns({onKeyUp, ...props}) {
     });
     return elements[inedx + next];
   };
+  return {...props}
+  // 暂时return false 左右没什么用
   return {
     ...props,
     onKeyUp: e=>{

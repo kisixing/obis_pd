@@ -272,7 +272,13 @@ export default function formRender(entity, config, onChange, { children, ...prop
     console.warn('entity最好不为空,否则可能导致保存不上');
   }
   return (
-    <form {...events(props)}>
+    // fixed form default submit
+    <form 
+      {...events(props)}
+      onSubmit={(e) => {
+        e.preventDefault();
+      }}  
+    >
       {render(entity, onChange, config)}
       {children}
     </form>

@@ -131,7 +131,7 @@ export default class OpenCase extends Component {
                 message.error(uRes.data.message)
               }
             });
-
+            // 需要等待服务器后才可以做，因为服务器会迟1、2秒
             setTimeout(() => {
               store.dispatch(setUserData(res.data.object))
             }, 2000);

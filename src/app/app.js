@@ -150,6 +150,7 @@ export default class App extends Component {
           <div><strong>预产期:</strong>{gesexpect}</div>
           <div><strong>门诊号:</strong>{usermcno}</div>
           <div><strong>病例号:</strong>{chanjno}</div>
+          <div><strong>多胎号:</strong></div>
         </div>
         {/* 这里做个搜索栏 */}
         <div className="search-block patient-Info_title">

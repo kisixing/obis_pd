@@ -5,9 +5,10 @@
 .form-row,.form-column{
   position: relative;
   .row-label,.column-label{
-    position: absolute;
-    left: 0;
-    top: -10px;
+    // position: absolute;
+    // left: 10px;
+    // top: -10px;
+    padding-left: 15px;
     font-weight: bold;
     color: #73a1ef;
   }
@@ -36,11 +37,12 @@
       background: none ;
     }
     .form-unit{
-      font-size: 0.7em;
+      // font-size: 0.7em;
       padding-left: 2px;
     }
     .form-message{
       // 因为不需要显示error message，所以隐藏
+      // TODO 之后修改为block form.js中的排布也需要修改
       display: none;
       position: absolute;
       left:0;

@@ -10,7 +10,6 @@ import mdConfig from './formRenderConfig';
 import { mapValueToKey } from '../../utils/index';
 
 import '../index.less';
-import operation from '../../service/operation';
 
 const { Panel } = Collapse;
 const { TabPane } = Tabs;
@@ -18,7 +17,7 @@ const { TabPane } = Tabs;
 // 可编辑tab的识别符
 const ULTRA = 'u', CHECK = 'c';
 
-const defaultActiveKeys = ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16'];
+const defaultActiveKeys = ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17'];
 
 /**
  * 本页面用于描述 专科病历 右侧的表单区域
@@ -45,8 +44,8 @@ export default class MedicalRecordForm extends Component{
         doctor: "",
         type: ""
       }
-      
     };
+    console.log(React);
   }
 
   componentDidMount(){
@@ -316,6 +315,7 @@ export default class MedicalRecordForm extends Component{
         ) : (
           [
             <Panel header="预产期" key='8'>{formRender(data.pregnancy_history, mdConfig.pregnancy_history_config(), (_, e) => this.handleFormChange("pregnancy_history",e))}</Panel>,
+            <Panel header="孕产史" key='17'>{formRender({}, mdConfig.maternity_history_config(), () => {})}</Panel>,
             <Panel header="现病史" key='9'>{formRender({medical_history: data.medical_history}, mdConfig.medical_history_config(this.openModal), (_, e) => this.handleFormChange("",e))}</Panel>,
             <Panel header="地贫/血型检查" key='13'>
               <Checkbox checked={!isTChecked} onChange={(e) => this.handleCheckboxChange(e.target.checked, "t")}>未检查</Checkbox>
@@ -433,7 +433,7 @@ export default class MedicalRecordForm extends Component{
         <div>
           {!this.state.formData.id ? null : ( 
             <div className="btn-group pull-right bottom-btn">
-              <Button className="blue-btn">打印</Button>
+              <Button className="blue-btn" onClick={() => window.print()}>打印</Button>
               <Button className="blue-btn" onClick={this.save}>保存</Button>
             </div>)}
         </div>

@@ -155,6 +155,28 @@ export const BvColumns = [
 	},
 ]
 
+/**
+ * TODO 之后后台改了后再来改名字
+ * 孕产史select 配置
+ */
+const c = toOptions('分娩,自然流产,人工流产,引产');
+const d = toOptions('顺产,剖宫产,吸引,钳产,臀助产');
+const sexOptions = toOptions('男,女');
+const isOptions = toOptions('是,否');
+/**
+ * 孕产史表头
+ */
+export const maternityColumns = [
+	{title: '胎儿', key: 'a', type: 'input'},
+	{title: '孕次', key: 'b', type: 'select', options: ccOptions},
+	{title: '分娩', key: 'c', type: 'input', options: c},
+	{title: '分娩方式', key: 'd', type: 'select',options: d },
+	{title: '不良孕史', key: 'e', type: 'input'},
+	{title: '新生儿性别', key: 'f', type: 'select', options: sexOptions},
+	{title: '孩子体健', key: 'g', type: 'select', options: isOptions},
+	{title: '备注', key: 'h', type: 'input'},
+]
+
 export const newDataTemplate = {
 	userid: "",
 	formType: "1",

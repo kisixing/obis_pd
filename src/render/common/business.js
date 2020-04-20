@@ -4,6 +4,7 @@ import { newDataTemplate } from '../../app/medicalrecord/data';
 // 业务组件
 const { Option } = Select;
 
+// 是否药物 延申
 export function pharacyinput(props) {
   const { name, entity, onChange, value, onBlur } = props;
   let targetData = value.split('|') || "";
@@ -40,7 +41,7 @@ export function pharacyinput(props) {
   )
 }
 
-
+// 流血时间/原因input
 export function bloodinput(props) {
   const { name, entity, onChange, value, onBlur } = props;
   let targetData = value.split('|') || "";
@@ -148,6 +149,7 @@ export function hemorrhageselect(props) {
   return <HemorrhageSelect {...props} />
 }
 
+// 是否流血
 export function whetherbleedingselect(props) {
   const { name, entity, onChange, onBlur } = props;
 
@@ -175,3 +177,4 @@ export function whetherbleedingselect(props) {
     
   )
 }
+

@@ -9,6 +9,7 @@ class MMix extends Component{
     const {option,baseColor} = props;
     const $label = option.label||option;
     const label = getrealy($label);
+    // 这个type就是option括号中的值
     const type = option.type || (/\((.*)\)/.test($label) && /\((.*)\)/.exec($label)[1]);
     const unit = option.unit || (/\[(.*)\]/.test($label) && /\[(.*)\]/.exec($label)[1]);
     const color = option.color || (/\{(.*)\}/.test($label) && /\{(.*)\}/.exec($label)[1]);
@@ -17,7 +18,6 @@ class MMix extends Component{
       label,type,unit,field,width:0,color:color || baseColor
     };
   }
-
   componentDidMount(){
     const { field } = this.state;
     const {args:[,AddResize], option, data} = this.props;
@@ -82,7 +82,6 @@ class MMix extends Component{
     const {label,type,field,color} = this.state; 
     const showEditor = type && data.hasOwnProperty(field);
     const fontColor = data.hasOwnProperty(field) && (color || baseColor) || '';
-
     return (
       <Col {...rest} span={span * (1 + (showEditor?(/^\d+$/.test(option.addspan) ? option.addspan : 1):0))}>
         <Checkbox style={{color: fontColor}} value={field} checked={data.hasOwnProperty(field)} onChange={e=>this.handleCheck(e)}>{label}</Checkbox>
@@ -106,7 +105,6 @@ export function checkinput$x({ name, options = [], onChange, onBlur, value:data1
   // const optionList = (unselect?[{label:unselect,value:'unselect',unselect:true}]:[]).concat(options);
   const optionList = (unselect?options.concat([{label:unselect,value:'unselect',unselect:true}]):options);
   const span = Math.floor(count ? (24/count) : Math.max(6, 24 / (optionList.length || 1)));
-  
   const data = data1 ? (typeof data1.$data === 'object' ? data1.$data : {}) : {};
   const toData = () => {
     var result = Object.keys(data).filter(i => !/^\$/.test(i)).map(i => ({label:i, value: data[i], $value: data[`$${i}`]}));

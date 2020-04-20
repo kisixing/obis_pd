@@ -12,6 +12,7 @@ const config = {
     rows: [
       {
         columns:[
+          { span: 1 },
           { name: 'chief_complaint[主诉]', type: 'textarea', valid: 'required',span: 16 },
           { type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr1'), valid: ""}
         ]
@@ -24,6 +25,7 @@ const config = {
     rows:[
       {
         columns:[
+          { span: 1 },
           { name: 'medical_history[现病史]', type: 'textarea', valid: 'required', span: 16 },
           { type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr2'), valid: ""}
         ]
@@ -36,6 +38,7 @@ const config = {
     rows: [
       {
         columns:[
+          { span: 1 },
           { name: 'other_exam[其他]', type: 'textarea', span: 16 },
           { type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr3'), valid: ""}
         ]
@@ -48,6 +51,7 @@ const config = {
     rows: [
       {
         columns:[
+          { span: 1 },
           { name: 'diagnosis[诊断]', type: 'textarea', valid: 'required', span: 16 },
           { type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr4'), valid: ''}
         ]
@@ -60,6 +64,7 @@ const config = {
     rows: [
       {
         columns:[
+          { span: 1 },
           { name: 'treatment[处理措施]', type: 'textarea', valid: 'required', span: 16 },
           { type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr5'), valid: ""}
         ]
@@ -72,18 +77,34 @@ const config = {
     rows: [
       {
         columns: [
-          { name: 'lmd[末次月经]', type: 'date', span: 12, valid: 'required'},
-          { name: 'edd[预产期]', type: 'date', span: 12, valid: 'required'},
+          { span: 1 },
+          { name: 'lmd[末次月经]', type: 'date', span: 7, valid: 'required'},
+          { name: 'edd[预产期-日期]', type: 'date', span: 7, valid: 'required'},
+          { name: '[预产期-B超]', type: 'date', span: 7, valid: 'required'},
+          { span: 2 }
+        ]
+      }
+    ]
+  }),
+  maternity_history_config: () => ({
+    step: 1,
+    rows: [
+      {
+        columns: [
+          { span: 1 },
+          { name: 'gravidity[G]', type: 'select', span: 5, showSearch: true, options: baseData.ccOptions, valid: 'required'},
+          { name: 'parity[P]',  type: 'select', span: 5, showSearch: true, options: baseData.ccOptions, valid: 'required'},
+          { name: 'abortion[A]',  type: 'select', span: 5, showSearch: true, options: baseData.ccOptions, valid: 'required'},
+          { name: 'exfetation[E]',  type: 'select', span: 5, showSearch: true, options: baseData.ccOptions, valid: 'required'},
+          { span: 3 },
         ]
       },
       {
         columns: [
-          { name: 'gravidity[G]', type: 'select', span: 6, showSearch: true, options: baseData.ccOptions, valid: 'required'},
-          { name: 'parity[P]',  type: 'select', span: 6, showSearch: true, options: baseData.ccOptions, valid: 'required'},
-          { name: 'abortion[A]',  type: 'select', span: 6, showSearch: true, options: baseData.ccOptions, valid: 'required'},
-          { name: 'exfetation[E]',  type: 'select', span: 6, showSearch: true, options: baseData.ccOptions, valid: 'required'},
+          { span: 1},
+          { name: '[孕产史]', type: 'table', span: 20, pagination: false, editable: true, options: baseData.maternityColumns }
         ]
-      },
+      }
     ]
   }),
   // 地贫/血型检查 - 胎儿+遗传
@@ -97,22 +118,27 @@ const config = {
       },
       {
         columns: [
-          { name: 'hb(g/L)[Hb]', type: 'input', span: 6, showSearch: true},
-          { name: 'mcv(fL)[MCV]',  type: 'input', span: 6, showSearch: true},
-          { name: 'mch[MCH]',  type: 'input', span: 6, showSearch: true},
+          { span: 1 },
+          { name: 'hb(g/L)[Hb]', type: 'input', span: 7},
+          { name: 'mcv(fL)[MCV]',  type: 'input', span: 7},
+          { name: 'mch[MCH]',  type: 'input', span: 7},
+          { span: 2 }
         ]
       },
       {
         columns: [
-          { name: 'hbA2[HbA2]', type: 'input', span: 6, showSearch: true,},
-          { name: 'blood_group[血型]',  type: 'select', span: 6, showSearch: true, options: baseData.xuexingOptions},
-          { name: 'rh[RH(D)血型]', type: 'select', span: 6, options: baseData.xuexing2Options}
+          { span: 1 },
+          { name: 'hbA2[HbA2]', type: 'input', span: 7, showSearch: true,},
+          { name: 'blood_group[血型]',  type: 'select', span: 7, showSearch: true, options: baseData.xuexingOptions},
+          { name: 'rh[RH(D)血型]', type: 'select', span: 7, options: baseData.xuexing2Options},
+          { span: 2 }
         ]
       },
       {
         columns:[
+          { span: 1 },
           { 
-            name: 'genotype[地贫基因型]',  type: 'select', span: 8, showSearch: true, multiple: true, options: baseData.genotypeAnemia, tags: true,
+            name: 'genotype[地贫基因型]',  type: 'select', span: 7, showSearch: true, multiple: true, options: baseData.genotypeAnemia, tags: true,
             filterOption: function (inputValue, option) {
               const val = option.key.split('-')[1];
               // 检查是否存在字母
@@ -136,8 +162,7 @@ const config = {
               return false;
             }
           },
-          { span: 2 },
-          { name: 'other_anomalies[其他异常]', type: 'input', span: 8 }
+          { name: 'other_anomalies[其他异常]', type: 'input', span: 7 },
         ]
       }
     ]
@@ -152,46 +177,50 @@ const config = {
       },
       {
         columns: [
-          { name: 'hb(g/L)[Hb]', type: 'input', span: 6, showSearch: true},
-          { name: 'mcv(fL)[MCV]',  type: 'input', span: 6, showSearch: true},
-          { name: 'mch[MCH]',  type: 'input', span: 6, showSearch: true},
+          { span: 1 },
+          { name: 'hb(g/L)[Hb]', type: 'input', span: 7, },
+          { name: 'mcv(fL)[MCV]',  type: 'input', span: 7, },
+          { name: 'mch[MCH]',  type: 'input', span: 7, },
+          { span: 2 }
         ]
       },
       {
         columns: [
-          { name: 'hbA2[HbA2]', type: 'input', span: 6, showSearch: true},
-          { name: 'blood_group[血型]',  type: 'select', span: 6, showSearch: true, options: baseData.xuexingOptions},
-          { name: 'rh[RH(D)血型]', type: 'select', span: 6, options: baseData.xuexing2Options}
+          { span: 1 },
+          { name: 'hbA2[HbA2]', type: 'input', span: 7},
+          { name: 'blood_group[血型]',  type: 'select', span: 7, showSearch: true, options: baseData.xuexingOptions},
+          { name: 'rh[RH(D)血型]', type: 'select', span: 7, options: baseData.xuexing2Options},
+          { span: 2 }
         ]
       },
       {
         columns:[
-          { name: 'genotype[地贫基因型]',  type: 'select', span: 8, showSearch: true, multiple: true, options: baseData.genotypeAnemia, tags: true,
-          filterOption: function (inputValue, option) {
-            const val = option.key.split('-')[1];
-            // 检查是否存在字母
-            if(/[a-zA-Z]+/.test(inputValue)){
-              const u = inputValue.toUpperCase();
-              const l = inputValue.toLowerCase();
-              if(val.indexOf(u) !== -1) {
-                return true;
-              }else if(val.indexOf(l) !== -1) {
-                return true;
-              }else if(inputValue.indexOf('b') !== -1) {
-                const b = inputValue.replace('b','β');
-                if(val.indexOf(b) !== -1) {
+          { span: 1 },
+          { name: 'genotype[地贫基因型]',  type: 'select', span: 7, showSearch: true, multiple: true, options: baseData.genotypeAnemia, tags: true,
+            filterOption: function (inputValue, option) {
+              const val = option.key.split('-')[1];
+              // 检查是否存在字母
+              if(/[a-zA-Z]+/.test(inputValue)){
+                const u = inputValue.toUpperCase();
+                const l = inputValue.toLowerCase();
+                if(val.indexOf(u) !== -1) {
                   return true;
+                }else if(val.indexOf(l) !== -1) {
+                  return true;
+                }else if(inputValue.indexOf('b') !== -1) {
+                  const b = inputValue.replace('b','β');
+                  if(val.indexOf(b) !== -1) {
+                    return true;
+                  }
                 }
               }
+              if(val.indexOf(inputValue) !== -1){
+                return true;
+              }
+              return false;
             }
-            if(val.indexOf(inputValue) !== -1){
-              return true;
-            }
-            return false;
-          }
-         },
-          { span: 2 },
-          { name: 'other_anomalies[其他异常]', type: 'input', span: 8 }
+          },
+          { name: 'other_anomalies[其他异常]', type: 'input', span: 7 }
         ]
       }
     ]
@@ -202,32 +231,44 @@ const config = {
     rows: [
       {
         columns:[
-          { name: 'hypertension[高血压]', type: 'checkinput-5', valid: 'required', radio: true, options: baseData.wssOptions,span:24 },
+          { span: 1 },
+          { name: 'hypertension[高血压]', type: 'checkinput-5', valid: 'required', radio: true, options: baseData.wssOptions,span: 20 },
+          { span : 3}
         ]
       },
       {
         columns:[
-          { name: 'diabetes_mellitus[糖尿病]', type: 'checkinput-5', valid: 'required', radio: true, options: baseData.wssOptions,span:24 },
+          { span: 1 },
+          { name: 'diabetes_mellitus[糖尿病]', type: 'checkinput-5', valid: 'required', radio: true, options: baseData.wssOptions, span:20 },
+          { span: 3 },
         ]
       },
       {
         columns:[
-          { name: 'heart_disease[心脏病]', type: 'checkinput-5', valid: 'required', radio: true, options: baseData.wssOptions,span:24 },
+          { span: 1 },
+          { name: 'heart_disease[心脏病]', type: 'checkinput-5', valid: 'required', radio: true, options: baseData.wssOptions, span:20 },
+          { span : 3}
         ]
       },
       {
         columns:[
-          { name: 'other_disease[其他病史]', type: 'checkinput-5', valid: 'required', radio: true, options: baseData.wssOptions,span:24 },
+          { span: 1 },
+          { name: 'other_disease[其他病史]', type: 'checkinput-5', valid: 'required', radio: true, options: baseData.wssOptions, span:20 },
+          { span : 3}
         ]
       },
       {
         columns:[
-          { name: 'allergy[过敏史]', type: 'checkinput-5', valid: 'required',radio: true, options: baseData.ywgmOptions, span:24 },
+          { span: 1 },
+          { name: 'allergy[过敏史]', type: 'checkinput-5', valid: 'required',radio: true, options: baseData.ywgmOptions, span:20 },
+          { span : 3}
         ]
       },
       {
         columns:[
-          { name: 'blood_transfusion[输血史]', type: 'checkinput-5', valid: 'required', radio: true, options: baseData.sxsOptions, span: 24 },
+          { span: 1 },
+          { name: 'blood_transfusion[输血史]', type: 'checkinput-5', valid: 'required', radio: true, options: baseData.sxsOptions, span: 20 },
+          { span : 3}
         ]
       }
     ]
@@ -237,7 +278,9 @@ const config = {
     rows: [
       {
         columns:[
-          { name: 'operation_history[手术史]', type: 'table', pagination: false, editable: true, options: baseData.shoushushiColumns },
+          { span: 1},
+          { name: 'operation_history[手术史]', type: 'table', pagination: false, editable: true, options: baseData.shoushushiColumns, span: 20 },
+          { span: 3}
         ]
       },
     ]
@@ -248,27 +291,37 @@ const config = {
     rows:[
       {
         columns:[
-          {name:'hypertension[高血压]', type:'checkinput-5',radio:true, valid: 'required', options: baseData.nhOptions,span: 15}
+          { span: 1},
+          {name:'hypertension[高血压]', type:'checkinput-5',radio:true, valid: 'required', options: baseData.nhOptions,span: 20},
+          { span: 3}
         ]
       },
       {
         columns:[
-          {name:'diabetes_mellitus[糖尿病]', type:'checkinput-5',radio:true, valid: 'required', options: baseData.nhOptions,span: 15}
+          { span: 1},
+          {name:'diabetes_mellitus[糖尿病]', type:'checkinput-5',radio:true, valid: 'required', options: baseData.nhOptions,span: 20},
+          { span: 3}
         ]
       },
       {
         columns:[
-          {name:'congenital_malformation[先天畸形]', type:'checkinput-5',radio:true, valid: 'required', options: baseData.nhOptions,span: 15}
+          { span: 1},
+          {name:'congenital_malformation[先天畸形]', type:'checkinput-5',radio:true, valid: 'required', options: baseData.nhOptions,span: 20},
+          { span: 3}
         ]
       },
       {
         columns:[
-          {name:'heritable_disease[遗传病]', type:'checkinput-5',radio:true, valid: 'required', options: baseData.nhOptions,span: 15}
+          { span: 1},
+          {name:'heritable_disease[遗传病]', type:'checkinput-5',radio:true, valid: 'required', options: baseData.nhOptions,span: 20},
+          { span: 3}
         ]
       },
       {
         columns: [
-          {name:'other[其他]', type:'checkinput-5',radio:true, valid: 'required', options: baseData.nhOptions,span: 15}
+          { span: 1},
+          {name:'other[其他]', type:'checkinput-5',radio:true, valid: 'required', options: baseData.nhOptions,span: 20},
+          { span :3}
         ]
       }
     ]
@@ -279,17 +332,18 @@ const config = {
     rows:[
       {
         columns:[
-          {name:'pre_weight(kg)[孕前体重]', type:'input', span:6, valid: 'required|number|rang(10,100)'},
-
-          {name:'current_weight(kg)[现 体 重 ]', type:'input', span:6, valid: 'required|number|rang(0,100)'},
-
-          {name:'weight_gain(kg)[体重增长]',type:'input', span:6, valid: 'required|number'},
+          { span: 1},
+          { name:'pre_weight(kg)[孕前体重]', type:'input', span:7, valid: 'required|number|rang(10,100)'},
+          { name:'current_weight(kg)[现 体 重 ]', type:'input', span:7, valid: 'required|number|rang(0,100)'},
+          { name:'weight_gain(kg)[体重增长]',type:'input', span:7, valid: 'required|number'},
+          { span: 2}
         ]
       },
       {
         columns: [
+          { span: 1},
           {
-            name: 'bp(mmHg)[血@@@压 ]', type: ['input(/)','input'], span: 6, valid: (value)=>{
+            name: 'bp(mmHg)[血压]', type: ['input(/)','input'], span: 7, valid: (value)=>{
               let message = '';
               if(value){
                 // 缺少valid
@@ -302,15 +356,17 @@ const config = {
             }
           },
           {
-            name:'edema[浮@@@肿 ]', type:'select', span: 6, showSearch: true, options: baseData.xzfOptions
+            name:'edema[浮肿 ]', type:'select', span: 7, showSearch: true, options: baseData.xzfOptions
           },
+          { span : 9}
         ]
       },
       {
         columns:[
-          {name:'fundal_height(cm)[宫@@@高 ]', type:'input', span:8, valid: 'number|rang(10,100)'},
-
-          {name:'waist_hip(cm)[腹@@@围 ]', type:'input', span:8, valid: 'number|rang(0,100)'},
+          { span: 1},
+          { name:'fundal_height(cm)[宫高 ]', type:'input', span: 7, valid: 'number|rang(10,100)'},
+          // { name:'waist_hip(cm)[腹围 ]', type:'input', span: 7, valid: 'number|rang(0,100)'},
+          // { span: 9}
         ]
       }
     ]
@@ -320,12 +376,10 @@ const config = {
     rows:[
       {
         columns:[
-          {
-            name: 'taix[胎心率](bpm)', type: 'input', span: 6, valid: 'required|number'
-          },
-          {
-            name: 'position[先露]', type: 'select', span: 6, options: baseData.presentationOptions
-          }
+          { span: 1},
+          { name: 'taix[胎心率](bpm)', type: 'input', span: 7, valid: 'required|number'},
+          { name: 'position[先露]', type: 'select', span: 7, options: baseData.presentationOptions },
+          { span: 9}
         ]
       }
     ]
@@ -344,23 +398,26 @@ const config = {
       },
       {
         columns: [
-          { name: 'trisomy21[21三体风险]', type: 'input', span: 5 },
-          { span: 1 },
-          { name: 'trisomy18[18三体风险]', type: 'input', span: 5 },
-          { span: 1 },
-          { name: 'trisomy13[13三体风险]', type: 'input', span: 5 },
+          { span: 1},
+          { name: 'trisomy21[21三体风险]', type: 'input', span: 7 },
+          { name: 'trisomy18[18三体风险]', type: 'input', span: 7 },
+          { name: 'trisomy13[13三体风险]', type: 'input', span: 7 },
+          { span: 2},
         ]
       },
       {
         columns: [
-          { name: 'hcg[β-HCG](mom)', type: 'input', span: 5 },
-          { span: 1 },
-          { name: 'papp[PAPP-A](mom)', type: 'input', span: 5 },
+          { span: 1},
+          { name: 'hcg[β-HCG](mom)', type: 'input', span: 7 },
+          { name: 'papp[PAPP-A](mom)', type: 'input', span: 7 },
+          { span: 9}
         ]
       },
       {
         columns: [
-          { name: 'other_anomalies[其他异常]', type: 'input', span: 11 }
+          { span: 1},
+          { name: 'other_anomalies[其他异常]', type: 'input', span: 7 },
+          { span: 16}
         ]
       }
     ]
@@ -375,30 +432,34 @@ const config = {
       },
       {
         columns: [
-          { name: 'trisomy21[21三体风险]', type: 'input', span: 5 },
-          { span: 1 },
-          { name: 'trisomy18[18三体风险]', type: 'input', span: 5 },
-          { span: 1 },
-          { name: 'trisomy13[13三体风险]', type: 'input', span: 5 },
+          { span: 1},
+          { name: 'trisomy21[21三体风险]', type: 'input', span: 7 },
+          { name: 'trisomy18[18三体风险]', type: 'input', span: 7 },
+          { name: 'trisomy13[13三体风险]', type: 'input', span: 7 },
+          { span: 2}
         ]
       },
       {
         columns: [
-          { name: 'ntd[NTD风险]', type: 'input', span: 5},
-          { span: 1 },
-          { name: 'hcg[β-HCG](mom)', type: 'input', span: 5 },
-          { span: 1 },
-          { name: 'afp[AFP](mom)', type: 'input', span: 5 },
+          { span: 1},
+          { name: 'ntd[NTD风险]', type: 'input', span: 7},
+          { name: 'hcg[β-HCG](mom)', type: 'input', span: 7 },
+          { name: 'afp[AFP](mom)', type: 'input', span: 7 },
+          { span: 2}
         ]
       },
       {
         columns: [
-          { name: 'e3[E3](mom)', type: 'input', span: 5 }
+          { span: 1},
+          { name: 'e3[E3](mom)', type: 'input', span: 7 },
+          { span: 16}
         ]
       },
       {
         columns: [
-          { name: 'other_anomalies[其他异常]', type: 'input', span: 11 }
+          { span: 1},
+          { name: 'other_anomalies[其他异常]', type: 'input', span: 7 },
+          { span: 16}
         ]
       }
     ]
@@ -413,25 +474,27 @@ const config = {
       },
       {
         columns: [
-          { name: 'trisomy21[21三体风险]', type: 'input', span: 5 },
-          { span: 1 },
-          { name: 'trisomy18[18三体风险]', type: 'input', span: 5 },
-          { span: 1 },
-          { name: 'trisomy13[13三体风险]', type: 'input', span: 5 },
+          { span: 1},
+          { name: 'trisomy21[21三体风险]', type: 'input', span: 7 },
+          { name: 'trisomy18[18三体风险]', type: 'input', span: 7 },
+          { name: 'trisomy13[13三体风险]', type: 'input', span: 7 },
+          { span: 2}
         ]
       },
       {
         columns: [
-          { name: 'z21[21三体Z值]', type: 'input', span: 5 },
-          { span: 1 },
-          { name: 'z18[18三体Z值]', type: 'input', span: 5 },
-          { span: 1 },
-          { name: 'z13[13三体Z值]', type: 'input', span: 5 },
+          { span: 1},
+          { name: 'z21[21三体Z值]', type: 'input', span: 7 },
+          { name: 'z18[18三体Z值]', type: 'input', span: 7 },
+          { name: 'z13[13三体Z值]', type: 'input', span: 7 },
+          { sapn: 2}
         ]
       },
       {
         columns: [
-          { name: 'other_anomalies[其他异常]', type: 'input', span: 11 }
+          { span: 1},
+          { name: 'other_anomalies[其他异常]', type: 'input', span: 7 },
+          { span: 16}
         ]
       }
     ]
@@ -445,25 +508,40 @@ const config = {
           {label: '早孕超声:', span: 12}
         ]
       },
+      // TODO 
       {
-        columns:[{ name: 'menopause(周)[停经]', type: 'input', span: 4 },]
+        columns:[
+          { span: 1},
+          { name: 'menopause(周)[停经]', type: 'input', span: 7 },
+          { name: '(个)[孕囊]', type: 'input', span: 7 },
+          { name: '(个)[卵黄囊]', type: 'input', span: 7 },
+          { span: 2}
+        ]
       }
     ]
   }),
   ultrasound_fetus_config : () => ({
     step : 3,
     rows:[
-      {
-        columns:[
-          { name: 'crl(mm)[CRL]', type: 'input', span: 7 },
-          { name: 'crlweek(周)[如 孕]', type: 'input', span: 7 },
-          {span:2},
-          { name: 'nt(mm)[NT]', type: 'input', span: 7 },
+      { 
+        columns: [
+          { label: 'NT检查', span: 24}
         ]
       },
       {
         columns:[
-          { name: 'excdesc[异常结果描述]', type: 'input', span: 8 },
+          { span: 1},
+          { name: 'crl(mm)[CRL]', type: 'input', span: 7 },
+          { name: 'crlweek(周)[如 孕]', type: 'input', span: 7 },
+          { name: 'nt(mm)[NT]', type: 'input', span: 7 },
+          { span: 2}
+        ]
+      },
+      {
+        columns:[
+          { span: 1},
+          { name: 'excdesc[异常结果描述]', type: 'input', span: 7 },
+          { span: 16}
         ]
       }
     ]
@@ -474,7 +552,9 @@ const config = {
     rows:[
       {
         columns:[
-          { name: 'middle[中孕超声]', type: 'table', pagination: false, editable: true, options: baseData.BvColumns},
+          { span: 1},
+          { name: 'middle[中孕超声]', type: 'table', span: 21, pagination: false, editable: true, options: baseData.BvColumns},
+          { span: 2}
         ]
       },
     ]
@@ -488,8 +568,10 @@ const config = {
     rows: [
       {
         columns:[
+          { span: 1},
           { name: 'karyotype[染色体核型]', type: 'textarea', span: 16 },
-          { name:'[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr6'), valid: ""}
+          { name:'[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr6'), valid: ""},
+          { span: 3}
         ]
       }
     ]
@@ -504,8 +586,9 @@ const config = {
     rows: [
       {
         columns: [
-          {name: 'createdate[复诊日期]', type: 'date', span: 6},
-          {name: 'ckweek[孕周]', type: 'input', span: 6},
+          { span: 1},
+          {name: 'createdate[复诊日期]', type: 'date', span: 7},
+          {name: 'ckweek[孕周]', type: 'input', span: 7},
         ]
       }
     ]
@@ -516,6 +599,7 @@ const config = {
     rows: [
       {
         columns:[
+          { span: 1},
           { name: 'stateChange[病情变化]', type: 'textarea', span: 16 },
           { name:'stateChange[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr7'), valid: ""}
         ]
@@ -528,6 +612,7 @@ const config = {
     rows: [
       {
         columns:[
+          { span: 1},
           { name: 'lastResult[前次检查结果]', type: 'textarea', span: 16 },
           { name:'lastResult[]', type: 'buttons',span: 4, text: '(#1890ff)[模板]',onClick: () => openModal('dmr8'), valid: ""}
         ]

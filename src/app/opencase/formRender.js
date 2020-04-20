@@ -21,7 +21,7 @@ const formRenderConfig = {
         columns: [
           {name: 'username[姓名]', type: 'input', span: 6, valid: 'required'},
           {span: 1},
-          {name: 'useridno[证件类型]', type: [{type: 'select',options: IDCardOptions, valid: 'required', span: 10},{type:'input', span: 14, valid: 'required', placeholder: '请输入证件号码'}], span: 8, valid: ['required',(value) => validIDCard(value,true)]},
+          {name: 'useridno[证件类型]', type: [{type: 'select',options: IDCardOptions, valid: 'required', span:8},{type:'input', span: 16, valid: 'required', placeholder: '请输入证件号码'}], span: 8, valid: ['required',(value) => validIDCard(value,true)]},
           {span: 1},
           {name: 'userage[年龄]', type: 'input', span: 6, valid: 'required'},
         ]
@@ -58,7 +58,7 @@ const formRenderConfig = {
         columns: [
           {name: 'userhname[姓名]', type: 'input', span: 6},
           {span: 1},
-          {name: 'userhidno[证件类型]', type: [{type: 'select',options: IDCardOptions, span: 10, name: '0'},{type:'input', span: 14, name: '1', placeholder: '请输入证件号码'}], span: 8, valid: (value = {}) => validIDCard(value, false)},
+          {name: 'userhidno[证件类型]', type: [{type: 'select',options: IDCardOptions, span: 8, name: '0'},{type:'input', span: 16, name: '1', placeholder: '请输入证件号码'}], span: 8, valid: (value = {}) => validIDCard(value, false)},
           {span: 1},
           {name: 'userhage[年龄]', type: 'input', span: 6},
         ]

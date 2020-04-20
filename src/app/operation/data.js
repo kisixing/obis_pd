@@ -675,8 +675,16 @@ export const iumOption = toOptions('有(右)(input),无');
 /**
  * 是否出血 （含特殊输入框）
  */
+// export const wbOptions = [
+//   {
+//     label: "有(select)", value: "有(select)", 
+//     options: [
+//       {label: "+", value: "+"},
+//       {label: "++", value: "++"}
+//     ]
+//   }
+// ];
 export const wbOptions = toOptions('有(whetherbleedingselect),无');
-
 /**
  *乳头
  */
